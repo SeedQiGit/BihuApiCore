@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj" />
+    <ProjectReference Include="..\BihuApiCore.Model\BihuApiCore.Model.csproj" />
+  </ItemGroup>
+
 </Project>

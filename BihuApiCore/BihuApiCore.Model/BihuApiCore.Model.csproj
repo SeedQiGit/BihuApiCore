@@ -10,4 +10,8 @@
     <Folder Include="Dto\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
