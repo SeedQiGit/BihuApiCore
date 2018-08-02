@@ -10,6 +10,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BihuApiCore.EntityFrameworkCore\BihuApiCore.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj" />
+    <ProjectReference Include="..\BihuApiCore.Model\BihuApiCore.Model.csproj" />
+    <ProjectReference Include="..\BihuApiCore.Repository\BihuApiCore.Repository.csproj" />
+    <ProjectReference Include="..\BihuApiCore.Service\BihuApiCore.Service.csproj" />
   </ItemGroup>
 
 </Project>
