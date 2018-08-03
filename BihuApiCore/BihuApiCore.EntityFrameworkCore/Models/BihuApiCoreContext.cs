@@ -8,11 +8,13 @@ namespace BihuApiCore.EntityFrameworkCore.Models
     {
         public BihuApiCoreContext()
         {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public BihuApiCoreContext(DbContextOptions<BihuApiCoreContext> options)
             : base(options)
         {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public virtual DbSet<User> User { get; set; }
