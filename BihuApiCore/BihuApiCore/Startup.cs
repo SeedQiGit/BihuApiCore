@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Repository.IRepository;
+using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +31,19 @@ namespace BihuApiCore
         {
             services.AddDbContext<BihuApiCoreContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            #region 依赖注入仓储和service
+
+            services.RegisterAssembly("BihuApiCore.Service", Lifecycle.Scoped);
+
+            services.RegisterAssembly("BihuApiCore.Repository", Lifecycle.Scoped);
+            services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
+            services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
+            services.AddScoped<DbContext,BihuApiCoreContext>();
+
+            #endregion
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

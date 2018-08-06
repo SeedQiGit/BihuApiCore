@@ -5,8 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BihuApiCore.EntityFrameworkCore\BihuApiCore.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj" />
     <ProjectReference Include="..\BihuApiCore.Model\BihuApiCore.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore\2.1.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
