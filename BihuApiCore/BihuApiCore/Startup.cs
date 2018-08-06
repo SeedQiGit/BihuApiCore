@@ -32,13 +32,13 @@ namespace BihuApiCore
             services.AddDbContext<BihuApiCoreContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            #region 依赖注入仓储和service
+            #region 依赖注入仓储和service及上下文等
 
             services.RegisterAssembly("BihuApiCore.Service", Lifecycle.Scoped);
 
             services.RegisterAssembly("BihuApiCore.Repository", Lifecycle.Scoped);
             services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
-            services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
+         
             services.AddScoped<DbContext,BihuApiCoreContext>();
 
             #endregion

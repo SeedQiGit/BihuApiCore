@@ -11,9 +11,12 @@ namespace BihuApiCore.Controllers
 {
     public class UserController : BaseController
     {
+
+
         [HttpGet]
         public BaseResponse Test()
         {
+
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
         }
 
