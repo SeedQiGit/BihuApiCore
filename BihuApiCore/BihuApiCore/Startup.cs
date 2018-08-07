@@ -6,6 +6,7 @@ using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Middlewares;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -58,7 +59,8 @@ namespace BihuApiCore
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            //异常处理中间件
+            app.UseExceptionHandling();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

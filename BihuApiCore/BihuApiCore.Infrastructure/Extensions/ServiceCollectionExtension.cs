@@ -150,6 +150,7 @@ namespace BihuApiCore.Infrastructure.Extensions
             var list = new List<Assembly>();
             var deps = DependencyContext.Default;
             var libs = deps.CompileLibraries.Where(lib => !lib.Serviceable && lib.Type != "package");//排除所有的系统程序集、Nuget下载包
+
             foreach (var lib in libs)
             {
                 try
