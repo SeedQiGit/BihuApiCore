@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NLog.Extensions.Logging;
 
 namespace BihuApiCore
 {
@@ -47,8 +48,9 @@ namespace BihuApiCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddNLog();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,7 +60,7 @@ namespace BihuApiCore
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "api/{controller=Home}/{action=Index}/{id?}");
+                    template: "api/{controller=User}/{action=Test}/{id?}");
             });
             //app.UseMvc(); 
         }
