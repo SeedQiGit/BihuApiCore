@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Extensions;
@@ -45,6 +46,7 @@ namespace BihuApiCore
 
             #endregion
 
+            services.AddAutoMapper();
 
         }
 

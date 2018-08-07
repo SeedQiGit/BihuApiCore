@@ -1,4 +1,6 @@
-﻿using BihuApiCore.EntityFrameworkCore.Models;
+﻿using AutoMapper;
+using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
@@ -13,9 +15,12 @@ namespace BihuApiCore.Service.Implementations
     public class UserService: IUserService
     {
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private readonly IMapper _mapper;
+
+        public UserService(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         public BaseResponse Test()
@@ -25,7 +30,8 @@ namespace BihuApiCore.Service.Implementations
             {
                 return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "发起请求的用户不存在");
             }
-            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userThis);
+            UserDto userDto = _mapper.Map<UserDto>(userThis);
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
         }
         public async Task<BaseResponse> TestAsy()
         {
@@ -34,7 +40,8 @@ namespace BihuApiCore.Service.Implementations
             {
                 return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "发起请求的用户不存在");
             }
-            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userThis);
+            UserDto userDto = _mapper.Map<UserDto>(userThis);
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
         }
     }
 }
