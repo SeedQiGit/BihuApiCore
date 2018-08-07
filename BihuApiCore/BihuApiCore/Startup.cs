@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Extensions;
 using BihuApiCore.Repository.IRepository;
@@ -30,7 +31,7 @@ namespace BihuApiCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<BihuApiCoreContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
+            services.AddDbContext<EntityContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             #region 依赖注入仓储和service及上下文等
@@ -40,7 +41,7 @@ namespace BihuApiCore
             services.RegisterAssembly("BihuApiCore.Repository", Lifecycle.Scoped);
             services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
          
-            services.AddScoped<DbContext,BihuApiCoreContext>();
+            services.AddScoped<DbContext, EntityContext>();
 
             #endregion
 
