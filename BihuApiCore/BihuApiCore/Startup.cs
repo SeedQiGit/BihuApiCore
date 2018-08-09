@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Extensions;
 using BihuApiCore.Middlewares;
 using BihuApiCore.Repository.IRepository;
@@ -46,6 +47,16 @@ namespace BihuApiCore
             services.AddScoped<DbContext, EntityContext>();
 
             #endregion
+
+            services.AddMvc(opt =>
+            {
+                ///模型验证过滤器，order:数字越小的越先执行
+                opt.Filters.Add(typeof(ModelVerifyFilterAttribute), 1);
+
+            }).AddJsonOptions(options =>
+            {
+                options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+            });
 
             services.AddAutoMapper();
 

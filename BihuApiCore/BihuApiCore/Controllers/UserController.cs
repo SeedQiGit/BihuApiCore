@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BihuApiCore.Filters;
 using BihuApiCore.Model.Enums;
+using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -35,11 +37,12 @@ namespace BihuApiCore.Controllers
             //return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }
 
-        //[HttpGet]
-        //public async Task<BaseResponse> FriendView([FromBody] FriendRequest request)
-        //{
-        //    return await _friendService.FriendView(request);
-        //}
+        [HttpPost]
+        [ModelVerifyFilter]
+        public async Task<BaseResponse> TestPost([FromBody] BaseRequest request)
+        {
+            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
+        }
 
 
     }
