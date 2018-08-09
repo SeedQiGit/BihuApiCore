@@ -45,11 +45,11 @@ namespace BihuApiCore.Filters
                     return;
                 }
             }
-            else
-            {
-                context.Result = GenerateJsonResult("参数不能为空");
-                return;
-            }
+            //else
+            //{
+            //    context.Result = GenerateJsonResult("参数不能为空");
+            //    return;
+            //}
         }
 
     }
