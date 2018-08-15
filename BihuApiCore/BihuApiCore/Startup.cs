@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace BihuApiCore
 {
@@ -35,6 +37,13 @@ namespace BihuApiCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<EntityContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
+            services.AddSwaggerGen(c =>
+            {
+                //配置第一个Doc
+                c.SwaggerDoc("v1", new Info { Title = "My API_1", Version = "v1" });
+                c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BihuApiCore.xml"));
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             #region 依赖注入仓储和service及上下文等
@@ -70,6 +79,14 @@ namespace BihuApiCore
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = "swagger";
+            });
+            app.UseSwagger();
+
             //异常处理中间件
             app.UseExceptionHandling();
             app.UseMvc(routes =>
