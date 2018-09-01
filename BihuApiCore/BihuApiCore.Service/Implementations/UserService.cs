@@ -32,6 +32,7 @@ namespace BihuApiCore.Service.Implementations
         public BaseResponse Test()
         {
             _logger.LogInformation("开始执行");
+            _logger.LogError("测试错误");
             User userThis = _userRepository.FirstOrDefault(c=>c.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
@@ -39,6 +40,7 @@ namespace BihuApiCore.Service.Implementations
         public async Task<BaseResponse> TestAsy()
         {
             _logger.LogInformation("开始执行");
+            _logger.LogError("测试错误");
             User userThis = await  _userRepository.FirstOrDefaultAsync(c => c.Id == 1);
             if (userThis == null)
             {
