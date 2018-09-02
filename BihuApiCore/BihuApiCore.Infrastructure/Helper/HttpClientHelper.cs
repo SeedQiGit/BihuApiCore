@@ -9,6 +9,19 @@ namespace BihuApiCore.Infrastructure.Helper
     {
         //私用的静态变量应该是线程安全的，静态方法也是线程安全的。
         private static HttpClient _client;
+
+        //static HttpClientHelper()
+        //{
+        //    _client = new HttpClient() { BaseAddress = new Uri(BASE_ADDRESS) };
+
+        //    //帮HttpClient热身
+        //    _client.SendAsync(new HttpRequestMessage
+        //    {
+        //        Method = new HttpMethod("HEAD"),
+        //        RequestUri = new Uri(BASE_ADDRESS + "/")
+        //    }) .Result.EnsureSuccessStatusCode();
+        //}
+
         public static HttpClient GetClient()
         {
             try
@@ -16,10 +29,11 @@ namespace BihuApiCore.Infrastructure.Helper
                 if (_client == null)
                 {
                     _client = new HttpClient();
-                    _client.Timeout = TimeSpan.FromSeconds(360);//设置默认200s
+                    _client.Timeout = TimeSpan.FromSeconds(200);//设置默认200s
                     _client.DefaultRequestHeaders.Connection.Add("keep-alive");
-                    _client.DefaultRequestHeaders.Add("UserAgent", "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727)");
+                    // 清除头部信息
                     _client.DefaultRequestHeaders.Connection.Clear();
+                    // 
                     _client.DefaultRequestHeaders.ConnectionClose = false;
                     return _client;
                 }

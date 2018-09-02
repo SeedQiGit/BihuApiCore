@@ -9,6 +9,7 @@ using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Extensions;
 using BihuApiCore.Middlewares;
+using BihuApiCore.Model.Model;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -50,7 +51,6 @@ namespace BihuApiCore
             });
             services.AddCors(options =>
             {
-
                 options.AddPolicy("AllowSpecificOrigin",
                     builder => builder
                     //. WithOrigins(allowOriginArr)
@@ -87,7 +87,13 @@ namespace BihuApiCore
             });
 
             services.AddAutoMapper();
+            #region 配置
 
+            //获取api地址
+            services.Configure<UrlModel>(Configuration.GetSection("UrlModel"));
+
+           
+            #endregion
         }
 
         /// <summary>

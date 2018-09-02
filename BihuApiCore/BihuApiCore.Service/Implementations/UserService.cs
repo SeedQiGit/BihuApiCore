@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
+using BihuApiCore.Model.Model;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,34 +25,41 @@ namespace BihuApiCore.Service.Implementations
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
+        private UrlModel _urlModel;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IProductRepository productRepository, ILogger<UserService> logger)
+        public UserService(IUserRepository userRepository, IMapper mapper, IProductRepository productRepository, ILogger<UserService> logger,IOptions<UrlModel> option)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _productRepository = productRepository;
             _logger = logger;
+            _urlModel = option.Value;
         }
 
         public BaseResponse Test()
         {
-            _logger.LogInformation("开始执行");
-            _logger.LogError("测试错误");
-            User userThis = _userRepository.FirstOrDefault(c=>c.Id==1);
+
+         
+            User userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
         }
         public async Task<BaseResponse> TestAsy()
         {
-            _logger.LogInformation("开始执行");
-            _logger.LogError("测试错误");
-            User userThis = await  _userRepository.FirstOrDefaultAsync(c => c.Id == 1);
-            if (userThis == null)
-            {
-                return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "发起请求的用户不存在");
-            }
-            UserDto userDto = _mapper.Map<UserDto>(userThis);
-            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
+            //User userThis = await  _userRepository.FirstOrDefaultAsync(c => c.Id == 1);
+            //if (userThis == null)
+            //{
+            //    return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "发起请求的用户不存在");
+            //}
+            //UserDto userDto = _mapper.Map<UserDto>(userThis);
+            //return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
+
+            
+            string a  = "{ 'UserAccount':'lilin1','UserPassWord':'123456','FromMethod':1,}";
+            string url = $"{_urlModel.BihuApi}/api/User/UserLogin";
+            string result = await HttpWebAsk.HttpClientPostAsync(a, url);
+           
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, result);
         }
     }
 }
