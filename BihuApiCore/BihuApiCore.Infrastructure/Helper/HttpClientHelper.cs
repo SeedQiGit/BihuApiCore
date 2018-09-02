@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BihuApiCore.Infrastructure.Configuration;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -10,18 +12,17 @@ namespace BihuApiCore.Infrastructure.Helper
         //私用的静态变量应该是线程安全的，静态方法也是线程安全的。
         private static HttpClient _client;
 
-        //static HttpClientHelper()
-        //{
-        //    _client = new HttpClient() { BaseAddress = new Uri(BASE_ADDRESS) };
-
-        //    //帮HttpClient热身
-        //    _client.SendAsync(new HttpRequestMessage
-        //    {
-        //        Method = new HttpMethod("HEAD"),
-        //        RequestUri = new Uri(BASE_ADDRESS + "/")
-        //    }) .Result.EnsureSuccessStatusCode();
-        //}
-
+        public static void WarmUpClient()
+        {
+            var urlModel = ConfigurationManager.GetValue<string>("UrlModel:BihuApi");
+            var client = GetClient();
+            client.SendAsync(new HttpRequestMessage
+            {
+                //此方法被用来获取请求实体的元信息而不需要传输实体主体（entity-body）。此方法经常被用来测试超文本链接的有效性，可访问性，和最近的改变。
+                Method = new HttpMethod("HEAD"),
+                RequestUri = new Uri(urlModel + "/api/Message/MessageExistById")
+            }).Wait();
+        }
         public static HttpClient GetClient()
         {
             try

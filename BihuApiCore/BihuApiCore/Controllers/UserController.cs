@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BihuApiCore.Filters;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;

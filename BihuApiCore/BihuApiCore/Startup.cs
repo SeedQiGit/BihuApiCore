@@ -7,9 +7,10 @@ using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Filters;
+using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Middlewares;
-using BihuApiCore.Model.Model;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -28,9 +29,14 @@ namespace BihuApiCore
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(env.ContentRootPath)
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+               .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+               .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -131,6 +137,8 @@ namespace BihuApiCore
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
             //app.UseMvc(); 
+
+            HttpClientHelper.WarmUpClient();
         }
     }
 }
