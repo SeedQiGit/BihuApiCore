@@ -13,7 +13,6 @@ namespace BihuApiCore.Infrastructure.Helper
 {
     public class HttpWebAsk
     {
- 
         public static async Task<string> HttpClientPostAsync(string postData, string url)
         {
             var client = HttpClientHelper.GetClient();

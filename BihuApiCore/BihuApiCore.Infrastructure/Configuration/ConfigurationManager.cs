@@ -8,7 +8,6 @@ using System.Text;
 namespace BihuApiCore.Infrastructure.Configuration
 {
     /// <summary>
-    /// ConfigurationManager的第二个版本
     /// 可以读取环境变量
     /// </summary>
     public static class ConfigurationManager
