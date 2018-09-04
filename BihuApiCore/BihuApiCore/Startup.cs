@@ -87,7 +87,7 @@ namespace BihuApiCore
                 //模型验证过滤器，order:数字越小的越先执行
                 opt.Filters.Add(typeof(ModelVerifyFilterAttribute), 1);
                 //日志记录，全局使用
-                opt.Filters.Add(typeof(LogAttribute));
+                opt.Filters.Add(new LogAttribute());
             }).AddJsonOptions(options =>
             {
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
