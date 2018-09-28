@@ -16,7 +16,7 @@ namespace BihuApiCore.Infrastructure.Helper
             client.SendAsync(new HttpRequestMessage
             {
                 //此方法被用来获取请求实体的元信息而不需要传输实体主体（entity-body）。此方法经常被用来测试超文本链接的有效性，可访问性，和最近的改变。
-                Method = new HttpMethod("HEAD"),
+                Method = new HttpMethod("Get"),
                 RequestUri = new Uri(urlModel + "/api/Message/MessageExistById")
             }).Wait();
         }
