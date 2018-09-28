@@ -56,7 +56,7 @@ namespace BihuApiCore.Controllers
         [ModelVerifyFilter]
         public async Task<BaseResponse> TestPost([FromBody] BaseRequest request)
         {
-            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
+            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.Ok); });
         }
 
 

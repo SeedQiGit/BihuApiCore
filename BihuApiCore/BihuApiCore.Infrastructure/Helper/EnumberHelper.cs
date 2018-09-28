@@ -16,10 +16,10 @@ namespace BihuApiCore.Infrastructure.Helper
         public static string GetEnumDescription(Enum enumValue)
         {
             string str = enumValue.ToString();
-            System.Reflection.FieldInfo field = enumValue.GetType().GetField(str);
-            object[] objs = field.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
+            FieldInfo field = enumValue.GetType().GetField(str);
+            object[] objs = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
             if (objs.Length == 0) return str;
-            System.ComponentModel.DescriptionAttribute da = (System.ComponentModel.DescriptionAttribute)objs[0];
+            DescriptionAttribute da = (DescriptionAttribute)objs[0];
             return da.Description;
         }
 
@@ -33,13 +33,12 @@ namespace BihuApiCore.Infrastructure.Helper
             Dictionary<string, string> dic = new Dictionary<string, string>();
             Type typeDescription = typeof(DescriptionAttribute);
             FieldInfo[] fields = enumType.GetFields();
-            string strText = string.Empty;
-            string strValue = string.Empty;
             foreach (FieldInfo field in fields)
             {
                 if (field.FieldType.IsEnum)
                 {
-                    strValue = ((int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null)).ToString();
+                    string strText;
+                    var strValue = ((int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null)).ToString();
                     object[] arr = field.GetCustomAttributes(typeDescription, true);
                     if (arr.Length > 0)
                     {
@@ -65,14 +64,11 @@ namespace BihuApiCore.Infrastructure.Helper
         {
             Type type = en.GetType();
             MemberInfo[] memInfo = type.GetMember(en.ToString());
-            if (memInfo != null && memInfo.Length > 0)
-            {
-                object[] attrs = memInfo[0].GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
-                if (attrs != null && attrs.Length > 0)
-                    return ((DescriptionAttribute)attrs[0]).Description;
-            }
+            if (memInfo == null || memInfo.Length <= 0) return en.ToString();
+            object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+            if (attrs != null && attrs.Length > 0)
+                return ((DescriptionAttribute)attrs[0]).Description;
             return en.ToString();
         }
-
     }
 }

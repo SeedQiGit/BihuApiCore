@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BihuApiCore.Infrastructure.Helper
 {
@@ -34,7 +32,6 @@ namespace BihuApiCore.Infrastructure.Helper
         }
         public static void Trace(string msg)
         {
-            //ExceptionlessClient.Default.CreateLog(msg).Submit();
             _logger.LogTrace(msg);
         }
 

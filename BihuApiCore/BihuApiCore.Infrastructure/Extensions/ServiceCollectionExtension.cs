@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
-using Microsoft.Extensions.DependencyModel;
 
 namespace BihuApiCore.Infrastructure.Extensions
 {
