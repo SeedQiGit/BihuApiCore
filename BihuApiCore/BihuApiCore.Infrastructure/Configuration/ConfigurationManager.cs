@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace BihuApiCore.Infrastructure.Configuration
 {
@@ -9,7 +11,7 @@ namespace BihuApiCore.Infrastructure.Configuration
     /// </summary>
     public static class ConfigurationManager
     {
-        static IConfiguration Configuration;
+        private static IConfiguration Configuration;
         static ConfigurationManager()
         {
             var provider = new EnvironmentVariablesConfigurationProvider();
@@ -22,6 +24,17 @@ namespace BihuApiCore.Infrastructure.Configuration
             .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables();
             Configuration = builder.Build();
+        }
+
+        public static T GetAppSettings<T>(string key) where T : class, new()
+        {
+            var appconfig = new ServiceCollection()
+                .AddOptions()
+                .Configure<T>(Configuration.GetSection(key))
+                .BuildServiceProvider()
+                .GetService<IOptions<T>>()
+                .Value;
+            return appconfig;
         }
 
         /// <summary>

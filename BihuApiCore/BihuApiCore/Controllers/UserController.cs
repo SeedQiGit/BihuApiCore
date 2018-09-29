@@ -28,7 +28,7 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("Test")]
+        //[Route("Test")]
         [ProducesResponseType(typeof(UserDto), 1)]
         public BaseResponse Test()
         {
@@ -39,7 +39,7 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("TestAsy")]
+        //[Route("TestAsy")]
         public async Task<BaseResponse> TestAsy()
         {
             return await _userService.TestAsy();

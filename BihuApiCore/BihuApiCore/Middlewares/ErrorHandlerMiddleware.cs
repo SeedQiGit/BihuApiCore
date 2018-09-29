@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Helper;
 
 namespace BihuApiCore.Middlewares
 {
@@ -55,9 +56,12 @@ namespace BihuApiCore.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception ex, string body)
         {
             WriteErrorLog(context, ex, body);
+            Stream stream = context.Items["Stream"] as Stream;
+            context.Response.Body = stream;
             var data = BaseResponse.GetBaseResponse(BusinessStatusType.Error);
             var result = JsonConvert.SerializeObject(data);
             context.Response.ContentType = "application/json;charset=utf-8";
+            LogHelper.Info(context.Items["LogString"] + Environment.NewLine + "请求返回值：请求出现异常");
             return context.Response.WriteAsync(result);
         }
 

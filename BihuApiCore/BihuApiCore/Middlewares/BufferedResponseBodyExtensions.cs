@@ -14,6 +14,7 @@ namespace BihuApiCore.Middlewares
                 using (var ms = new MemoryStream())
                 {
                     var orgBodyStream = context.Response.Body;
+                    context.Items["Stream"] = orgBodyStream;
                     context.Response.Body = ms;
 
                     await next();//there is running MVC

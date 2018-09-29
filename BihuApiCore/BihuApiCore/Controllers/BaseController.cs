@@ -2,8 +2,8 @@
 
 namespace BihuApiCore.Controllers
 {
-    [Route("api/[controller]")]
-    public class BaseController : Controller
+    //[Route("api/[controller]")]
+    public class BaseController : ControllerBase
     {
     }
 }
