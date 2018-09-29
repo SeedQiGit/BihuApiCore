@@ -41,7 +41,7 @@ namespace BihuApiCore.Service.Implementations
 
             User userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
-            return BaseResponse.GetBaseResponse(BusinessStatusType.Ok, userDto);
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
         }
 
         public async Task<BaseResponse> TestAsy()
@@ -58,7 +58,7 @@ namespace BihuApiCore.Service.Implementations
             string url = $"{_urlModel.BihuApi}/api/Message/MessageExistById";
             string result = await HttpWebAsk.HttpClientPostAsync(a, url);
            
-            return BaseResponse.GetBaseResponse(BusinessStatusType.Ok, result);
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, result);
         }
     }
 }

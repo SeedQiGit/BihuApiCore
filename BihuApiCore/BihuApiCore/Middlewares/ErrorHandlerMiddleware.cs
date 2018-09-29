@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,9 +54,7 @@ namespace BihuApiCore.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception ex, string body)
         {
-            string errorMsg = ex.Source + "\n" + ex.StackTrace + "\n" + ex.Message + "\n" + ex.InnerException;
             WriteErrorLog(context, ex, body);
-            PathString path = context.Request.Path;
             var data = BaseResponse.GetBaseResponse(BusinessStatusType.Error);
             var result = JsonConvert.SerializeObject(data);
             context.Response.ContentType = "application/json;charset=utf-8";

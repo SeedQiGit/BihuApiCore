@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
-using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Extensions;
@@ -21,9 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.IO;
 
 namespace BihuApiCore
 {

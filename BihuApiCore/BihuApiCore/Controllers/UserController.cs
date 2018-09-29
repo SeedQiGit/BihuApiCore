@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BihuApiCore.Filters;
-using BihuApiCore.Infrastructure.Helper;
+﻿using BihuApiCore.Filters;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
+using System.Threading.Tasks;
 
 namespace BihuApiCore.Controllers
 {
@@ -56,7 +50,7 @@ namespace BihuApiCore.Controllers
         [ModelVerifyFilter]
         public async Task<BaseResponse> TestPost([FromBody] BaseRequest request)
         {
-            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.Ok); });
+            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }
 
 

@@ -1,18 +1,13 @@
-﻿using BihuApiCore.Infrastructure.Helper;
-using Microsoft.AspNetCore.Http.Internal;
+﻿using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BihuApiCore.Filters
 {
+
     /// <summary>
     /// 全局日志记录
     /// </summary>
@@ -21,7 +16,7 @@ namespace BihuApiCore.Filters
         #region 构造函数及属性
 
         //定时器的固定key
-        private const string timeKey = "__action_duration__";
+        private const string TimeKey = "__action_duration__";
 
         #endregion
 
@@ -29,19 +24,18 @@ namespace BihuApiCore.Filters
         {
 
             var stopWatch = new Stopwatch();
-            actionContext.HttpContext.Items[timeKey] = stopWatch;
+            actionContext.HttpContext.Items[TimeKey] = stopWatch;
             stopWatch.Start();
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             StringBuilder msgSb = new StringBuilder();
-           
+
             // 请求标识 请求地址  请求参数
             var requestUri = context.HttpContext.Request.Host.ToString() + context.HttpContext.Request.Path.ToString() + context.HttpContext.Request.QueryString.Value;
-            var requestArguments = string.Empty;
             msgSb.Append("请求地址：" + requestUri + Environment.NewLine);
-            
+
             if (context.HttpContext.Request.Method.ToUpper() == "Post")
             {
                 var contentLength = context.HttpContext.Request.ContentLength;
@@ -60,8 +54,8 @@ namespace BihuApiCore.Filters
                     }
                 }
             }
-
-            var stopWatch = context.HttpContext.Items[timeKey] as Stopwatch;
+            //as 的效率更高，is要两次转换
+            var stopWatch = context.HttpContext.Items[TimeKey] as Stopwatch;
             if (stopWatch != null)
             {
                 stopWatch.Stop();
@@ -69,6 +63,5 @@ namespace BihuApiCore.Filters
             }
             context.HttpContext.Items["LogString"] = msgSb.ToString();
         }
-
     }
 }
