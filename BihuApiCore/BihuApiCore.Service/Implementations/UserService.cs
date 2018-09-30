@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,8 +39,13 @@ namespace BihuApiCore.Service.Implementations
 
         public BaseResponse Test()
         {
+            User userThis;
+            using (EntityContext ef = new EntityContext())
+            {
+                userThis = ef.User.FirstOrDefault(w => w.Id == 1);
+            }
 
-            User userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
+            //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
         }

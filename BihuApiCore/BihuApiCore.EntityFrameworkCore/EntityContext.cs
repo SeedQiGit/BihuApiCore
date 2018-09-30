@@ -1,28 +1,31 @@
 ﻿using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.EntityFrameworkCore
 {
     public class EntityContext:DbContext
     {
-        //public EntityContext()
-        //{
-        //}
-
+        //异步方法使用
+        public EntityContext()
+        {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+        //这两种构造函数，一个是依赖注入，一个是手动新增用的，我这种理解对不？？
         public EntityContext(DbContextOptions<EntityContext> options) : base(options)
         {
             Database.EnsureCreated();
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        //如果要使用无参数去创建上下文，这个地方就需要显示配置出来。
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=123456;Database= bihu_apicore;sslmode=none;");
-        //    }
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var conStr = ConfigurationManager.GetValue("ConnectionStrings:EntityContext");
+                optionsBuilder.UseMySql(conStr);
+            }
+        }
 
         public DbSet<User> User { get; set; }
         public DbSet<Product> Product { get; set; }

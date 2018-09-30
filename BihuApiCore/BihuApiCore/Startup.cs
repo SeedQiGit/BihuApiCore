@@ -89,12 +89,13 @@ namespace BihuApiCore
             });
 
             services.AddAutoMapper();
+
             #region 配置
 
             //获取api地址
             services.Configure<UrlModel>(Configuration.GetSection("UrlModel"));
+            //上面语句类似于 services.AddSingleton<UrlModel>(Configuration.GetSection("UrlModel"));
 
-           
             #endregion
         }
 
