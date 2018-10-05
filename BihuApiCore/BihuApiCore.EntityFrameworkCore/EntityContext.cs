@@ -14,7 +14,7 @@ namespace BihuApiCore.EntityFrameworkCore
         //这两种构造函数，一个是依赖注入，一个是手动新增用的，我这种理解对不？？
         public EntityContext(DbContextOptions<EntityContext> options) : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
