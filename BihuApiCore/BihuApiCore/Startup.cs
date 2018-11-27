@@ -19,6 +19,7 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
+using BihuApiCore.EntityFrameworkCore.Models;
 
 namespace BihuApiCore
 {
@@ -71,7 +72,7 @@ namespace BihuApiCore
             services.RegisterAssembly("BihuApiCore.Repository", Lifecycle.Scoped);
             services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
          
-            services.AddScoped<DbContext, EntityContext>();
+            services.AddScoped<DbContext, bihu_apicoreContext>();
 
             #endregion
 
