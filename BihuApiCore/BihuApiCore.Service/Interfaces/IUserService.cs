@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using BihuApiCore.Model.Request;
 
 namespace BihuApiCore.Service.Interfaces
 {
@@ -10,5 +11,6 @@ namespace BihuApiCore.Service.Interfaces
     {
         BaseResponse Test();
         Task<BaseResponse> TestAsy();
+        Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request);
     }
 }

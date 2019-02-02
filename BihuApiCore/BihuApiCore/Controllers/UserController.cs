@@ -46,13 +46,17 @@ namespace BihuApiCore.Controllers
             //return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }
 
-        [HttpPost("TestPost")]
+        [HttpPost]
         [ModelVerifyFilter]
         public async Task<BaseResponse> TestPost([FromBody] BaseRequest request)
         {
             return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }
 
-
+        [HttpPost]
+        public async Task<BaseResponse> AddUserByAccount([FromBody] AddUserByAccountRequest request)
+        {
+            return await _userService.AddUserByAccount(request);
+        }
     }
 }

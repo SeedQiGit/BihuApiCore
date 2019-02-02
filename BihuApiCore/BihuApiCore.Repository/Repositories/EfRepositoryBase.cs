@@ -10,7 +10,8 @@ namespace BihuApiCore.Repository.Repositories
 {
     public class EfRepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
     {
-        protected DbContext Context;
+        
+        public DbContext Context { get; set; }
 
         public EfRepositoryBase(DbContext context)
         {

@@ -11,6 +11,7 @@ namespace BihuApiCore.Repository.IRepository
     {
         #region GetDbContext
 
+        DbContext Context { get; set; }
         /// <summary>
         /// 获取Context
         /// </summary>

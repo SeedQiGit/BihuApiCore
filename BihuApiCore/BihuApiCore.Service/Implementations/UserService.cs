@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AutoMapper;
 using BihuApiCore.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Threading.Tasks;
+using BihuApiCore.Model.Request;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -28,6 +30,9 @@ namespace BihuApiCore.Service.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
         private UrlModel _urlModel;
+
+        private  static ConcurrentDictionary<string,string> _strDic=new ConcurrentDictionary<string, string>();
+
 
         public UserService(IUserRepository userRepository, IMapper mapper, IProductRepository productRepository, ILogger<UserService> logger,IOptions<UrlModel> option,IDataExcelRepository dataExcelRepository, IZsPiccCallRepository zsPiccCallRepository)
         {
@@ -79,21 +84,38 @@ namespace BihuApiCore.Service.Implementations
 
             _zsPiccCallRepository.SaveChanges();
 
-
-
-
-
-
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
-
-
-
-
-
 
             //string a  = "{ 'UserId':'10'}";
             //string url = $"{_urlModel.BihuApi}/api/Message/MessageExistById";
             //string result = await HttpWebAsk.HttpClientPostAsync(a, url);
         }
+
+
+        public async Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request)
+        {
+            var userExist =await _userRepository.FirstOrDefaultAsync(c => c.UserAccount == request.Account);
+            if (userExist==null)
+            {
+                LogHelper.Info("新增账户：" + request.Account);
+                User user=new User
+                {
+                    UserName="asd",
+                    UserPassWord="123123",
+                    CertificateNo="123131",
+                    Mobile=13313331333,
+                    IsVerify=1
+                };
+
+                user.UserAccount = request.Account;
+
+                _userRepository.Insert(user);
+                _userRepository.SaveChanges();
+            }
+
+
+            return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
+        }
+
     }
 }
