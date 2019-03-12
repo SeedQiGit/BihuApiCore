@@ -136,8 +136,7 @@ namespace BihuApiCore
             });
           
             //app.UseMvc(); 
-
-            HttpClientHelper.WarmUpClient();
+            //HttpClientHelper.WarmUpClient();
         }
     }
 }

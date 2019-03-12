@@ -100,6 +100,7 @@ namespace BihuApiCore.Service.Implementations
             //成功写入
             if (_strDic.TryAdd(request.Account,request.Account))
             {
+                LogHelper.Info("成功写入");
                 var userExist =await _userRepository.FirstOrDefaultAsync(c => c.UserAccount == request.Account);
                 if (userExist==null)
                 {
@@ -117,7 +118,13 @@ namespace BihuApiCore.Service.Implementations
 
                     _userRepository.Insert(user);
                     _userRepository.SaveChanges();
-                } 
+                }
+                string res;
+                if (_strDic.TryRemove(request.Account, out res))
+                {
+                    LogHelper.Info("去除成功");
+                }
+
                 return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
             }
             //尝试竞争线程，写入失败
