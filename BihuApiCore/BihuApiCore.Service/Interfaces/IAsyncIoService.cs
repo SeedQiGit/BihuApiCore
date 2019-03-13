@@ -7,5 +7,7 @@ namespace BihuApiCore.Service.Interfaces
     {
         BaseResponse SyncIoExcel();
         Task<BaseResponse> AsyncIoExcel();
+        Task<BaseResponse> AsyncIoExcelWeb();
+        Task<BaseResponse> AsyncIoExcelFile();
     }
 }
