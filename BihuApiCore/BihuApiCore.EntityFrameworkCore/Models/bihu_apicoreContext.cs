@@ -8,18 +8,18 @@ namespace BihuApiCore.EntityFrameworkCore.Models
     {
         public bihu_apicoreContext()
         {
-            
         }
 
         public bihu_apicoreContext(DbContextOptions<bihu_apicoreContext> options)
             : base(options)
         {
-            
         }
 
         public virtual DbSet<DataExcel> DataExcel { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<UserConfig> UserConfig { get; set; }
+        public virtual DbSet<UserExtent> UserExtent { get; set; }
         public virtual DbSet<ZsPiccCall> ZsPiccCall { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -94,7 +94,9 @@ namespace BihuApiCore.EntityFrameworkCore.Models
                     .IsRequired()
                     .HasColumnType("varchar(20)");
 
-                entity.Property(e => e.CreateTime).HasColumnType("datetime");
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'");
 
                 entity.Property(e => e.IsVerify)
                     .HasColumnType("int(4)")
@@ -102,7 +104,10 @@ namespace BihuApiCore.EntityFrameworkCore.Models
 
                 entity.Property(e => e.Mobile).HasColumnType("bigint(20)");
 
-                entity.Property(e => e.UpdateTime).HasColumnType("datetime");
+                entity.Property(e => e.UpdateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
+                    .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.UserAccount)
                     .IsRequired()
@@ -113,6 +118,60 @@ namespace BihuApiCore.EntityFrameworkCore.Models
                     .HasColumnType("varchar(30)");
 
                 entity.Property(e => e.UserPassWord)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+            });
+
+            modelBuilder.Entity<UserConfig>(entity =>
+            {
+                entity.ToTable("user_config");
+
+                entity.HasIndex(e => e.UserId)
+                    .HasName("idx_userId");
+
+                entity.Property(e => e.Id).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'");
+
+                entity.Property(e => e.UpdateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.UserGrade).HasColumnType("int(5)");
+
+                entity.Property(e => e.UserId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.UserLevel).HasColumnType("int(5)");
+            });
+
+            modelBuilder.Entity<UserExtent>(entity =>
+            {
+                entity.ToTable("user_extent");
+
+                entity.HasIndex(e => e.UserId)
+                    .HasName("idx_userId");
+
+                entity.Property(e => e.Id).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'");
+
+                entity.Property(e => e.UpdateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.UserHobby)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.UserId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.UserOccupation)
                     .IsRequired()
                     .HasColumnType("varchar(100)");
             });
