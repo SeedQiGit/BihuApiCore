@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 27/11/2018 20:09:13
+ Date: 29/03/2019 13:52:11
 */
 
 SET NAMES utf8mb4;
@@ -29,7 +29,7 @@ CREATE TABLE `data_excel`  (
   `call_ext_number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '分机号  我们系统的坐席号',
   `direct_number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户直线号码，只在用户需要绑定直线时使用',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 89 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 123 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product
@@ -52,14 +52,44 @@ CREATE TABLE `user`  (
   `UserName` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `UserAccount` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `UserPassWord` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `CreateTime` datetime(0) NULL,
-  `UpdateTime` datetime(0) NULL,
+  `CreateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
   `CertificateNo` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `Mobile` bigint(20) NOT NULL,
   `IsVerify` int(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`Id`) USING BTREE,
   INDEX `idx_account`(`UserAccount`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for user_config
+-- ----------------------------
+DROP TABLE IF EXISTS `user_config`;
+CREATE TABLE `user_config`  (
+  `Id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `UserId` bigint(20) NOT NULL,
+  `UserLevel` int(5) NOT NULL,
+  `UserGrade` int(5) NOT NULL,
+  `CreateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`Id`) USING BTREE,
+  INDEX `idx_userId`(`UserId`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for user_extent
+-- ----------------------------
+DROP TABLE IF EXISTS `user_extent`;
+CREATE TABLE `user_extent`  (
+  `Id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `UserId` bigint(20) NOT NULL,
+  `UserHobby` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `UserOccupation` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `CreateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`Id`) USING BTREE,
+  INDEX `idx_userId`(`UserId`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for zs_picc_call
@@ -79,6 +109,6 @@ CREATE TABLE `zs_picc_call`  (
   `direct_number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户直线号码，只在用户需要绑定直线时使用',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_agent_id`(`user_agent_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 89 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 123 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
