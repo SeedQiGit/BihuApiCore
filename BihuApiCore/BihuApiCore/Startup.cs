@@ -44,7 +44,8 @@ namespace BihuApiCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<EntityContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
+            //这里我用的是db first，所以就不用自己定义的EntityContext
+            //services.AddDbContext<EntityContext>(options =>options.UseMySql(Configuration.GetConnectionString("EntityContext")));
             services.AddSwaggerGen(c =>
             {
                 //配置第一个Doc

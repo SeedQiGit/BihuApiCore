@@ -8,11 +8,13 @@ namespace BihuApiCore.EntityFrameworkCore.Models
     {
         public bihu_apicoreContext()
         {
+            
         }
 
         public bihu_apicoreContext(DbContextOptions<bihu_apicoreContext> options)
             : base(options)
         {
+            
         }
 
         public virtual DbSet<DataExcel> DataExcel { get; set; }
