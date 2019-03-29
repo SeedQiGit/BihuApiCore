@@ -129,11 +129,6 @@ namespace BihuApiCore.Service.Implementations
             }
             //尝试竞争线程，写入失败
             return BaseResponse.GetBaseResponse(BusinessStatusType.Failed,"写入失败");
-
-
-            
-
-
            
         }
 

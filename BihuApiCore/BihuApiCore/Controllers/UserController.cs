@@ -16,13 +16,18 @@ namespace BihuApiCore.Controllers
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly IObserverService _observerService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger, IObserverService observerService)
         {
             _userService = userService;
             _logger = logger;
+            _observerService = observerService;
         }
+
+        #region 测试接口
+
         /// <summary>
         /// 测试get 同步
         /// </summary>
@@ -58,5 +63,22 @@ namespace BihuApiCore.Controllers
         {
             return await _userService.AddUserByAccount(request);
         }
+
+        #endregion
+
+
+        #region 观察者模式接口
+
+        [HttpPost]
+        [ModelVerifyFilter]
+        public async Task<BaseResponse> AddUserAllSheet([FromBody] BaseRequest request)
+        {
+            return await _observerService.AddUserAllSheet(request);
+        }
+        
+
+        #endregion
+
+
     }
 }
