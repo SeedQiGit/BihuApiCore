@@ -69,13 +69,23 @@ namespace BihuApiCore.Controllers
 
         #region 观察者模式接口
 
+        #region 创建账户 同时自动生成配置
+
         [HttpPost]
         [ModelVerifyFilter]
-        public async Task<BaseResponse> AddUserAllSheet([FromBody] BaseRequest request)
+        public async Task<BaseResponse> AddUserAllSheet()
         {
-            return await _observerService.AddUserAllSheet(request);
+            return await _observerService.AddUserAllSheet();
         }
-        
+
+        #endregion
+
+        [HttpPost]
+        [ModelVerifyFilter]
+        public async Task<BaseResponse> DelAllSheet([FromBody]BaseRequest request)
+        {
+            return await _observerService.DelAllSheet(request);
+        }
 
         #endregion
 

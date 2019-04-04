@@ -9,6 +9,7 @@ namespace BihuApiCore.Service.Interfaces
 {
     public interface IObserverService
     {
-        Task<BaseResponse> AddUserAllSheet(BaseRequest request);
+        Task<BaseResponse> AddUserAllSheet();
+        Task<BaseResponse> DelAllSheet(BaseRequest request);
     }
 }

@@ -7,5 +7,6 @@ namespace BihuApiCore.Repository.IRepository
 {
     public interface IUserConfigRepository:IRepositoryBase<UserConfig>
     {
+        void DelUserConfig(long userId);
     }
 }

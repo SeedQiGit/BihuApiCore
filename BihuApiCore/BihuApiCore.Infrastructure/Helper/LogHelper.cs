@@ -39,5 +39,10 @@ namespace BihuApiCore.Infrastructure.Helper
         {
             Error("发生异常:" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
         }
+       
+        public static void Error(string msg,Exception ex)
+        {
+            Error(msg + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
+        }
     }
 }
