@@ -31,6 +31,12 @@ namespace BihuApiCore.Model.Response
             Message = EnumberHelper.GetEnumDescription(code);
         }
 
+        public BaseResponse(BusinessStatusType code, string message)
+        {
+            Code = (int) code;
+            Message =message;
+        }
+
         public static BaseResponse GetBaseResponse(int code)
         {
             return new BaseResponse(code);
@@ -48,7 +54,7 @@ namespace BihuApiCore.Model.Response
 
         public static BaseResponse GetBaseResponse(BusinessStatusType code, string message)
         {
-            return new BaseResponse((int)code, message);
+            return new BaseResponse(code, message);
         }
 
     }
@@ -79,10 +85,11 @@ namespace BihuApiCore.Model.Response
         {
             return new BaseResponse<T>((int)code, EnumberHelper.GetEnumDescription(code), data);
         }
+
+        public static BaseResponse<T> GetBaseResponse(BusinessStatusType code, string message, T data)
+        {
+            return new BaseResponse<T>((int)code, message, data);
+        }
     }
-
-
-
-
 
 }
