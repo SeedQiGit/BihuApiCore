@@ -9,24 +9,6 @@ namespace BihuApiCore.Model.Response
         public int Code { get; set; }
         public string Message { get; set; }
 
-
-        private object _data;
-        public object Data
-        {
-            get { return _data ?? new object(); }
-            set
-            {
-                if (value is IList || value is string)
-                {
-                    _data = new { Value = value };
-                }
-                else
-                {
-                    _data = value;
-                }
-            }
-        }
-
         public BaseResponse()
         {
 
@@ -37,15 +19,16 @@ namespace BihuApiCore.Model.Response
 
         }
 
-        public BaseResponse(int code, string message) : this(code, message, null)
-        {
-        }
-
-        public BaseResponse(int code, string message, object data)
+        public BaseResponse(int code, string message)
         {
             Code = code;
             Message = message;
-            Data = data;
+        }
+
+        public BaseResponse(BusinessStatusType code)
+        {
+            Code = (int) code;
+            Message = EnumberHelper.GetEnumDescription(code);
         }
 
         public static BaseResponse GetBaseResponse(int code)
@@ -58,14 +41,9 @@ namespace BihuApiCore.Model.Response
             return new BaseResponse(code, message);
         }
 
-        public static BaseResponse GetBaseResponse(int code, string message, object data)
-        {
-            return new BaseResponse(code, message, data);
-        }
-
         public static BaseResponse GetBaseResponse(BusinessStatusType code)
         {
-            return new BaseResponse((int)code, EnumberHelper.GetEnumDescription(code));
+            return new BaseResponse(code);
         }
 
         public static BaseResponse GetBaseResponse(BusinessStatusType code, string message)
@@ -73,15 +51,35 @@ namespace BihuApiCore.Model.Response
             return new BaseResponse((int)code, message);
         }
 
-        public static BaseResponse GetBaseResponse(BusinessStatusType code, object data)
+    }
+
+    public class BaseResponse<T> : BaseResponse where T : class
+    {
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public T Data { get; set; }
+
+        public BaseResponse(int code, string message, T data)
         {
-            return new BaseResponse((int)code, EnumberHelper.GetEnumDescription(code), data);
+            Code = code;
+            Message = message;
+            Data = data;
         }
 
-        public static BaseResponse GetBaseResponse(BusinessStatusType code, string message, object data)
+        public static BaseResponse<T> GetBaseResponse(int code, string message, T data)
         {
-            return new BaseResponse((int)code, message, data);
+            return new BaseResponse<T>(code, message, data);
         }
-       
+
+        public static BaseResponse<T> GetBaseResponse(BusinessStatusType code, T data)
+        {
+            return new BaseResponse<T>((int)code, EnumberHelper.GetEnumDescription(code), data);
+        }
     }
+
+
+
+
+
 }

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Helper;
@@ -29,8 +28,7 @@ namespace BihuApiCore.Service.Implementations
         private readonly ILogger<UserService> _logger;
         private UrlModel _urlModel;
 
-        private  static ConcurrentDictionary<string,string> _strDic=new ConcurrentDictionary<string, string>();
-
+        private static ConcurrentDictionary<string,string> _strDic=new ConcurrentDictionary<string, string>();
 
         public UserService(IUserRepository userRepository, IMapper mapper , ILogger<UserService> logger,IOptions<UrlModel> option,IDataExcelRepository dataExcelRepository, IZsPiccCallRepository zsPiccCallRepository)
         {
@@ -46,14 +44,14 @@ namespace BihuApiCore.Service.Implementations
         public BaseResponse Test()
         {
             User userThis;
-            using (EntityContext ef = new EntityContext())
+            using (bihu_apicoreContext ef = new bihu_apicoreContext())
             {
-                userThis = ef.User.FirstOrDefault(w => w.Id == 1);
+                userThis = ef.User.FirstOrDefault();
             }
 
             //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
-            return BaseResponse.GetBaseResponse(BusinessStatusType.OK, userDto);
+            return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
         }
 
         public async Task<BaseResponse> TestAsy()
@@ -81,7 +79,7 @@ namespace BihuApiCore.Service.Implementations
             }
 
             _zsPiccCallRepository.SaveChanges();
-
+            //return new BaseResponse(BusinessStatusType.OK);
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
 
             //string a  = "{ 'UserId':'10'}";

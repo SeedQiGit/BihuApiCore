@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using BihuApiCore.EntityFrameworkCore.Models;
 
 namespace BihuApiCore.EntityFrameworkCore.Migrations
 {
-    [DbContext(typeof(EntityContext))]
+    [DbContext(typeof(bihu_apicoreContext))]
     [Migration("20180808115707_DataInit")]
     partial class DataInit
     {
