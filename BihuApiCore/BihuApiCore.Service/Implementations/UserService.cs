@@ -49,6 +49,8 @@ namespace BihuApiCore.Service.Implementations
                 userThis = ef.User.FirstOrDefault();
             }
 
+            BaseResponse<UserDto> a=new BaseResponse<UserDto>();
+
             //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
             return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);

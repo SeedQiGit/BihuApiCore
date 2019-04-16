@@ -60,6 +60,9 @@ namespace BihuApiCore.Model.Response
         /// </summary>
         public T Data { get; set; }
 
+        public BaseResponse()
+        {}
+
         public BaseResponse(int code, string message, T data)
         {
             Code = code;
