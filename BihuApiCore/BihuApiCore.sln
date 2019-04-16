@@ -5,15 +5,23 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore", "BihuApiCore\BihuApiCore.csproj", "{646794ED-FF7F-49B7-BC1C-E9BF72642C2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.EntityFrameworkCore", "BihuApiCore.EntityFrameworkCore\BihuApiCore.EntityFrameworkCore.csproj", "{829DC315-DCDE-403B-BC27-B2392A6C3D5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.EntityFrameworkCore", "BihuApiCore.EntityFrameworkCore\BihuApiCore.EntityFrameworkCore.csproj", "{829DC315-DCDE-403B-BC27-B2392A6C3D5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Repository", "BihuApiCore.Repository\BihuApiCore.Repository.csproj", "{541BF683-1DC3-4DEA-A729-1C3EDDD1142A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Repository", "BihuApiCore.Repository\BihuApiCore.Repository.csproj", "{541BF683-1DC3-4DEA-A729-1C3EDDD1142A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Infrastructure", "BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj", "{868F47C1-1F0F-46DC-9146-61D08568F1F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Infrastructure", "BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj", "{868F47C1-1F0F-46DC-9146-61D08568F1F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Model", "BihuApiCore.Model\BihuApiCore.Model.csproj", "{75CEFEC3-46C8-40CC-8927-AC41C754F1FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Model", "BihuApiCore.Model\BihuApiCore.Model.csproj", "{75CEFEC3-46C8-40CC-8927-AC41C754F1FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Service", "BihuApiCore.Service\BihuApiCore.Service.csproj", "{5FDBFE6E-A4D6-44A6-913C-26D64C4CD710}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Service", "BihuApiCore.Service\BihuApiCore.Service.csproj", "{5FDBFE6E-A4D6-44A6-913C-26D64C4CD710}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B5653591-8815-4E72-90B1-D41F6CB1DB10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Service.UnitTest", "test\BihuApiCore.Service.UnitTest\BihuApiCore.Service.UnitTest.csproj", "{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Infrastructure.UnitTest", "test\BihuApiCore.Infrastructure.UnitTest\BihuApiCore.Infrastructure.UnitTest.csproj", "{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Repository.UnitTest", "test\BihuApiCore.Repository.UnitTest\BihuApiCore.Repository.UnitTest.csproj", "{D6B474A6-B1AE-4A34-AB9C-82842E914534}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,9 +53,26 @@ Global
 		{5FDBFE6E-A4D6-44A6-913C-26D64C4CD710}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FDBFE6E-A4D6-44A6-913C-26D64C4CD710}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FDBFE6E-A4D6-44A6-913C-26D64C4CD710}.Release|Any CPU.Build.0 = Release|Any CPU
+		{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB} = {B5653591-8815-4E72-90B1-D41F6CB1DB10}
+		{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5} = {B5653591-8815-4E72-90B1-D41F6CB1DB10}
+		{D6B474A6-B1AE-4A34-AB9C-82842E914534} = {B5653591-8815-4E72-90B1-D41F6CB1DB10}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C2896CEE-E330-45C6-90A8-4321DACDEA8E}

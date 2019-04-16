@@ -1,6 +1,5 @@
 ﻿using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Enums;
-using System.Collections;
 
 namespace BihuApiCore.Model.Response
 {

@@ -41,6 +41,11 @@ namespace BihuApiCore.Service.Implementations
             _zsPiccCallRepository = zsPiccCallRepository;
         }
 
+        public int Add(int nb1, int nb2)
+        {
+            return nb1 + nb2;
+        }
+
         public BaseResponse Test()
         {
             User userThis;
@@ -92,7 +97,6 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request)
         {
-
             if ( _strDic.ContainsKey(request.Account))
             {
                 return BaseResponse.GetBaseResponse(BusinessStatusType.Failed,"键值已存在");
@@ -129,7 +133,6 @@ namespace BihuApiCore.Service.Implementations
             }
             //尝试竞争线程，写入失败
             return BaseResponse.GetBaseResponse(BusinessStatusType.Failed,"写入失败");
-           
         }
 
     }
