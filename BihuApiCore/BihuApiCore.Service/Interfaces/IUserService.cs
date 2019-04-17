@@ -11,6 +11,7 @@ namespace BihuApiCore.Service.Interfaces
     {
         BaseResponse Test();
         Task<BaseResponse> TestAsy();
+        Task<BaseResponse> MockAsy();
         Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request);
     }
 }

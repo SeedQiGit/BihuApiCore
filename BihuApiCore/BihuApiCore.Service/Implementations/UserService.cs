@@ -53,9 +53,6 @@ namespace BihuApiCore.Service.Implementations
             {
                 userThis = ef.User.FirstOrDefault();
             }
-
-            BaseResponse<UserDto> a=new BaseResponse<UserDto>();
-
             //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
             UserDto userDto = _mapper.Map<UserDto>(userThis);
             return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
@@ -93,6 +90,31 @@ namespace BihuApiCore.Service.Implementations
             //string url = $"{_urlModel.BihuApi}/api/Message/MessageExistById";
             //string result = await HttpWebAsk.HttpClientPostAsync(a, url);
         }
+
+        public async Task<BaseResponse> MockAsy()
+        {
+            User user=new User
+            {
+                UserName="asd",
+                UserAccount = "1233123213123",
+                UserPassWord="123123",
+                CertificateNo="123131",
+                Mobile=13313331333,
+                IsVerify=1
+            };
+            _userRepository.Insert(user);
+            var a=await _userRepository.SaveChangesAsync();
+            //这里故意增加这个判断，为了测试mock
+            if (a>0)
+            {
+                return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
+            }
+            else
+            {
+                return BaseResponse.GetBaseResponse(BusinessStatusType.Failed);
+            }
+        }
+
 
 
         public async Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request)
