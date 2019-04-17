@@ -19,16 +19,16 @@ namespace BihuApiCore.Service.UnitTest
         private readonly UserService _service;
         public UserServiceTest()
         {
-            var studentRepositories = new Mock<IUserRepository>();
-            studentRepositories.Setup(f => f.Insert(It.IsAny<User>()));
-            studentRepositories.Setup(f => f.SaveChangesAsync()).Returns(Task.FromResult(1));
+            var userRepository = new Mock<IUserRepository>();
+            userRepository.Setup(f => f.Insert(It.IsAny<User>()));
+            userRepository.Setup(f => f.SaveChangesAsync()).Returns(Task.FromResult(1));
             var mapper = new Mock<IMapper>();
             var iLogger = new Mock<ILogger<UserService> >();
             var option = new Mock< IOptions<UrlModel>>();
             var dataExcelRepository = new Mock<IDataExcelRepository>();
             var zsPiccCallRepository = new Mock<IZsPiccCallRepository>();
        
-            _service = new UserService(studentRepositories.Object,mapper.Object,iLogger.Object,option.Object,dataExcelRepository.Object,zsPiccCallRepository.Object);
+            _service = new UserService(userRepository.Object,mapper.Object,iLogger.Object,option.Object,dataExcelRepository.Object,zsPiccCallRepository.Object);
         }
 
         [Theory]
