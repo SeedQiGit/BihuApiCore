@@ -15,8 +15,12 @@ namespace BihuApiCore.EntityFrameworkCore.Models
         {
         }
 
+        public virtual DbSet<Companies> Companies { get; set; }
+        public virtual DbSet<CompanyModuleRelation> CompanyModuleRelation { get; set; }
         public virtual DbSet<DataExcel> DataExcel { get; set; }
+        public virtual DbSet<Modules> Modules { get; set; }
         public virtual DbSet<Product> Product { get; set; }
+        public virtual DbSet<RoleModuleRelation> RoleModuleRelation { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserConfig> UserConfig { get; set; }
         public virtual DbSet<UserExtent> UserExtent { get; set; }
@@ -27,12 +31,91 @@ namespace BihuApiCore.EntityFrameworkCore.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=123456;Database=bihu_apicore;sslmode=none;");
+                optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=123456;Database= bihu_apicore ");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Companies>(entity =>
+            {
+                entity.HasKey(e => e.CompId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("companies");
+
+                entity.Property(e => e.CompId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.ClientName).HasColumnType("varchar(30)");
+
+                entity.Property(e => e.CompName)
+                    .IsRequired()
+                    .HasColumnType("varchar(200)");
+
+                entity.Property(e => e.CompanyType).HasColumnType("int(11)");
+
+                entity.Property(e => e.CreatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Createdtime).HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'");
+
+                entity.Property(e => e.IsUsed).HasColumnType("bit(1)");
+
+                entity.Property(e => e.LevelCode)
+                    .IsRequired()
+                    .HasColumnType("varchar(2000)");
+
+                entity.Property(e => e.LevelNum).HasColumnType("int(4)");
+
+                entity.Property(e => e.ParentCompId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.PayType).HasColumnType("int(11)");
+
+                entity.Property(e => e.PiccAccount).HasColumnType("int(11)");
+
+                entity.Property(e => e.Region).HasColumnType("varchar(200)");
+
+                entity.Property(e => e.SecretKey).HasColumnType("varchar(200)");
+
+                entity.Property(e => e.TopAgentId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.UpdatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Updatedtime)
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.ZsType).HasColumnType("int(11)");
+            });
+
+            modelBuilder.Entity<CompanyModuleRelation>(entity =>
+            {
+                entity.ToTable("company_module_relation");
+
+                entity.HasIndex(e => e.CompId)
+                    .HasName("idx_compId");
+
+                entity.HasIndex(e => e.ModuleCode)
+                    .HasName("idx_moduleCode");
+
+                entity.Property(e => e.Id).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CompId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CreatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Createdtime).HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'");
+
+                entity.Property(e => e.ModuleCode)
+                    .IsRequired()
+                    .HasColumnType("varchar(200)");
+
+                entity.Property(e => e.UpdatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Updatedtime)
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'")
+                    .ValueGeneratedOnAddOrUpdate();
+            });
+
             modelBuilder.Entity<DataExcel>(entity =>
             {
                 entity.ToTable("data_excel");
@@ -66,6 +149,50 @@ namespace BihuApiCore.EntityFrameworkCore.Models
                     .HasColumnType("varchar(50)");
             });
 
+            modelBuilder.Entity<Modules>(entity =>
+            {
+                entity.HasKey(e => e.ModuleCode)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("modules");
+
+                entity.Property(e => e.ModuleCode).HasColumnType("varchar(255)");
+
+                entity.Property(e => e.ActionUrl)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.CreatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Createdtime).HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'");
+
+                entity.Property(e => e.Icon).HasColumnType("varchar(300)");
+
+                entity.Property(e => e.IsUserd).HasColumnType("int(11)");
+
+                entity.Property(e => e.ModuleLevel).HasColumnType("int(11)");
+
+                entity.Property(e => e.ModuleName)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.ModuleType).HasColumnType("int(11)");
+
+                entity.Property(e => e.OrderBy).HasColumnType("int(11)");
+
+                entity.Property(e => e.ParentCode)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.PlatformType).HasColumnType("int(11)");
+
+                entity.Property(e => e.UpdatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Updatedtime)
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'")
+                    .ValueGeneratedOnAddOrUpdate();
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("product");
@@ -79,6 +206,32 @@ namespace BihuApiCore.EntityFrameworkCore.Models
                     .HasColumnType("varchar(50)");
 
                 entity.Property(e => e.Price).HasColumnType("decimal(8,2)");
+            });
+
+            modelBuilder.Entity<RoleModuleRelation>(entity =>
+            {
+                entity.ToTable("role_module_relation");
+
+                entity.HasIndex(e => e.RoleId)
+                    .HasName("idx_roleId");
+
+                entity.Property(e => e.Id).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.CreatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Createdtime).HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'");
+
+                entity.Property(e => e.ModuleCode)
+                    .IsRequired()
+                    .HasColumnType("varchar(200)");
+
+                entity.Property(e => e.RoleId).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.UpdatedEmp).HasColumnType("bigint(20)");
+
+                entity.Property(e => e.Updatedtime)
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(6)'")
+                    .ValueGeneratedOnAddOrUpdate();
             });
 
             modelBuilder.Entity<User>(entity =>

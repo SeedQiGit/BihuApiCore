@@ -17,11 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Service", "Bihu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B5653591-8815-4E72-90B1-D41F6CB1DB10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Service.UnitTest", "test\BihuApiCore.Service.UnitTest\BihuApiCore.Service.UnitTest.csproj", "{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Service.UnitTest", "test\BihuApiCore.Service.UnitTest\BihuApiCore.Service.UnitTest.csproj", "{137F7B58-06A8-4FA3-916C-DD0A28C6B9FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Infrastructure.UnitTest", "test\BihuApiCore.Infrastructure.UnitTest\BihuApiCore.Infrastructure.UnitTest.csproj", "{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Infrastructure.UnitTest", "test\BihuApiCore.Infrastructure.UnitTest\BihuApiCore.Infrastructure.UnitTest.csproj", "{F1119E7C-4EDC-486A-AA6C-8E13925C6DC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Repository.UnitTest", "test\BihuApiCore.Repository.UnitTest\BihuApiCore.Repository.UnitTest.csproj", "{D6B474A6-B1AE-4A34-AB9C-82842E914534}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Repository.UnitTest", "test\BihuApiCore.Repository.UnitTest\BihuApiCore.Repository.UnitTest.csproj", "{D6B474A6-B1AE-4A34-AB9C-82842E914534}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.EntityFrameworkCore2", "BihuApiCore.EntityFrameworkCore2\BihuApiCore.EntityFrameworkCore2.csproj", "{FCAACE7C-2D2B-4FCB-AF3A-676C5D66029B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,10 @@ Global
 		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6B474A6-B1AE-4A34-AB9C-82842E914534}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCAACE7C-2D2B-4FCB-AF3A-676C5D66029B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCAACE7C-2D2B-4FCB-AF3A-676C5D66029B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCAACE7C-2D2B-4FCB-AF3A-676C5D66029B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCAACE7C-2D2B-4FCB-AF3A-676C5D66029B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
