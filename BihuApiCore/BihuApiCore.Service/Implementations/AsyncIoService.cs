@@ -101,7 +101,6 @@ namespace BihuApiCore.Service.Implementations
             catch (Exception ex)
             {
                 LogHelper.Error("读取批量续保文件路径" + url + " 错误信息：" + ex.Message);
-              
             }
 
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
