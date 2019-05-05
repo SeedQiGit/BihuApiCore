@@ -58,7 +58,7 @@ namespace BihuApiCore.Model.Response
 
     }
 
-    public class BaseResponse<T> : BaseResponse where T : class
+    public class BaseResponse<T> : BaseResponse
     {
         /// <summary>
         /// 数据
