@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using BihuApiCore.EntityFrameworkCore;
+using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Extensions;
-using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Middlewares;
+using BihuApiCore.Model;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +19,6 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
-using BihuApiCore.EntityFrameworkCore.Models;
 
 namespace BihuApiCore
 {
@@ -89,7 +88,13 @@ namespace BihuApiCore
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
             });
 
-            services.AddAutoMapper();
+            //services.AddAutoMapper();  这里使用另一种automapper的注入方式
+            AutoMapper.IConfigurationProvider config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<DtoProfile>();
+            });
+            services.AddSingleton(config);
+            services.AddScoped<IMapper, Mapper>();
 
             #region 配置
 
