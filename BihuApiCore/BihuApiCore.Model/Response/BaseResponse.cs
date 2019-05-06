@@ -1,12 +1,19 @@
-﻿using BihuApiCore.Infrastructure.Helper;
+﻿using System;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Enums;
 
 namespace BihuApiCore.Model.Response
 {
     public class BaseResponse
     {
+        #region 属性
+
         public int Code { get; set; }
         public string Message { get; set; }
+
+        #endregion
+
+        #region 构造函数
 
         public BaseResponse()
         {
@@ -36,6 +43,10 @@ namespace BihuApiCore.Model.Response
             Message =message;
         }
 
+        #endregion
+
+        #region 扩展方法
+
         public static BaseResponse GetBaseResponse(int code)
         {
             return new BaseResponse(code);
@@ -56,6 +67,44 @@ namespace BihuApiCore.Model.Response
             return new BaseResponse(code, message);
         }
 
+        #endregion
+
+        #region 快捷方法
+
+        /// <summary>
+        ///     返回成功结果
+        /// </summary>
+        /// <param name="message">结果信息</param>
+        /// <returns></returns>
+        public static BaseResponse Ok(string message = null)
+        {
+            var code = BusinessStatusType.OK;
+            return GetBaseResponse(code, message ?? EnumberHelper.GetEnumDescription(code));
+        }
+
+        /// <summary>
+        ///     返回错误结果
+        /// </summary>
+        /// <param name="ex">异常</param>
+        /// <returns></returns>
+        public static BaseResponse Error(Exception ex)
+        {
+            return Error(ex.Message);
+        }
+
+        /// <summary>
+        ///     返回错误结果
+        /// </summary>
+        /// <param name="message">错误信息</param>
+        /// <returns></returns>
+        public static BaseResponse Error(string message = null)
+        {
+            var code = BusinessStatusType.Error;
+            return GetBaseResponse(code, message ?? EnumberHelper.GetEnumDescription(code));
+        }
+
+        #endregion      
+
     }
 
     public class BaseResponse<T> : BaseResponse
@@ -65,6 +114,7 @@ namespace BihuApiCore.Model.Response
         /// </summary>
         public T Data { get; set; }
 
+        #region 构造函数
         public BaseResponse()
         {}
 
@@ -74,6 +124,10 @@ namespace BihuApiCore.Model.Response
             Message = message;
             Data = data;
         }
+
+        #endregion
+
+        #region 扩展方法
 
         public static BaseResponse<T> GetBaseResponse(int code, string message, T data)
         {
@@ -89,6 +143,24 @@ namespace BihuApiCore.Model.Response
         {
             return new BaseResponse<T>((int)code, message, data);
         }
+
+        #endregion
+
+        #region 快捷方法
+
+        /// <summary>
+        ///     返回成功结果
+        /// </summary>
+        /// <param name="data">结果数据集</param>
+        /// <returns></returns>
+        public static BaseResponse<T> Ok(T data)
+        {
+            var code = BusinessStatusType.OK;
+            return GetBaseResponse(code, data);
+        }
+
+        #endregion
+
     }
 
 }
