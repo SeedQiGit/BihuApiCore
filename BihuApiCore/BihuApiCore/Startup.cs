@@ -19,6 +19,7 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
+using BihuApiCore.Infrastructure.Helper;
 
 namespace BihuApiCore
 {
@@ -43,8 +44,9 @@ namespace BihuApiCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<bihu_apicoreContext>(options => options.UseMySql(Configuration.GetConnectionString("EntityContext")));
-           
+            services.AddDbContext<bihu_apicoreContext>(options => options.UseMySql(Configuration.GetConnectionString("EntityContext")).UseLoggerFactory(LogHelper.LoggerFactorySingleton));
+            // Warning: Do not create a new ILoggerFactory instance each time
+
             services.AddSwaggerGen(c =>
             {
                 //配置第一个Doc

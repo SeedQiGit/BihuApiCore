@@ -33,14 +33,14 @@ namespace BihuApiCore.Model.Response
 
         public BaseResponse(BusinessStatusType code)
         {
-            Code = (int) code;
+            Code = (int)code;
             Message = EnumberHelper.GetEnumDescription(code);
         }
 
         public BaseResponse(BusinessStatusType code, string message)
         {
-            Code = (int) code;
-            Message =message;
+            Code = (int)code;
+            Message = message;
         }
 
         #endregion
@@ -70,6 +70,17 @@ namespace BihuApiCore.Model.Response
         #endregion
 
         #region 快捷方法
+
+        /// <summary>
+        ///     返回成功结果
+        /// </summary>
+        /// <param name="message">结果信息</param>
+        /// <returns></returns>
+        public static BaseResponse Failed(string message = null)
+        {
+            var code = BusinessStatusType.Failed;
+            return GetBaseResponse(code, message ?? EnumberHelper.GetEnumDescription(code));
+        }
 
         /// <summary>
         ///     返回成功结果
@@ -116,7 +127,7 @@ namespace BihuApiCore.Model.Response
 
         #region 构造函数
         public BaseResponse()
-        {}
+        { }
 
         public BaseResponse(int code, string message, T data)
         {

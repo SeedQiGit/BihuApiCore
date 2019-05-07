@@ -128,6 +128,10 @@ namespace BihuApiCore.Repository.IRepository
         /// <param name="listEntity"></param>
         void Update(List<TEntity> listEntity);
 
+        void SetFieldValue(TEntity entity, Expression<Func<TEntity, object>> field);
+
+
+
         #endregion
 
         #region Delete
@@ -221,5 +225,7 @@ namespace BihuApiCore.Repository.IRepository
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
 
         #endregion
+
+        void AttachIfNot(TEntity entity);
     }
 }

@@ -6,33 +6,41 @@ namespace BihuApiCore.Infrastructure.Helper
 {
     public class LogHelper
     {
-        private static ILogger _logger;
+        private static readonly ILogger Logger;
+        private static readonly ILoggerFactory LoggerFactory;
+
+        public static ILoggerFactory LoggerFactorySingleton
+        {
+            get { return LoggerFactory; }
+        }
+
 
         static LogHelper()
         {
             ILoggerFactory loggerFactory = new LoggerFactory();
             //这里会输出到Nlog
             loggerFactory.AddNLog();
-            _logger = loggerFactory.CreateLogger(nameof(LogHelper));
+            LoggerFactory = loggerFactory;
+            Logger = loggerFactory.CreateLogger(nameof(LogHelper));
         }
 
         public static void Info(string msg)
         {
-            _logger.LogInformation(msg);
+            Logger.LogInformation(msg);
         }
 
         public static void Error(string msg)
         {
-            _logger.LogError(msg);
+            Logger.LogError(msg);
         }
 
         public static void Warning(string msg)
         {
-            _logger.LogWarning(msg);
+            Logger.LogWarning(msg);
         }
         public static void Trace(string msg)
         {
-            _logger.LogTrace(msg);
+            Logger.LogTrace(msg);
         }
 
         public static void Error(Exception ex)

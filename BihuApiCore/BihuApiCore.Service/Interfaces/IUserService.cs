@@ -1,9 +1,6 @@
-﻿using BihuApiCore.Model.Response;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BihuApiCore.Model.Request;
+using BihuApiCore.Model.Response;
 using System.Threading.Tasks;
-using BihuApiCore.Model.Request;
 
 namespace BihuApiCore.Service.Interfaces
 {
@@ -13,5 +10,7 @@ namespace BihuApiCore.Service.Interfaces
         Task<BaseResponse> TestAsy();
         Task<BaseResponse> MockAsy();
         Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request);
+        Task<BaseResponse> TestEf();
+        Task<BaseResponse> TestEf2();
     }
 }

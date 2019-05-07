@@ -8,6 +8,7 @@ using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -17,10 +18,10 @@ using System.Threading.Tasks;
 
 namespace BihuApiCore.Service.Implementations
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        
+
         private readonly IDataExcelRepository _dataExcelRepository;
         private readonly IZsPiccCallRepository _zsPiccCallRepository;
 
@@ -28,18 +29,58 @@ namespace BihuApiCore.Service.Implementations
         private readonly ILogger<UserService> _logger;
         private UrlModel _urlModel;
 
-        private static ConcurrentDictionary<string,string> _strDic=new ConcurrentDictionary<string, string>();
+        private static ConcurrentDictionary<string, string> _strDic = new ConcurrentDictionary<string, string>();
 
-        public UserService(IUserRepository userRepository, IMapper mapper , ILogger<UserService> logger,IOptions<UrlModel> option,IDataExcelRepository dataExcelRepository, IZsPiccCallRepository zsPiccCallRepository)
+        public UserService(IUserRepository userRepository, IMapper mapper, ILogger<UserService> logger, IOptions<UrlModel> option, IDataExcelRepository dataExcelRepository, IZsPiccCallRepository zsPiccCallRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
-     
+
             _logger = logger;
             _urlModel = option.Value;
             _dataExcelRepository = dataExcelRepository;
             _zsPiccCallRepository = zsPiccCallRepository;
         }
+
+        #region EF test
+
+        public async Task<BaseResponse> TestEf()
+        {
+            //var a =await _userRepository.FirstOrDefaultAsync(c => c.Id == 6);
+            //a.UserAccount = "1231";
+            //_userRepository.SaveChanges();
+            User a = new User();
+            a.Id = 6;
+            a.UserAccount = "121";
+            //0.1添加到EF管理容器中，并获取 实体对象 的伪包装类对象
+            EntityEntry<User> entry = _userRepository.GetDbContext().Entry<User>(a);
+            ////如果使用 Entry 附加实体对象到数据容器中，则需要手动设置 实体包装类的对象的状态为 Unchanged
+            ////**如果使用 Attach 就不需要这句
+            //entry.State = EntityState.Unchanged;
+
+            //标识实体对象某些属性已经被修改了
+            entry.Property("UserAccount").IsModified = true;
+
+            _userRepository.GetDbContext().Set<User>().Attach(a);
+            //跟新到数据库
+            _userRepository.SaveChanges();
+
+            return BaseResponse<object>.Ok(a);
+        }
+
+        public async Task<BaseResponse> TestEf2()
+        {
+            User a = new User();
+            a.Id = 6;
+            a.UserAccount = "121";
+            _userRepository.SetFieldValue(a,c=>c.UserAccount);
+            _userRepository.AttachIfNot(a);
+            //跟新到数据库
+            _userRepository.SaveChanges();
+            return BaseResponse<object>.Ok(a);
+        }
+
+        #endregion
 
         public int Add(int nb1, int nb2)
         {
@@ -71,13 +112,13 @@ namespace BihuApiCore.Service.Implementations
             {
                 ZsPiccCall picc = _mapper.Map<ZsPiccCall>(item);
                 picc.CallPassword = picc.CallPassword.Substring(0, picc.CallPassword.Length - 2);
-                picc.CallExtNumber= picc.CallExtNumber.Substring(0, picc.CallExtNumber.Length - 2);
-                picc.CallNumber= picc.CallNumber.Substring(0, picc.CallNumber.Length - 2);
+                picc.CallExtNumber = picc.CallExtNumber.Substring(0, picc.CallExtNumber.Length - 2);
+                picc.CallNumber = picc.CallNumber.Substring(0, picc.CallNumber.Length - 2);
                 picc.CallId = 0;
                 picc.UserAgentId = 0;
                 picc.CallState = 1;
-                picc.CreateTime =DateTime.Now;
-                picc.UpdateTime =DateTime.Now;
+                picc.CreateTime = DateTime.Now;
+                picc.UpdateTime = DateTime.Now;
                 _zsPiccCallRepository.Insert(picc);
 
             }
@@ -93,19 +134,19 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> MockAsy()
         {
-            User user=new User
+            User user = new User
             {
-                UserName="asd",
+                UserName = "asd",
                 UserAccount = "1233123213123",
-                UserPassWord="123123",
-                CertificateNo="123131",
-                Mobile=13313331333,
-                IsVerify=1
+                UserPassWord = "123123",
+                CertificateNo = "123131",
+                Mobile = 13313331333,
+                IsVerify = 1
             };
             _userRepository.Insert(user);
-            var a=await _userRepository.SaveChangesAsync();
+            var a = await _userRepository.SaveChangesAsync();
             //这里故意增加这个判断，为了测试mock
-            if (a>0)
+            if (a > 0)
             {
                 return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
             }
@@ -119,25 +160,25 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> AddUserByAccount(AddUserByAccountRequest request)
         {
-            if ( _strDic.ContainsKey(request.Account))
+            if (_strDic.ContainsKey(request.Account))
             {
-                return BaseResponse.GetBaseResponse(BusinessStatusType.Failed,"键值已存在");
+                return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "键值已存在");
             }
             //成功写入
-            if (_strDic.TryAdd(request.Account,request.Account))
+            if (_strDic.TryAdd(request.Account, request.Account))
             {
                 LogHelper.Info("成功写入");
-                var userExist =await _userRepository.FirstOrDefaultAsync(c => c.UserAccount == request.Account);
-                if (userExist==null)
+                var userExist = await _userRepository.FirstOrDefaultAsync(c => c.UserAccount == request.Account);
+                if (userExist == null)
                 {
                     LogHelper.Info("新增账户：" + request.Account);
-                    User user=new User
+                    User user = new User
                     {
-                        UserName="asd",
-                        UserPassWord="123123",
-                        CertificateNo="123131",
-                        Mobile=13313331333,
-                        IsVerify=1
+                        UserName = "asd",
+                        UserPassWord = "123123",
+                        CertificateNo = "123131",
+                        Mobile = 13313331333,
+                        IsVerify = 1
                     };
 
                     user.UserAccount = request.Account;
@@ -154,7 +195,7 @@ namespace BihuApiCore.Service.Implementations
                 return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
             }
             //尝试竞争线程，写入失败
-            return BaseResponse.GetBaseResponse(BusinessStatusType.Failed,"写入失败");
+            return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "写入失败");
         }
 
     }

@@ -39,6 +39,20 @@ namespace BihuApiCore.Controllers
         {
             return _userService.Test();
         }
+
+
+        [HttpGet]
+        public async Task<BaseResponse> TestEf()
+        {
+            return await _userService.TestEf();
+        }
+        
+        [HttpGet]
+        public async Task<BaseResponse> TestEf2()
+        {
+            return await _userService.TestEf2();
+        }
+
         /// <summary>
         /// 测试get 异步
         /// </summary>

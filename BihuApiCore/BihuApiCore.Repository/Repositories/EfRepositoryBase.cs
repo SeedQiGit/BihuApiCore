@@ -185,7 +185,15 @@ namespace BihuApiCore.Repository.Repositories
             }
         }
 
-        protected virtual void AttachIfNot(TEntity entity)
+        public void SetFieldValue(TEntity entity, Expression<Func<TEntity, object>> field)
+        {
+            var property = Context.Entry(entity).Property(field);
+            //字段复制
+            property.IsModified = true;
+            //property.CurrentValue = value;
+        }
+
+        public virtual void AttachIfNot(TEntity entity)
         {
             var entry = Context.ChangeTracker.Entries().FirstOrDefault(ent => ent.Entity == entity);
             if (entry != null)
