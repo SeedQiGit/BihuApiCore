@@ -7,13 +7,14 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BihuApiCore.Infrastructure.Helper
 {
     public static class DatabaseExtensions
     {
         /// <summary>
-        /// 网上找到的方法  
+        ///  EF Core使用原生SQL的扩展方法  
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
@@ -31,6 +32,7 @@ namespace BihuApiCore.Infrastructure.Helper
                 using (var command = conn.CreateCommand())
                 {
                     command.CommandText = sql;
+                    command.CommandType = CommandType.Text;
                     command.Parameters.AddRange(parameters);
                     var propts = typeof(T).GetProperties();
                     var rtnList = new List<T>();
@@ -59,54 +61,39 @@ namespace BihuApiCore.Infrastructure.Helper
         }
 
         /// <summary>
-        /// EF Core使用原生SQL的扩展方法   除了这个方法，其他方法在v盟中都没什么引用。
+        ///  EF Core使用原生SQL的扩展方法  异步
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="database"></param>
+        /// <param name="db"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static List<T> SqlQueryExt<T>(this DatabaseFacade database, string sql, params object[] parameters)
+        public static async Task<List<T>>  SqlQueryAsync<T>(this DbContext db, string sql, params object[] parameters)
             where T : new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
-            var conn = database.GetDbConnection();
+            var conn = db.Database.GetDbConnection();
             try
             {
-                if (conn.State != ConnectionState.Open)
-                {
-                    conn.Open();
-                }
-
+                await conn.OpenAsync();
                 using (var command = conn.CreateCommand())
                 {
                     command.CommandText = sql;
                     command.CommandType = CommandType.Text;
-                    command.Parameters.AddRange(GetSqlParameters(parameters));
+                    command.Parameters.AddRange(parameters);
                     var propts = typeof(T).GetProperties();
                     var rtnList = new List<T>();
                     T model;
-                    using (var reader = command.ExecuteReader())
+                    object val;
+                    using (var reader =await command.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             model = new T();
-                            foreach (var propt in propts)
+                            foreach (var l in propts)
                             {
-                                if (propt.CanWrite)
-                                {
-                                    
-                                    object value = reader[propt.Name];
-                                    if (value is DBNull) propt.SetValue(model, null);
-                                    else propt.SetValue(model, value);
-                                    //原来v盟的写法，不知道为啥这么写
-                                    //if (reader.ReaderExists(propt.Name))
-                                    //{
-                                    //    value = reader[propt.Name];
-                                    //    if (value is DBNull) propt.SetValue(model, null);
-                                    //    else propt.SetValue(model, value);
-                                    //}
-                                }
+                                val = reader[l.Name];
+                                l.SetValue(model, val == DBNull.Value ? null : val);
                             }
                             rtnList.Add(model);
                         }
@@ -114,14 +101,10 @@ namespace BihuApiCore.Infrastructure.Helper
                     return rtnList;
                 }
             }
-            catch (Exception ex) {
-                LogHelper.Error("查询数据错误",ex);
-            }
             finally
             {
                 conn.Close();
             }
-            return new List<T>();
         }
 
         /// <summary>
@@ -268,33 +251,9 @@ namespace BihuApiCore.Infrastructure.Helper
 
         }
 
-
         /// <summary>
         /// 执行原生语句相当于原生ExecuteScalar
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query">sql语句</param>
-        /// <returns></returns>
-        public static object ExecuteScalar(this DatabaseFacade context, string query )
-        {
-            try
-            {
-                using (var command = context.GetDbConnection().CreateCommand())
-                {
-                    command.CommandText = query;
-                    command.CommandType = CommandType.Text;
-                    context.OpenConnection();
-                    return command.ExecuteScalar();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("执行ExecuteScalar语句出现异常", ex);
-            }
-        }
-
-        /// <summary>
-        /// 执行原生语句相当于原生ExecuteScalar
+        /// 如果没有参数，可以直接使用原生ExecuteSqlCommand
         /// </summary>
         /// <param name="context"></param>
         /// <param name="query">sql语句</param>

@@ -26,7 +26,7 @@ namespace BihuApiCore.Model.Enums
         NotFindObject = 404,
 
         [Description("没有权限")]
-        NoAuthority = 405,
+        NoAuthority = 401,
 
         [Description("必填项为空")]
         ItemEmpty = 406,

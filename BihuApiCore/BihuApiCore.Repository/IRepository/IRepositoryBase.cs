@@ -20,7 +20,6 @@ namespace BihuApiCore.Repository.IRepository
 
         #endregion
 
-
         #region Select/Get/Query
 
         /// <summary>
@@ -130,8 +129,6 @@ namespace BihuApiCore.Repository.IRepository
 
         void SetFieldValue(TEntity entity, Expression<Func<TEntity, object>> field);
 
-
-
         #endregion
 
         #region Delete
@@ -210,6 +207,7 @@ namespace BihuApiCore.Repository.IRepository
         #endregion
 
         #region Others
+
         /// <summary>
         /// 是否存在
         /// </summary>

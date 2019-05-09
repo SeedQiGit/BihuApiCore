@@ -5,6 +5,7 @@ using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 
 namespace BihuApiCore.Service.Implementations
@@ -14,15 +15,60 @@ namespace BihuApiCore.Service.Implementations
 
         private readonly ICompanyModuleRelationRepository _companyModuleRelationRepository;
         private readonly IRoleModuleRelationRepository _roleModuleRelationRepository;
-        
+
         private readonly IMapper _mapper;
 
-        public RoleService(ICompanyModuleRelationRepository companyModuleRelationRepository, IRoleModuleRelationRepository roleModuleRelationRepository,IMapper mapper)
+        public RoleService(ICompanyModuleRelationRepository companyModuleRelationRepository, IRoleModuleRelationRepository roleModuleRelationRepository, IMapper mapper)
         {
             _companyModuleRelationRepository = companyModuleRelationRepository;
             _roleModuleRelationRepository = roleModuleRelationRepository;
             _mapper = mapper;
         }
+
+        #region RoleModuleByRoleIdAsync
+
+        public async Task<List<ModuleTreeViewModel>> RoleModuleByRoleIdAsync(long roleId, long compId)
+        {
+            //get company module
+            var allModule =await _companyModuleRelationRepository.CompanyModuleFullByIdAsync(compId);
+            //get role module
+            List<Modules> roleModule = new List<Modules>();
+            if (roleId > 0)
+            {
+                roleModule = _roleModuleRelationRepository.RoleModuleFullById(roleId);
+            }
+
+            //get all level=1 module
+            var parentModule = allModule.Where(t => t.ParentCode == "system_all" && t.ModuleLevel == 1).ToList();
+
+            #region buid module tree (infinite recursion is better considering extend )
+
+            #region recursion version
+
+            List<ModuleTreeViewModel> moduleTree = parentModule.Select(c => new ModuleTreeViewModel()
+            {
+                ModuleCode = c.ModuleCode,
+                ModuleName = c.ModuleName,
+                ParentCode = c.ParentCode,
+                ModuleType = (EnumModuleType)c.ModuleType,
+                Plat = (EnumPlatformType)c.PlatformType,
+                Status = roleId > 0 ? GetRoleModuleStatus(roleModule, c.ModuleCode) : "",
+                Nodes = new List<ModuleTreeViewModel>()
+            }).ToList();
+
+            ModuleTreeRecursion(allModule, roleModule, moduleTree, roleId);
+
+            #endregion
+
+            #endregion
+
+            return moduleTree;
+        }
+
+
+        #endregion
+
+
 
         #region get Role Module Tree By RoleId
 

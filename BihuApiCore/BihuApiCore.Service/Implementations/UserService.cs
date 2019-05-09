@@ -15,6 +15,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -89,41 +91,98 @@ namespace BihuApiCore.Service.Implementations
 
         public BaseResponse Test()
         {
-            User userThis;
-            using (bihu_apicoreContext ef = new bihu_apicoreContext())
+            //User userThis;
+            //using (bihu_apicoreContext ef = new bihu_apicoreContext())
+            //{
+            //    userThis = ef.User.FirstOrDefault();
+            //}
+            ////userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
+            //UserDto userDto = _mapper.Map<UserDto>(userThis);
+            //return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
+
+            //_companyModuleRelationRepository.DeleteRelation(request.EditCompId);
+
+            using (var transaction = _zsPiccCallRepository.GetDbContext().Database.BeginTransaction())
             {
-                userThis = ef.User.FirstOrDefault();
+                User user = new User
+                {
+                    UserName = "asd",
+                    UserAccount = "1233123213123",
+                    UserPassWord = "123123",
+                    CertificateNo = "123131",
+                    Mobile = 13313331333,
+                    IsVerify = 1
+                };
+                _userRepository.Insert(user);
+                ZsPiccCall picc = new ZsPiccCall();
+                picc.UserName = "";
+                picc.CallPassword ="1231231";
+                picc.CallExtNumber = "12312321";
+                picc.CallNumber = "12312";
+                picc.CallId = 0;
+                picc.UserAgentId = 0;
+                picc.CallState = 1;
+                picc.CreateTime = DateTime.Now;
+                picc.UpdateTime = DateTime.Now;
+
+                _userRepository.GetDbContext().Database.ExecuteSqlCommand(new RawSqlString(" delete from user where user.Id=7"));
+
+                //_userRepository.CommandTest();
+                _zsPiccCallRepository.Insert(picc);
+                _userRepository.FirstOrDefault(w=>w.Id==1);
+                _zsPiccCallRepository.SaveChanges();
+                transaction.Commit();
             }
-            //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
-            UserDto userDto = _mapper.Map<UserDto>(userThis);
-            return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
+            return BaseResponse.Ok();
+           
+
         }
 
         public async Task<BaseResponse> TestAsy()
         {
-            var list = await _dataExcelRepository.GetAllListAsync();
+            using (var transaction =await _zsPiccCallRepository.GetDbContext().Database.BeginTransactionAsync())
+            {
+                User user = new User
+                {
+                    UserName = "asd",
+                    UserAccount = "1233123213123",
+                    UserPassWord = "123123",
+                    CertificateNo = "123131",
+                    Mobile = 13313331333,
+                    IsVerify = 1
+                };
+                await _userRepository.InsertAsync(user);
+
+                await _userRepository.GetDbContext().Database.ExecuteSqlCommandAsync(new RawSqlString(" delete from user where user.Id=8"));
+                await _zsPiccCallRepository.SaveChangesAsync();
+                transaction.Commit();
+            }
+
+
+
+            //var list = await _dataExcelRepository.GetAllListAsync();
             //if (userThis == null)
             //{
             //    return BaseResponse.GetBaseResponse(BusinessStatusType.Failed, "发起请求的用户不存在");
             //}
             //UserDto userDto = _mapper.Map<UserDto>(userThis);
             //List<ZsPiccCall> piccList=new List<ZsPiccCall>();
-            foreach (var item in list)
-            {
-                ZsPiccCall picc = _mapper.Map<ZsPiccCall>(item);
-                picc.CallPassword = picc.CallPassword.Substring(0, picc.CallPassword.Length - 2);
-                picc.CallExtNumber = picc.CallExtNumber.Substring(0, picc.CallExtNumber.Length - 2);
-                picc.CallNumber = picc.CallNumber.Substring(0, picc.CallNumber.Length - 2);
-                picc.CallId = 0;
-                picc.UserAgentId = 0;
-                picc.CallState = 1;
-                picc.CreateTime = DateTime.Now;
-                picc.UpdateTime = DateTime.Now;
-                _zsPiccCallRepository.Insert(picc);
+            //foreach (var item in list)
+            //{
+            //    ZsPiccCall picc = _mapper.Map<ZsPiccCall>(item);
+            //    picc.CallPassword = picc.CallPassword.Substring(0, picc.CallPassword.Length - 2);
+            //    picc.CallExtNumber = picc.CallExtNumber.Substring(0, picc.CallExtNumber.Length - 2);
+            //    picc.CallNumber = picc.CallNumber.Substring(0, picc.CallNumber.Length - 2);
+            //    picc.CallId = 0;
+            //    picc.UserAgentId = 0;
+            //    picc.CallState = 1;
+            //    picc.CreateTime = DateTime.Now;
+            //    picc.UpdateTime = DateTime.Now;
+            //    _zsPiccCallRepository.Insert(picc);
 
-            }
+            //}
 
-            _zsPiccCallRepository.SaveChanges();
+            //_zsPiccCallRepository.SaveChanges();
             //return new BaseResponse(BusinessStatusType.OK);
             return BaseResponse.GetBaseResponse(BusinessStatusType.OK);
 

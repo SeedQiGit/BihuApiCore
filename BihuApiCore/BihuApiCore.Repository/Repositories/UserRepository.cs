@@ -1,9 +1,7 @@
 ﻿using BihuApiCore.EntityFrameworkCore.Models;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BihuApiCore.Repository.Repositories
 {
@@ -12,5 +10,13 @@ namespace BihuApiCore.Repository.Repositories
         public UserRepository(DbContext context) : base(context)
         {
         }
+
+        public void CommandTest()
+        {
+            var sql = $@" delete from user where user.Id=100 ";
+            Context.Database.ExecuteScalar(sql);
+        }
+
+
     }
 }

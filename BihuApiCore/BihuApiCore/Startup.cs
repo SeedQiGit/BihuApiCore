@@ -3,6 +3,7 @@ using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Middlewares;
 using BihuApiCore.Model;
 using BihuApiCore.Repository.IRepository;
@@ -19,7 +20,6 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
-using BihuApiCore.Infrastructure.Helper;
 
 namespace BihuApiCore
 {
