@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace BihuApiCore.Infrastructure.Helper
 {
     public static class DatabaseExtensions
     {
+        #region 查询 T : new类型(有公共无参的构造函数)
+
         /// <summary>
         ///  EF Core使用原生SQL的扩展方法  
         /// </summary>
@@ -28,28 +28,25 @@ namespace BihuApiCore.Infrastructure.Helper
             var conn = db.Database.GetDbConnection();
             try
             {
-                conn.Open();
-                using (var command = conn.CreateCommand())
+                if (conn.State != ConnectionState.Open)
                 {
-                    command.CommandText = sql;
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddRange(parameters);
+                    conn.Open();
+                }
+                using (var reader = PreCommandReader(db.Database, sql, parameters))
+                {
                     var propts = typeof(T).GetProperties();
                     var rtnList = new List<T>();
                     T model;
                     object val;
-                    using (var reader = command.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        model = new T();
+                        foreach (var l in propts)
                         {
-                            model = new T();
-                            foreach (var l in propts)
-                            {
-                                val = reader[l.Name];
-                                l.SetValue(model, val == DBNull.Value ? null : val);
-                            }
-                            rtnList.Add(model);
+                            val = reader[l.Name];
+                            l.SetValue(model, val == DBNull.Value ? null : val);
                         }
+                        rtnList.Add(model);
                     }
                     return rtnList;
                 }
@@ -68,35 +65,32 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static async Task<List<T>>  SqlQueryAsync<T>(this DbContext db, string sql, params object[] parameters)
+        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params object[] parameters)
             where T : new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
             var conn = db.Database.GetDbConnection();
             try
             {
-                await conn.OpenAsync();
-                using (var command = conn.CreateCommand())
+                if (conn.State != ConnectionState.Open)
                 {
-                    command.CommandText = sql;
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddRange(parameters);
+                    await conn.OpenAsync();
+                }
+                using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
+                {
                     var propts = typeof(T).GetProperties();
                     var rtnList = new List<T>();
                     T model;
                     object val;
-                    using (var reader =await command.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.ReadAsync())
+                        model = new T();
+                        foreach (var l in propts)
                         {
-                            model = new T();
-                            foreach (var l in propts)
-                            {
-                                val = reader[l.Name];
-                                l.SetValue(model, val == DBNull.Value ? null : val);
-                            }
-                            rtnList.Add(model);
+                            val = reader[l.Name];
+                            l.SetValue(model, val == DBNull.Value ? null : val);
                         }
+                        rtnList.Add(model);
                     }
                     return rtnList;
                 }
@@ -107,66 +101,114 @@ namespace BihuApiCore.Infrastructure.Helper
             }
         }
 
+        #endregion
+
+        #region 辅助方法
+
+        private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params object[] parameters)
+        {
+            using (var command = context.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = query;
+                command.Parameters.AddRange(parameters);
+                command.CommandType = CommandType.Text;
+                return command.ExecuteReader();
+            }
+        }
+
+        private static async Task<DbDataReader> PreCommandReaderAsync(DatabaseFacade context, string query, params object[] parameters)
+        {
+            using (var command = context.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = query;
+                command.Parameters.AddRange(parameters);
+                command.CommandType = CommandType.Text;
+                return await command.ExecuteReaderAsync();
+            }
+        }
+
+        #endregion
+
+        #region Func转换类型 sql查询方法  
+
+        public static async Task<List<T>> SqlFuncAsync<T>(this DbContext db, string sql, Func<DbDataReader, T> map, params object[] parameters)
+        {
+            //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
+            var conn = db.Database.GetDbConnection();
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    await conn.OpenAsync();
+                }
+                using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
+                {
+                    var list = new List<T>();
+                    while (await reader.ReadAsync())
+                    {
+                        list.Add(map(reader));
+                    }
+                    return list;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("PreCommandReader执行sql:{0}", sql), ex);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// 获取第一行数据（这么做相比于SqlQueryExt，唯一的好处就是节约内存了，如果是多行数据的情况下，list的多条内存，变为单条内存）
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="database"></param>
+        /// <param name="db"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static T SqlQuerySingle<T>(this DatabaseFacade database, string sql, params object[] parameters)
+        public static T SqlQuerySingle<T>(this DbContext db, string sql, params object[] parameters)
            where T : new()
         {
-            //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
-            var conn = database.GetDbConnection();
+            var conn = db.Database.GetDbConnection();
             try
             {
                 if (conn.State != ConnectionState.Open)
                 {
                     conn.Open();
                 }
-
-                using (var command = conn.CreateCommand())
+                using (var reader = PreCommandReader(db.Database, sql, parameters))
                 {
-                    command.CommandText = sql;
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddRange(GetSqlParameters(parameters));
+                    T model = new T();
                     var propts = typeof(T).GetProperties();
-                    //var rtnList = new List<T>();
-                    T model;
-                    using (var reader = command.ExecuteReader())
+                    while (reader.Read())
                     {
-                        model = new T();
-                        while (reader.Read())
+                        foreach (var propt in propts)
                         {
-                            foreach (var propt in propts)
+                            if (propt.CanWrite)
                             {
-                                if (propt.CanWrite)
+                                object value;
+                                if (reader.ReaderExists(propt.Name))
                                 {
-                                    object value;
-                                    if (reader.ReaderExists(propt.Name))
-                                    {
-                                        value = reader[propt.Name];
-                                        if (value is DBNull) propt.SetValue(model, null);
-                                        else propt.SetValue(model, value);
-                                    }
+                                    value = reader[propt.Name];
+                                    if (value is DBNull) propt.SetValue(model, null);
+                                    else propt.SetValue(model, value);
                                 }
                             }
                         }
-                        return model;
                     }
+                    return model;
                 }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error("查询数据错误：", ex);
             }
             finally
             {
                 conn.Close();
             }
-            return default(T);
         }
 
         /// <summary>
@@ -182,94 +224,26 @@ namespace BihuApiCore.Infrastructure.Helper
         }
 
         /// <summary>
-        /// EfCore执行原生sql语句，以DbDataReader返回结果，在map中做数据匹配
+        ///  执行原生语句相当于原生ExecuteScalar
         /// </summary>
-        /// <typeparam name="T">数据结果类型</typeparam>
-        /// <param name="context">DatabaseFacade对象</param>
-        /// <param name="query">sql语句</param>
-        /// <param name="map">用于DbDataReader 和 对象之间匹配的</param>
+        /// <param name="db"></param>
+        /// <param name="query"></param>
+        /// <param name="parameters"></param>
         /// <returns></returns>
-        public static List<T> ExecSQL<T>(this DatabaseFacade context, string query, Func<DbDataReader, T> map, params object[] parameters)
+        public static object ExecuteScalar(this DbContext db, string query, params object[] parameters)
         {
+            var conn = db.Database.GetDbConnection();
             try
             {
-                using (var reader = PreCommandReader(context, query, GetSqlParameters(parameters)))
+                if (conn.State != ConnectionState.Open)
                 {
-                    var entities = new List<T>();
-                    while (reader.Read())
-                    {
-                        entities.Add(map(reader));
-                    }
-
-                    return entities;
+                    conn.Open();
                 }
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(string.Format(@"ExecSQL:执行sql\r\n{0}出现错误", query), ex);
-            }
-
-        }
-
-        /// <summary>
-        /// 执行sql语句返回List集合(适合简单对象)
-        /// </summary>
-        /// <typeparam name="T">集合数据类型</typeparam>
-        /// <param name="context">DatabaseFacade 对象</param>
-        /// <param name="query">sql语句,需要完整的语句(包含参数)</param>
-        /// <remarks>此方法中用的反射，自动填充数据</remarks>
-        /// <returns></returns>
-        public static List<T> ExecSQL<T>(this DatabaseFacade context, string query, params object[] parameters)
-        {
-            try
-            {
-                using (var result = PreCommandReader(context, query, GetSqlParameters(parameters)))
-                {
-                    List<T> list = new List<T>();
-                    T obj = default(T);
-                    while (result.Read())
-                    {
-                        obj = Activator.CreateInstance<T>();
-                        foreach (PropertyInfo prop in obj.GetType().GetProperties())
-                        {
-                            if (!object.Equals(result[prop.Name], DBNull.Value))
-                            {
-                                prop.SetValue(obj, result[prop.Name], null);
-                            }
-                        }
-                        list.Add(obj);
-                    }
-                    return list;
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(string.Format(@"ExecSQL:执行sql\r\n{0}出现错误", query), ex);
-            }
-
-        }
-
-        /// <summary>
-        /// 执行原生语句相当于原生ExecuteScalar
-        /// 如果没有参数，可以直接使用原生ExecuteSqlCommand
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query">sql语句</param>
-        /// <returns></returns>
-        public static object ExecuteScalar(this DatabaseFacade context, string query, params object[] parameters)
-        {
-
-            try
-            {
-                using (var command = context.GetDbConnection().CreateCommand())
+                using (var command = db.Database.GetDbConnection().CreateCommand())
                 {
                     command.CommandText = query;
-                    if (parameters != null)
-                        command.Parameters.AddRange(GetSqlParameters(parameters));
+                    command.Parameters.AddRange(parameters);
                     command.CommandType = CommandType.Text;
-                    context.OpenConnection();
                     return command.ExecuteScalar();
                 }
             }
@@ -277,59 +251,10 @@ namespace BihuApiCore.Infrastructure.Helper
             {
                 throw new Exception("执行ExecuteScalar语句出现异常", ex);
             }
-        }
-
-        #region 辅助方法
-
-        private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params object[] parameters)
-        {
-            try
-            {
-                using (var command = context.GetDbConnection().CreateCommand())
-                {
-                    command.CommandText = query;
-                    if (parameters != null)
-                        command.Parameters.AddRange(GetSqlParameters(parameters));
-                    command.CommandType = CommandType.Text;
-
-                    context.OpenConnection();
-
-                    return command.ExecuteReader();
-                }
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(string.Format("PreCommandReader执行sql:{0}", query), ex);
-            }
             finally
             {
-                context.CloseConnection();
+                conn.Close();
             }
-
-
         }
-        #endregion
-
-        #region 由于sql参数化导致引用冲突转换参数
-
-        public static MySqlParameter[] GetSqlParameters(object[] Parameters)
-        {
-            List<MySqlParameter> parames = new List<MySqlParameter>();
-            if (Parameters != null)
-            {
-                foreach (var item in Parameters)
-                {
-                    List<(string, object)> str = item.GetType().GetProperties().Select(x => (x.Name, x.GetValue(item, null))).ToList();
-                    foreach (var properties in str)
-                    {
-                        parames.Add(new MySqlParameter(properties.Item1, properties.Item2));
-                    }
-                }
-            }
-            return parames.ToArray();
-        }
-        #endregion
     }
 }

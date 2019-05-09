@@ -1,13 +1,12 @@
 ﻿using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Repository.IRepository;
-using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.Repository.Repositories
 {
     public class UserConfigRepository : EfRepositoryBase<UserConfig>, IUserConfigRepository
     {
-        public bihu_apicoreContext Context { get; set; }
+        public new bihu_apicoreContext Context { get; set; }
 
         public UserConfigRepository(bihu_apicoreContext context) : base(context)
         {
@@ -17,7 +16,7 @@ namespace BihuApiCore.Repository.Repositories
         public void DelUserConfig(long userId)
         {
             var sql = $@"delete from user_config where UserId = {userId} ";
-            Context.Database.ExecuteScalar(sql);
+            Context.ExecuteScalar(sql);
         }
 
         public void DelUserConfigContext(UserConfig user)

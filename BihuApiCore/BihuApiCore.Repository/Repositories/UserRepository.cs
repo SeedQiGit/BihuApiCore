@@ -14,7 +14,7 @@ namespace BihuApiCore.Repository.Repositories
         public void CommandTest()
         {
             var sql = $@" delete from user where user.Id=100 ";
-            Context.Database.ExecuteScalar(sql);
+            Context.ExecuteScalar(sql);
         }
 
 
