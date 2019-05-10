@@ -35,7 +35,7 @@ namespace BihuApiCore.Infrastructure.Helper
                 using (var reader = PreCommandReader(db.Database, sql, parameters))
                 {
                     var propts = typeof(T).GetProperties();
-                    var rtnList = new List<T>();
+                    var list = new List<T>();
                     T model;
                     object val;
                     while (reader.Read())
@@ -46,9 +46,9 @@ namespace BihuApiCore.Infrastructure.Helper
                             val = reader[l.Name];
                             l.SetValue(model, val == DBNull.Value ? null : val);
                         }
-                        rtnList.Add(model);
+                        list.Add(model);
                     }
-                    return rtnList;
+                    return list;
                 }
             }
             finally
@@ -79,7 +79,7 @@ namespace BihuApiCore.Infrastructure.Helper
                 using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
                 {
                     var propts = typeof(T).GetProperties();
-                    var rtnList = new List<T>();
+                    var list = new List<T>();
                     T model;
                     object val;
                     while (await reader.ReadAsync())
@@ -90,9 +90,9 @@ namespace BihuApiCore.Infrastructure.Helper
                             val = reader[l.Name];
                             l.SetValue(model, val == DBNull.Value ? null : val);
                         }
-                        rtnList.Add(model);
+                        list.Add(model);
                     }
-                    return rtnList;
+                    return list;
                 }
             }
             finally
