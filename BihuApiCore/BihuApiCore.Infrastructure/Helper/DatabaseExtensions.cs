@@ -21,7 +21,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static List<T> SqlQuery<T>(this DbContext db, string sql, params object[] parameters)
+        public static List<T> SqlQuery<T>(this DbContext db, string sql, params DbParameter[] parameters)
             where T : new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
@@ -65,7 +65,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params object[] parameters)
+        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
             where T : new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
@@ -105,7 +105,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #region 辅助方法
 
-        private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params object[] parameters)
+        private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params DbParameter[] parameters)
         {
             using (var command = context.GetDbConnection().CreateCommand())
             {
@@ -116,7 +116,7 @@ namespace BihuApiCore.Infrastructure.Helper
             }
         }
 
-        private static async Task<DbDataReader> PreCommandReaderAsync(DatabaseFacade context, string query, params object[] parameters)
+        private static async Task<DbDataReader> PreCommandReaderAsync(DatabaseFacade context, string query, params DbParameter[] parameters)
         {
             using (var command = context.GetDbConnection().CreateCommand())
             {
@@ -131,7 +131,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #region Func转换类型 sql查询方法  
 
-        public static async Task<List<T>> SqlFuncAsync<T>(this DbContext db, string sql, Func<DbDataReader, T> map, params object[] parameters)
+        public static async Task<List<T>> SqlFuncAsync<T>(this DbContext db, string sql, Func<DbDataReader, T> map, params DbParameter[] parameters)
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
             var conn = db.Database.GetDbConnection();
@@ -172,7 +172,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static T SqlQuerySingle<T>(this DbContext db, string sql, params object[] parameters)
+        public static T SqlQuerySingle<T>(this DbContext db, string sql, params DbParameter[] parameters)
            where T : new()
         {
             var conn = db.Database.GetDbConnection();
