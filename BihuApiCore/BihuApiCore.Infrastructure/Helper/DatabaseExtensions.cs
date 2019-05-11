@@ -104,6 +104,16 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #region 辅助方法
 
+        /// <summary>
+        /// 判断值类型,string,datetime
+        /// </summary>
+        /// <param name="tp"></param>
+        /// <returns></returns>
+        private static bool IsValueType(Type tp)
+        {
+            return tp.IsValueType || tp == typeof(Nullable<>) || tp == typeof(string) || tp == typeof(DateTime);
+        }
+
         private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params DbParameter[] parameters)
         {
             using (var command = context.GetDbConnection().CreateCommand())
@@ -174,7 +184,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static async Task<T> SqlQueryFirstAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : class,new()
+            where T : new()
         {
             var conn = db.Database.GetDbConnection();
             try
@@ -186,9 +196,15 @@ namespace BihuApiCore.Infrastructure.Helper
                 using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
                 {
                     T model = new T();
-                    var propts = typeof(T).GetProperties();
+                    Type tp = typeof(T);
+                  
                     if (await reader.ReadAsync())
                     {
+                        if (tp.IsValueType)
+                        {
+                            return (T) Convert.ChangeType(reader.GetValue(0), tp);
+                        }
+                        var propts = tp.GetProperties();
                         foreach (var propt in propts)
                         {
                             object value = reader[propt.Name];
