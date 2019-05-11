@@ -61,25 +61,69 @@ namespace BihuApiCore.Service.Implementations
                 CertificateNo = "123131",
                 Mobile = 13313331333,
                 IsVerify = 1,
-                
+                LevelNum = userParent.LevelNum+1,
+                LevelCode = userParent.LevelCode,
+                ParentId = userParent.Id
             };
             await _userRepository.InsertAsync(user);
             using (var transaction =await _userRepository.GetDbContext().Database.BeginTransactionAsync())
             {
                 await _userRepository.SaveChangesAsync();
-
-
-
+                user.LevelCode=$"{userParent.LevelCode}{user.Id},";//左右都加逗号是防止like到冗余数据
+                await _userRepository.SaveChangesAsync();
+                transaction.Commit();
             }
-
-
 
             return BaseResponse.Ok();
         }
 
         #endregion
 
+        #region  修改用户  层次码
 
+        public async Task<BaseResponse> UpdateUser(UpdateUserRequest request)
+        {
+            var user = await _userRepository.FirstOrDefaultAsync(c=>c.Id==request.UserId);
+            if (user==null)
+            {
+                return BaseResponse.Failed("未找到对应用户");
+            }
+            
+            //不重要的赋值就不模拟了
+
+            if (request.ParentId!=user.ParentId)
+            {
+                //search parent data
+                var userParent = await _userRepository.FirstOrDefaultAsync(c=>c.Id==request.ParentId);
+                if (userParent == null) 
+                {
+                    return BaseResponse.Failed("未找到对应父级用户");
+                }
+                string newCode = $"{userParent.LevelCode}{user.Id},";
+                string oldCode = user.LevelCode;
+                int oldNum = user.LevelNum;
+                int newNum = userParent.LevelNum + 1;
+              
+                int cNum = newNum - oldNum;
+                user.LevelCode = newCode;
+                user.LevelNum= newNum;
+                user.ParentId = userParent.Id;
+                //查找当前用户及其下级用户列表
+                var relevantUsers = await _userRepository.GetAll().Where(x => x.LevelCode.StartsWith(oldCode)).ToListAsync();
+                foreach (var item in relevantUsers)
+                {
+                    if (item.Id==user.Id)continue;
+                   
+                    item.LevelCode = item.LevelCode.Replace(oldCode, newCode);
+                    item.LevelNum  = item.LevelNum + cNum;
+                }
+            }
+
+            await _userRepository.SaveChangesAsync();
+            return BaseResponse.Ok();
+        }
+
+        #endregion
 
         #region EF test
 

@@ -27,7 +27,6 @@ namespace BihuApiCore.Controllers
         }
 
         #region levelCode相关测试接口
-
         
         #region 新增用户，非顶级
 
@@ -39,8 +38,17 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
+        #region 更新用户，非顶级
+
+        [HttpPost]
+        public async Task<BaseResponse> UpdateUser([FromBody]UpdateUserRequest request)
+        {
+            return SetStatusCode(await _userService.UpdateUser(request));
+        }
+
         #endregion
 
+        #endregion
 
         #region 测试接口
 
@@ -55,7 +63,6 @@ namespace BihuApiCore.Controllers
         {
             return _userService.Test();
         }
-
 
         [HttpGet]
         public async Task<BaseResponse> TestEf()
@@ -96,7 +103,6 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
-
         #region 观察者模式接口
 
         #region 创建账户 同时自动生成配置
@@ -118,7 +124,6 @@ namespace BihuApiCore.Controllers
         }
 
         #endregion
-
 
     }
 }
