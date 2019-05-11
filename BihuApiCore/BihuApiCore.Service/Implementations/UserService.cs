@@ -63,8 +63,14 @@ namespace BihuApiCore.Service.Implementations
                 IsVerify = 1,
                 
             };
-            _userRepository
+            await _userRepository.InsertAsync(user);
+            using (var transaction =await _userRepository.GetDbContext().Database.BeginTransactionAsync())
+            {
+                await _userRepository.SaveChangesAsync();
 
+
+
+            }
 
 
 
