@@ -14,5 +14,9 @@ namespace BihuApiCore.EntityFrameworkCore.Models
         public string CertificateNo { get; set; }
         public long Mobile { get; set; }
         public int IsVerify { get; set; }
+
+        public long ParentId { get; set; }
+        public int LevelNum { get; set; }
+        public string LevelCode { get; set; }
     }
 }

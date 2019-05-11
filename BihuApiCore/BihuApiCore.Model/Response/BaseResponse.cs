@@ -159,6 +159,16 @@ namespace BihuApiCore.Model.Response
 
         #region 快捷方法
 
+        public static BaseResponse<T> Failed(T data)
+        {
+            return GetBaseResponse(BusinessStatusType.Failed, data);
+        }
+
+        public static BaseResponse<T> Failed(string message,T data)
+        {
+            return GetBaseResponse(BusinessStatusType.Failed,message, data);
+        }
+
         /// <summary>
         ///     返回成功结果
         /// </summary>
@@ -166,8 +176,7 @@ namespace BihuApiCore.Model.Response
         /// <returns></returns>
         public static BaseResponse<T> Ok(T data)
         {
-            var code = BusinessStatusType.OK;
-            return GetBaseResponse(code, data);
+            return GetBaseResponse(BusinessStatusType.OK, data);
         }
 
         #endregion

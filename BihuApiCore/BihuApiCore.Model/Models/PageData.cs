@@ -8,8 +8,8 @@ namespace BihuApiCore.Model.Models
     /// <typeparam name="TEntity"></typeparam>
     public class PageData<TEntity>
     {
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
+        public int PageIndex { get; set; } 
+        public int PageSize { get; set; } 
 
         /// <summary>
         /// 总页数
@@ -20,5 +20,6 @@ namespace BihuApiCore.Model.Models
         /// 当前页数据集合
         /// </summary>
         public List<TEntity> DataList { get; set; }
+
     }
 }

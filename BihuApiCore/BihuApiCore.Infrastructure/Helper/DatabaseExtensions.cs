@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BihuApiCore.Infrastructure.Helper
@@ -22,7 +21,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static List<T> SqlQuery<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : new()
+            where T : class,new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
             var conn = db.Database.GetDbConnection();
@@ -66,7 +65,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : new()
+            where T : class,new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
             var conn = db.Database.GetDbConnection();
@@ -164,16 +163,62 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion
 
+        #region 获取单行数据  类似First()  未找到抛出异常
+
         /// <summary>
-        /// 获取第一行数据（这么做相比于SqlQueryExt，唯一的好处就是节约内存了，如果是多行数据的情况下，list的多条内存，变为单条内存）
+        /// 获取第一行数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="db"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static T SqlQuerySingle<T>(this DbContext db, string sql, params DbParameter[] parameters)
-           where T : new()
+        public static async Task<T> SqlQueryFirstAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
+            where T : class,new()
+        {
+            var conn = db.Database.GetDbConnection();
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    await conn.OpenAsync();
+                }
+                using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
+                {
+                    T model = new T();
+                    var propts = typeof(T).GetProperties();
+                    if (await reader.ReadAsync())
+                    {
+                        foreach (var propt in propts)
+                        {
+                            object value = reader[propt.Name];
+                            propt.SetValue(model, value == DBNull.Value ? null : value);
+                        } 
+                    }
+                    else
+                    {
+                        throw new Exception("SqlQueryFirst未读取到任何数据");
+                    }
+                    
+                    return model;
+                }
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        /// <summary>
+        /// 获取第一行数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="sql"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static T SqlQueryFirst<T>(this DbContext db, string sql, params DbParameter[] parameters)
+            where T : class,new()
         {
             var conn = db.Database.GetDbConnection();
             try
@@ -186,22 +231,19 @@ namespace BihuApiCore.Infrastructure.Helper
                 {
                     T model = new T();
                     var propts = typeof(T).GetProperties();
-                    while (reader.Read())
+                    if (reader.Read())
                     {
                         foreach (var propt in propts)
                         {
-                            if (propt.CanWrite)
-                            {
-                                object value;
-                                if (reader.ReaderExists(propt.Name))
-                                {
-                                    value = reader[propt.Name];
-                                    if (value is DBNull) propt.SetValue(model, null);
-                                    else propt.SetValue(model, value);
-                                }
-                            }
-                        }
+                            object value = reader[propt.Name];
+                            propt.SetValue(model, value == DBNull.Value ? null : value);
+                        } 
                     }
+                    else
+                    {
+                        throw new Exception("SqlQueryFirst未读取到任何数据");
+                    }
+                    
                     return model;
                 }
             }
@@ -211,25 +253,38 @@ namespace BihuApiCore.Infrastructure.Helper
             }
         }
 
-        /// <summary>
-        /// 判断DbDataReader是否存在某列
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
-        static private bool ReaderExists(this DbDataReader dr, string columnName)
+        #endregion
+
+        #region 执行原生语句相当于原生ExecuteScalar
+
+        public static async Task<object> ExecuteScalarAsync(this DbContext db, string query, params object[] parameters)
         {
-            int count = dr.GetColumnSchema().Where(x => x.ColumnName.ToUpper() == columnName.ToUpper()).Count();
-            return count > 0;
+            var conn = db.Database.GetDbConnection();
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    await conn.OpenAsync();
+                }
+                using (var command = conn.CreateCommand())
+                {
+                    command.CommandText = query;
+                    command.Parameters.AddRange(parameters);
+                    command.CommandType = CommandType.Text;
+                    return await command.ExecuteScalarAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("执行ExecuteScalar语句出现异常", ex);
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
 
-        /// <summary>
-        ///  执行原生语句相当于原生ExecuteScalar
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="query"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        
         public static object ExecuteScalar(this DbContext db, string query, params object[] parameters)
         {
             var conn = db.Database.GetDbConnection();
@@ -256,5 +311,7 @@ namespace BihuApiCore.Infrastructure.Helper
                 conn.Close();
             }
         }
+
+        #endregion
     }
 }

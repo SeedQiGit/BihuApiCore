@@ -44,6 +44,37 @@ namespace BihuApiCore.Service.Implementations
             _zsPiccCallRepository = zsPiccCallRepository;
         }
 
+        #region 新增用户  层次码
+
+        public async Task<BaseResponse> AddUser(BaseRequest request)
+        {
+            var userParent = await _userRepository.FirstOrDefaultAsync(c=>c.Id==request.UserId);
+            if (userParent==null)
+            {
+                return BaseResponse.Failed("未找到对应父级用户");
+            }
+            User user = new User
+            {
+                UserName = "asd",
+                UserAccount = "1233123213123",
+                UserPassWord = "123123",
+                CertificateNo = "123131",
+                Mobile = 13313331333,
+                IsVerify = 1,
+                
+            };
+            _userRepository
+
+
+
+
+            return BaseResponse.Ok();
+        }
+
+        #endregion
+
+
+
         #region EF test
 
         public async Task<BaseResponse> TestEf()

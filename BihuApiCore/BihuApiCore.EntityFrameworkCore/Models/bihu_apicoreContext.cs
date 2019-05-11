@@ -266,6 +266,10 @@ namespace BihuApiCore.EntityFrameworkCore.Models
                     .IsRequired()
                     .HasColumnType("varchar(20)");
 
+                entity.Property(e => e.LevelCode)
+                    .IsRequired()
+                    .HasColumnType("varchar(5000)");
+
                 entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasColumnType("varchar(30)");

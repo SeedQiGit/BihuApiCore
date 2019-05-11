@@ -26,6 +26,22 @@ namespace BihuApiCore.Controllers
             _observerService = observerService;
         }
 
+        #region levelCode相关测试接口
+
+        
+        #region 新增用户，非顶级
+
+        [HttpPost]
+        public async Task<BaseResponse> AddUser([FromBody]BaseRequest request)
+        {
+            return SetStatusCode(await _userService.AddUser(request));
+        }
+
+        #endregion
+
+        #endregion
+
+
         #region 测试接口
 
         /// <summary>
