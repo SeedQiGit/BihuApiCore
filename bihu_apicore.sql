@@ -1,5 +1,5 @@
 /*
- Navicat MySQL Data Transfer
+ Navicat Premium Data Transfer
 
  Source Server         : my
  Source Server Type    : MySQL
@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 05/05/2019 16:08:57
+ Date: 11/05/2019 21:21:27
 */
 
 SET NAMES utf8mb4;
@@ -41,7 +41,7 @@ CREATE TABLE `companies`  (
   `LevelCode` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '层次码 上级层次码+,+当前主键Id+,。顶级层次码为：“,当前主键Id,”，前后均需加逗号',
   `ClientName` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`CompId`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of companies
@@ -63,7 +63,7 @@ CREATE TABLE `company_module_relation`  (
   PRIMARY KEY (`Id`) USING BTREE,
   INDEX `idx_compId`(`CompId`) USING BTREE,
   INDEX `idx_moduleCode`(`ModuleCode`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of company_module_relation
@@ -180,7 +180,7 @@ CREATE TABLE `role_module_relation`  (
   `ModuleCode` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '模块英文名称（唯一标识）',
   PRIMARY KEY (`Id`) USING BTREE,
   INDEX `idx_roleId`(`RoleId`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of role_module_relation
@@ -202,14 +202,24 @@ CREATE TABLE `user`  (
   `CertificateNo` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `Mobile` bigint(20) NOT NULL,
   `IsVerify` int(4) NOT NULL DEFAULT 0,
+  `LevelCode` varchar(5000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '层次码 上级层次码+,+当前主键Id+,。顶级层次码为：“,当前主键Id,”，前后均需加逗号',
+  `LevelNum` int(4) NOT NULL COMMENT '层次数 从1开始',
+  `ParentId` bigint(20) NOT NULL COMMENT '父级id',
   PRIMARY KEY (`Id`) USING BTREE,
-  INDEX `idx_account`(`UserAccount`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_account`(`UserAccount`) USING BTREE,
+  INDEX `idx_parentId`(`ParentId`) USING BTREE,
+  FULLTEXT INDEX `idx_levelCode`(`LevelCode`)
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (6, 'asd', '123', '123123', '2019-04-04 11:05:16', '2019-04-04 11:05:16', '123131', 13313331333, 1);
+INSERT INTO `user` VALUES (6, 'top', 'top', '123123', '2019-04-04 11:05:16', '2019-05-11 11:52:44', '123131', 13313331333, 1, ',6,', 1, 0);
+INSERT INTO `user` VALUES (10, 'asd', '123', '123123', '2019-04-04 11:05:16', '2019-05-11 17:22:36', '123131', 13313331333, 1, ',6,10,', 2, 6);
+INSERT INTO `user` VALUES (11, 'asd', '1233123213123', '123123', '2019-05-11 16:56:24', '2019-05-11 17:29:45', '123131', 13313331333, 1, ',6,11,', 2, 6);
+INSERT INTO `user` VALUES (12, 'asd', '1233123213123', '123123', '2019-05-11 16:57:43', '2019-05-11 17:32:56', '123131', 13313331333, 1, ',6,10,12,', 3, 10);
+INSERT INTO `user` VALUES (13, 'asd', '1233123213123', '123123', '2019-05-11 17:14:08', '2019-05-11 17:32:56', '123131', 13313331333, 1, ',6,10,12,13,', 4, 12);
+INSERT INTO `user` VALUES (14, 'asd', '1233123213123', '123123', '2019-05-11 17:17:44', '2019-05-11 17:32:56', '123131', 13313331333, 1, ',6,10,12,14,', 4, 12);
 
 -- ----------------------------
 -- Table structure for user_config
@@ -269,7 +279,7 @@ CREATE TABLE `zs_picc_call`  (
   `direct_number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户直线号码，只在用户需要绑定直线时使用',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_agent_id`(`user_agent_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 123 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 126 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of zs_picc_call
@@ -309,5 +319,8 @@ INSERT INTO `zs_picc_call` VALUES (120, 0, '王玲', 1, 0, '1034', '16675885530'
 INSERT INTO `zs_picc_call` VALUES (121, 0, '陈文媛', 1, 0, '1035', '15900079191', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1035', '0760-23870669');
 INSERT INTO `zs_picc_call` VALUES (122, 0, '黄绍英', 1, 0, '1038', '15338289287', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1038', '0760-23870653');
 INSERT INTO `zs_picc_call` VALUES (123, 0, '吴柏燕', 1, 0, '1012', '15813110972', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1012', '0760-23870590');
+INSERT INTO `zs_picc_call` VALUES (124, 0, '', 1, 0, '1231231', '12312', '2019-05-08 09:05:19', '2019-05-08 09:05:19', '12312321', NULL);
+INSERT INTO `zs_picc_call` VALUES (125, 0, '', 1, 0, '1231231', '12312', '2019-05-08 09:30:44', '2019-05-08 09:30:44', '12312321', NULL);
+INSERT INTO `zs_picc_call` VALUES (126, 0, '', 1, 0, '1231231', '12312', '2019-05-08 09:31:28', '2019-05-08 09:31:27', '12312321', NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
