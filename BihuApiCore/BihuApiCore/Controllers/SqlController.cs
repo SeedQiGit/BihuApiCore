@@ -33,7 +33,15 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
+        #region 获取列表，带分页
 
+        [HttpGet]
+        public async Task<BaseResponse> TestSql()
+        {
+            return SetStatusCode(await _sqlService.TestSql());
+        }
+
+        #endregion
 
     }
 }

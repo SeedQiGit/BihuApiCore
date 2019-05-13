@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using AutoMapper;
 using BihuApiCore.EntityFrameworkCore.Models;
-using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Model.Models;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -38,6 +32,11 @@ namespace BihuApiCore.Service.Implementations
                 return BaseResponse<PageData<User>>.Failed("未找到对应公司",new PageData<User>());
             }
             return BaseResponse<PageData<User>>.Ok(await _userRepository.GetUserList(request,userThis.LevelCode));
+        }
+
+        public async Task<BaseResponse> TestSql()
+        {
+            return BaseResponse<List<string>>.Ok( await _userRepository.TestSql());
         }
     }
 }

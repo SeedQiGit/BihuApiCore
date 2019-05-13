@@ -24,6 +24,8 @@ namespace BihuApiCore.Repository.Repositories
             Context.ExecuteScalar(sql);
         }
 
+        #region 列表方法
+
         public async Task<PageData<User>> GetUserList(PageRequest request,string levelCode)
         {
             List<DbParameter> parms = new List<DbParameter>();
@@ -70,5 +72,27 @@ namespace BihuApiCore.Repository.Repositories
 
             return result;
         }
+
+        #endregion
+
+        #region 测试sql方法
+
+        public async Task<List<string>> TestSql()
+        {
+            #region 查总数
+
+            string sqlcount = @"
+                        SELECT
+	                        UserName
+                        FROM  user ";
+
+            var count = await Context.SqlQueryDtAsync<string>(sqlcount);
+
+            #endregion
+
+            return count;
+        }
+
+        #endregion
     }
 }

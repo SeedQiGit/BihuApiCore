@@ -9,5 +9,6 @@ namespace BihuApiCore.Service.Interfaces
     public interface ISqlService
     {
         Task<BaseResponse<PageData<User>>> GetUserList(PageRequest request);
+        Task<BaseResponse> TestSql();
     }
 }
