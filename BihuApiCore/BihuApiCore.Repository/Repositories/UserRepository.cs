@@ -57,8 +57,8 @@ namespace BihuApiCore.Repository.Repositories
 	                        count(1)  as Count
                         FROM  user where LevelCode like  concat(?levelCode,'%') ";
 
-            var count = await Context.SqlFuncAsync(sqlcount,c => (long)c["Count"],parmArr);
-
+            //var count = await Context.SqlFuncAsync(sqlcount,c => (long)c["Count"],parmArr);
+            var count = await Context.SqlQueryFirstAsync<long>(sqlcount,parmArr);
             #endregion
 
       
@@ -66,7 +66,7 @@ namespace BihuApiCore.Repository.Repositories
             {
                 PageIndex = request.PageIndex,
                 PageSize = request.PageSize,
-                TotalCount = count.FirstOrDefault(),
+                TotalCount = count,
                 DataList = data
             };
 
@@ -86,7 +86,7 @@ namespace BihuApiCore.Repository.Repositories
 	                        UserName
                         FROM  user ";
 
-            var count = await Context.SqlQueryDtAsync<string>(sqlcount);
+            var count = await Context.SqlQueryAsync<string>(sqlcount);
 
             #endregion
 

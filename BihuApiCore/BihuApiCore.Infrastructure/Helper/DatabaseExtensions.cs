@@ -35,19 +35,27 @@ namespace BihuApiCore.Infrastructure.Helper
                 }
                 using (var reader = PreCommandReader(db.Database, sql, parameters))
                 {
-                    var propts = typeof(T).GetProperties();
+                    var type = typeof(T);
+                    var propts = type.GetProperties();
                     var list = new List<T>();
                     T model;
                     object val;
                     while (reader.Read())
                     {
-                        model = new T();
-                        foreach (var l in propts)
+                        if (IsValueType(type))
                         {
-                            val = reader[l.Name];
-                            l.SetValue(model, val == DBNull.Value ? null : val);
+                            list.Add(DbChangeType<T>(reader[0]));
                         }
-                        list.Add(model);
+                        else
+                        {
+                            model = new T();
+                            foreach (var l in propts)
+                            {
+                                val = reader[l.Name];
+                                l.SetValue(model, val == DBNull.Value ? null : val);
+                            }
+                            list.Add(model);
+                        }
                     }
                     return list;
                 }
@@ -67,7 +75,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : class,new()
+            //where T : class,new()
         {
             //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
             var conn = db.Database.GetDbConnection();
@@ -79,19 +87,27 @@ namespace BihuApiCore.Infrastructure.Helper
                 }
                 using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
                 {
-                    var propts = typeof(T).GetProperties();
+                    var type = typeof(T);
+                    var propts = type.GetProperties();
                     var list = new List<T>();
-                    T model;
-                    object val;
+                   
                     while (await reader.ReadAsync())
                     {
-                        model = new T();
-                        foreach (var l in propts)
+                        if (IsValueType(type))
                         {
-                            val = reader[l.Name];
-                            l.SetValue(model, val == DBNull.Value ? null : val);
+                            list.Add(DbChangeType<T>(reader[0]));
                         }
-                        list.Add(model);
+                        else
+                        {
+                            T model =  Activator.CreateInstance<T>();
+                            object val;
+                            foreach (var l in propts)
+                            {
+                                val = reader[l.Name];
+                                l.SetValue(model, val == DBNull.Value ? null : val);
+                            }
+                            list.Add(model);
+                        }
                     }
                     return list;
                 }
@@ -104,7 +120,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion
 
-        #region 使用DataTable的查询方法
+        #region 使用DataTable的查询方法  不兼容数据库int转枚举
 
         public static List<T> SqlQueryDt<T>(this DbContext db, string sql, params DbParameter[] parameters)
         {
@@ -361,7 +377,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static async Task<T> SqlQueryFirstAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : new()
+            //where T : new()
         {
             var conn = db.Database.GetDbConnection();
             try
@@ -372,28 +388,30 @@ namespace BihuApiCore.Infrastructure.Helper
                 }
                 using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
                 {
-                    T model = new T();
-                    Type tp = typeof(T);
-                  
+                    Type type = typeof(T);
                     if (await reader.ReadAsync())
                     {
-                        if (tp.IsValueType)
+                        //if (type.IsValueType)//只兼容默认值类型的写法
+                        //{
+                        //    return (T) Convert.ChangeType(reader.GetValue(0), type);
+                        //}
+                        if (IsValueType(type))//增加对可空类型和string datetime兼容
                         {
-                            return (T) Convert.ChangeType(reader.GetValue(0), tp);
+                            return DbChangeType<T>(reader[0]);
                         }
-                        var propts = tp.GetProperties();
+                        var propts = type.GetProperties();
+                        T model = Activator.CreateInstance<T>();
                         foreach (var propt in propts)
                         {
                             object value = reader[propt.Name];
                             propt.SetValue(model, value == DBNull.Value ? null : value);
                         } 
+                        return model;
                     }
                     else
                     {
                         throw new Exception("SqlQueryFirst未读取到任何数据");
                     }
-                    
-                    return model;
                 }
             }
             finally
@@ -411,7 +429,7 @@ namespace BihuApiCore.Infrastructure.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static T SqlQueryFirst<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : class,new()
+            //where T : class,new()
         {
             var conn = db.Database.GetDbConnection();
             try
@@ -422,15 +440,23 @@ namespace BihuApiCore.Infrastructure.Helper
                 }
                 using (var reader = PreCommandReader(db.Database, sql, parameters))
                 {
-                    T model = new T();
-                    var propts = typeof(T).GetProperties();
+                    T model = Activator.CreateInstance<T>();
+                    var type = typeof(T);
+                    var propts =type.GetProperties();
                     if (reader.Read())
                     {
-                        foreach (var propt in propts)
+                        if (IsValueType(type))
                         {
-                            object value = reader[propt.Name];
-                            propt.SetValue(model, value == DBNull.Value ? null : value);
-                        } 
+                            model=DbChangeType<T>(reader[0]);
+                        }
+                        else
+                        {
+                            foreach (var propt in propts)
+                            {
+                                object value = reader[propt.Name];
+                                propt.SetValue(model, value == DBNull.Value ? null : value);
+                            } 
+                        }
                     }
                     else
                     {
@@ -445,14 +471,6 @@ namespace BihuApiCore.Infrastructure.Helper
                 conn.Close();
             }
         }
-
-        #endregion
-
-        #region MyRegion
-
-        
-
-
 
         #endregion
 
