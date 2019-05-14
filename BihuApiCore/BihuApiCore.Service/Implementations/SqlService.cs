@@ -33,7 +33,18 @@ namespace BihuApiCore.Service.Implementations
             }
             return BaseResponse<PageData<User>>.Ok(await _userRepository.GetUserList(request,userThis.LevelCode));
         }
+        public async Task<BaseResponse> TestTransaction()
+        {
+            using (var transaction =await _userRepository.GetDbContext().Database.BeginTransactionAsync())
+            {
+                await _userRepository.SaveChangesAsync();
+               
+                transaction.Commit();
+            }
+            return BaseResponse.Ok();
 
+
+        }
         public async Task<BaseResponse> TestSql()
         {
             return BaseResponse<List<string>>.Ok( await _userRepository.TestSql());
