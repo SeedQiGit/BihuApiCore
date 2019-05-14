@@ -13,7 +13,7 @@ namespace BihuApiCore.EntityFrameworkCore.Models
         public DateTime UpdateTime { get; set; }
         public string CertificateNo { get; set; }
         public long Mobile { get; set; }
-        public int IsVerify { get; set; }
+        public IsVerifyEnum IsVerify { get; set; }
 
         public long ParentId { get; set; }
         public int LevelNum { get; set; }

@@ -8,6 +8,7 @@ using BihuApiCore.Service.Interfaces;
 using System;
 using System.Threading.Tasks;
 using System.Transactions;
+using BihuApiCore.EntityFrameworkCore;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -41,7 +42,7 @@ namespace BihuApiCore.Service.Implementations
                 CertificateNo="123131",
                 UserAccount="123",
                 Mobile=13313331333,
-                IsVerify=1
+                IsVerify=IsVerifyEnum.可用
             };
             _userRepository.Insert(user);
             //这里需要id，所以必须保存一下

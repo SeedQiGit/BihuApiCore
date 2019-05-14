@@ -46,7 +46,7 @@ namespace BihuApiCore.Repository.Repositories
             string limit = request.LimitSql();
             string sql = string.Concat(select, limit);
            
-            var data =await Context.SqlQueryAsync<User>(sql,parmArr);
+            var data =await Context.SqlQueryDtAsync<User>(sql,parmArr);
 
             #endregion
 

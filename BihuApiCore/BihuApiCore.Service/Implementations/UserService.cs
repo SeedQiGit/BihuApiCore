@@ -16,6 +16,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using BihuApiCore.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.Service.Implementations
@@ -60,7 +61,7 @@ namespace BihuApiCore.Service.Implementations
                 UserPassWord = "123123",
                 CertificateNo = "123131",
                 Mobile = 13313331333,
-                IsVerify = 1,
+                IsVerify = IsVerifyEnum.可用,
                 LevelNum = userParent.LevelNum+1,
                 LevelCode = userParent.LevelCode,
                 ParentId = userParent.Id
@@ -192,7 +193,7 @@ namespace BihuApiCore.Service.Implementations
                     UserPassWord = "123123",
                     CertificateNo = "123131",
                     Mobile = 13313331333,
-                    IsVerify = 1
+                    IsVerify = IsVerifyEnum.可用
                 };
                 _userRepository.Insert(user);
                 ZsPiccCall picc = new ZsPiccCall();
@@ -230,7 +231,7 @@ namespace BihuApiCore.Service.Implementations
                     UserPassWord = "123123",
                     CertificateNo = "123131",
                     Mobile = 13313331333,
-                    IsVerify = 1
+                    IsVerify = IsVerifyEnum.可用
                 };
                 await _userRepository.InsertAsync(user);
 
@@ -281,7 +282,7 @@ namespace BihuApiCore.Service.Implementations
                 UserPassWord = "123123",
                 CertificateNo = "123131",
                 Mobile = 13313331333,
-                IsVerify = 1
+                IsVerify = IsVerifyEnum.可用
             };
             _userRepository.Insert(user);
             var a = await _userRepository.SaveChangesAsync();
@@ -318,7 +319,7 @@ namespace BihuApiCore.Service.Implementations
                         UserPassWord = "123123",
                         CertificateNo = "123131",
                         Mobile = 13313331333,
-                        IsVerify = 1
+                        IsVerify = IsVerifyEnum.可用
                     };
 
                     user.UserAccount = request.Account;

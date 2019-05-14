@@ -229,6 +229,12 @@ namespace BihuApiCore.Infrastructure.Helper
                 NullableConverter nullableConverter = new NullableConverter(conversionType);
                 conversionType = nullableConverter.UnderlyingType;
             }
+            //枚举值赋值需要特殊转换
+            if (conversionType.IsEnum)
+            {
+                var enumValue = Enum.ToObject(conversionType, value);
+                return enumValue;
+            }
 
             return Convert.ChangeType(value, conversionType);
         }
