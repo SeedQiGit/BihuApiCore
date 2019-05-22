@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using BihuApiCore.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -173,51 +174,18 @@ namespace BihuApiCore.Service.Implementations
 
         public BaseResponse Test()
         {
-            //User userThis;
-            //using (bihu_apicoreContext ef = new bihu_apicoreContext())
-            //{
-            //    userThis = ef.User.FirstOrDefault();
-            //}
-            ////userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
+            User userThis;
+            using (bihu_apicoreContext ef = new bihu_apicoreContext())
+            {
+                userThis = ef.User.FirstOrDefault();
+            }
+
+            userThis.UserAccount = null;
+            userThis = JsonConvert.DeserializeObject<User>(JsonConvert.SerializeObject(userThis));
+            //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
+            return BaseResponse<User>.Ok(userThis);
             //UserDto userDto = _mapper.Map<UserDto>(userThis);
             //return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
-
-            //_companyModuleRelationRepository.DeleteRelation(request.EditCompId);
-
-            using (var transaction = _zsPiccCallRepository.GetDbContext().Database.BeginTransaction())
-            {
-                User user = new User
-                {
-                    UserName = "asd",
-                    UserAccount = "1233123213123",
-                    UserPassWord = "123123",
-                    CertificateNo = "123131",
-                    Mobile = 13313331333,
-                    IsVerify = IsVerifyEnum.可用
-                };
-                _userRepository.Insert(user);
-                ZsPiccCall picc = new ZsPiccCall();
-                picc.UserName = "";
-                picc.CallPassword ="1231231";
-                picc.CallExtNumber = "12312321";
-                picc.CallNumber = "12312";
-                picc.CallId = 0;
-                picc.UserAgentId = 0;
-                picc.CallState = 1;
-                picc.CreateTime = DateTime.Now;
-                picc.UpdateTime = DateTime.Now;
-
-                _userRepository.GetDbContext().Database.ExecuteSqlCommand(new RawSqlString(" delete from user where user.Id=7"));
-
-                //_userRepository.CommandTest();
-                _zsPiccCallRepository.Insert(picc);
-                _userRepository.FirstOrDefault(w=>w.Id==1);
-                _zsPiccCallRepository.SaveChanges();
-                transaction.Commit();
-            }
-            return BaseResponse.Ok();
-           
-
         }
 
         public async Task<BaseResponse> TestAsy()

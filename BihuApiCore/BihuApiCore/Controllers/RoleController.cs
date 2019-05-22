@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BihuApiCore.Model.Enums;
+using BihuApiCore.Model.Models;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
@@ -26,7 +28,7 @@ namespace BihuApiCore.Controllers
         [HttpPost]
         public async Task<BaseResponse> RoleModuleByRoleIdAsync([FromBody]RoleModuleByRoleIdRequest request)
         {
-            return BaseResponse<object>.GetBaseResponse(BusinessStatusType.OK,await _roleService.RoleModuleByRoleIdAsync(request.RoleId,request.CompId));
+            return BaseResponse<List<ModuleTreeViewModel>>.GetBaseResponse(BusinessStatusType.OK,await _roleService.RoleModuleByRoleIdAsync(request.RoleId,request.CompId));
         }
 
         [HttpPost]

@@ -64,8 +64,6 @@ namespace BihuApiCore
                     );
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
             #region 依赖注入仓储和service及上下文等
 
             services.RegisterAssembly("BihuApiCore.Service", Lifecycle.Scoped);
@@ -85,9 +83,12 @@ namespace BihuApiCore
                 opt.Filters.Add(typeof(ModelVerifyFilterAttribute), 1);
                 //日志记录，全局使用  已经直接使用中间件了
                 //opt.Filters.Add(new LogAttribute());
-            }).AddJsonOptions(options =>
+            })
+            .AddJsonOptions(options =>
             {
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                //空值处理
+                options.SerializerSettings.ContractResolver = new NullToEmptyStringResolver();
             });
 
             //services.AddAutoMapper();  这里使用另一种automapper的注入方式
