@@ -23,7 +23,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
             #endregion
 
-            var response = client.PostAsync(url, content).Result;
+            HttpResponseMessage response = await client.PostAsync(url, content);
             if (response.IsSuccessStatusCode)
             {
                 result = response.Content.ReadAsStringAsync();
