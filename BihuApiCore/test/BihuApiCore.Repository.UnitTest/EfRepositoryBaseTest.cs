@@ -2,6 +2,7 @@
 using BihuApiCore.Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
+using BihuApiCore.EntityFrameworkCore;
 using Xunit;
 
 namespace BihuApiCore.Repository.UnitTest
@@ -27,7 +28,7 @@ namespace BihuApiCore.Repository.UnitTest
                 UserPassWord="123123",
                 CertificateNo="123131",
                 Mobile=13313331333,
-                IsVerify=1
+                IsVerify=IsVerifyEnum.可用
             };
             _repository.Insert(user);
             _repository.SaveChanges();
@@ -62,7 +63,7 @@ namespace BihuApiCore.Repository.UnitTest
                 UserPassWord="123123",
                 CertificateNo="123131",
                 Mobile=13313331333,
-                IsVerify=1
+                IsVerify=IsVerifyEnum.可用
             };
             _repository.Insert(user);
             _repository.SaveChanges();
