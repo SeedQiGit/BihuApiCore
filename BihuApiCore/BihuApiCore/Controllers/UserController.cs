@@ -1,4 +1,5 @@
-﻿using BihuApiCore.Filters;
+﻿using System.Security.Claims;
+using BihuApiCore.Filters;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;
@@ -81,9 +82,9 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Route("TestAsy")]
         public async Task<BaseResponse> TestAsy()
         {
+            var a =HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return await _userService.TestAsy();
             //return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }

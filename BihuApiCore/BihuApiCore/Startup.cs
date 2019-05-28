@@ -8,6 +8,7 @@ using BihuApiCore.Middlewares;
 using BihuApiCore.Model;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
+using Dnc.Api.Throttle;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,23 @@ namespace BihuApiCore
 
             #endregion
 
+            //Api限流
+            services.AddApiThrottle(options => {
+                //配置redis
+                //如果Cache和Storage使用同一个redis，则可以按如下配置
+                options.UseRedisCacheAndStorage(opts => {
+                    opts.ConnectionString =Configuration["ApiThrottleConnectionString"];
+                    //opts.KeyPrefix = "apithrottle"; //指定给所有key加上前缀，默认为apithrottle
+                });
+                //如果Cache和Storage使用不同redis库，可以按如下配置
+                //options.UseRedisCache(opts => {
+                //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=0";
+                //});
+                //options.UseRedisStorage(opts => {
+                //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=1";
+                //});
+            });
+
             services.AddMvc(opt =>
             {
                 // 跨域
@@ -83,6 +101,8 @@ namespace BihuApiCore
                 opt.Filters.Add(typeof(ModelVerifyFilterAttribute), 1);
                 //日志记录，全局使用  已经直接使用中间件了
                 //opt.Filters.Add(new LogAttribute());
+                //这里添加ApiThrottleActionFilter拦截器
+                opt.Filters.Add(typeof(ApiThrottleActionFilter));
             })
             .AddJsonOptions(options =>
             {
@@ -142,8 +162,10 @@ namespace BihuApiCore
                     name: "default",
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
-          
-            //app.UseMvc(); 
+            //Api限流
+            app.UseApiThrottle();
+
+            app.UseMvc(); 
             //HttpClientHelper.WarmUpClient();
         }
     }
