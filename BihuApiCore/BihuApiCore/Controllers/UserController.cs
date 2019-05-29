@@ -8,6 +8,7 @@ using BihuApiCore.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Dnc.Api.Throttle;
 
 namespace BihuApiCore.Controllers
 {
@@ -82,9 +83,10 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [RateValve(Policy = Policy.Header,PolicyKey = "Authorize",  Limit = 1, Duration = 30,WhenNull = WhenNull.Intercept)]
         public async Task<BaseResponse> TestAsy()
         {
-            var a =HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var a =HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return await _userService.TestAsy();
             //return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }

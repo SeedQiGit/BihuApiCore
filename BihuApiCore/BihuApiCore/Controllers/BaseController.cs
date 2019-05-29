@@ -1,5 +1,6 @@
 ﻿using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Response;
+using Dnc.Api.Throttle;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

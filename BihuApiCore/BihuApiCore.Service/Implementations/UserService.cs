@@ -190,23 +190,23 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> TestAsy()
         {
-            using (var transaction =await _zsPiccCallRepository.GetDbContext().Database.BeginTransactionAsync())
-            {
-                User user = new User
-                {
-                    UserName = "asd",
-                    UserAccount = "1233123213123",
-                    UserPassWord = "123123",
-                    CertificateNo = "123131",
-                    Mobile = 13313331333,
-                    IsVerify = IsVerifyEnum.可用
-                };
-                await _userRepository.InsertAsync(user);
+            //using (var transaction =await _zsPiccCallRepository.GetDbContext().Database.BeginTransactionAsync())
+            //{
+            //    User user = new User
+            //    {
+            //        UserName = "asd",
+            //        UserAccount = "1233123213123",
+            //        UserPassWord = "123123",
+            //        CertificateNo = "123131",
+            //        Mobile = 13313331333,
+            //        IsVerify = IsVerifyEnum.可用
+            //    };
+            //    await _userRepository.InsertAsync(user);
 
-                await _userRepository.GetDbContext().Database.ExecuteSqlCommandAsync(new RawSqlString(" delete from user where user.Id=8"));
-                await _zsPiccCallRepository.SaveChangesAsync();
-                transaction.Commit();
-            }
+            //    await _userRepository.GetDbContext().Database.ExecuteSqlCommandAsync(new RawSqlString(" delete from user where user.Id=8"));
+            //    await _zsPiccCallRepository.SaveChangesAsync();
+            //    transaction.Commit();
+            //}
 
 
 

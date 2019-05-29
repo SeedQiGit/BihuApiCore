@@ -21,6 +21,8 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
+using BihuApiCore.Model.Enums;
+using BihuApiCore.Model.Response;
 
 namespace BihuApiCore
 {
@@ -91,7 +93,16 @@ namespace BihuApiCore
                 //options.UseRedisStorage(opts => {
                 //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=1";
                 //});
+
+                options.onIntercepted = (context, valve, where) =>
+                {
+                    //valve：引发拦截的valve
+                    //where：拦截发生的地方，有ActionFilter,PageFilter,Middleware(全局)
+                    context.Response.StatusCode = 429;
+                    return new JsonResult(new BaseResponse{ Code = (int)BusinessStatusType.FrequencyRequest, Message = "访问过于频繁，请稍后重试！" });
+                };
             });
+            
 
             services.AddMvc(opt =>
             {
