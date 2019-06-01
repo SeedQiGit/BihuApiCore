@@ -100,7 +100,9 @@ namespace BihuApiCore
                     //where：拦截发生的地方，有ActionFilter,PageFilter,Middleware(全局)
                     context.Response.StatusCode = 429;
                     return new JsonResult(new BaseResponse{ Code = (int)BusinessStatusType.FrequencyRequest, Message = "访问过于频繁，请稍后重试！" });
+
                 };
+
             });
             
 

@@ -5,10 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="0.56.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BihuApiCore.EntityFrameworkCore\BihuApiCore.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\BihuApiCore.Infrastructure\BihuApiCore.Infrastructure.csproj" />
     <ProjectReference Include="..\BihuApiCore.Model\BihuApiCore.Model.csproj" />
     <ProjectReference Include="..\BihuApiCore.Repository\BihuApiCore.Repository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Data.SqlClient">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.5.1\ref\netcoreapp2.1\System.Data.SqlClient.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
