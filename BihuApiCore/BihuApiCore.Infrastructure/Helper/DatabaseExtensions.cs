@@ -120,7 +120,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion
 
-        #region 使用DataTable的查询方法  不兼容数据库int转枚举
+        #region 使用DataTable的查询方法 
 
         public static List<T> SqlQueryDt<T>(this DbContext db, string sql, params DbParameter[] parameters)
         {
