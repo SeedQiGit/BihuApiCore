@@ -40,5 +40,15 @@ namespace BihuApiCore.Controllers
             return await _adoService.MysqlDataReader();
         }
 
+        [HttpGet]
+        public async Task<BaseResponse> MysqlExecuteNonQuery()
+        {
+            return await _adoService.MysqlExecuteNonQuery();
+        }
+        [HttpGet]
+        public async Task<BaseResponse> MysqlExecuteDataTable()
+        {
+            return await _adoService.MysqlExecuteDataTable();
+        }
     }
 }

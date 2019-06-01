@@ -12,5 +12,9 @@ namespace BihuApiCore.Service.Interfaces
         Task<BaseResponse> MysqlCommand();
 
         Task<BaseResponse> MysqlDataReader();
+
+        Task<BaseResponse> MysqlExecuteNonQuery();
+
+        Task<BaseResponse> MysqlExecuteDataTable();
     }
 }

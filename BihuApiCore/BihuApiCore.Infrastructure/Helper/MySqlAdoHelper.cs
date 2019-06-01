@@ -135,6 +135,200 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion 
 
+        #region ExecuteDataTable
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="commandText">SQL语句</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataTable(ConnectionString, CommandType.Text, commandText, parms);
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(ConnectionString, commandType, commandText, parms).Tables[0];
+        }
+
+        #endregion ExecuteDataTable
+
+        #region ExecuteDataTable
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串</param>
+        /// <param name="commandText">SQL语句</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(string connectionString, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(connectionString, CommandType.Text, commandText, parms).Tables[0];
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(string connectionString, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(connectionString, commandType, commandText, parms).Tables[0];
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(MySqlConnection connection, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(connection, commandType, commandText,parms).Tables[0];
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="transaction">事务</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteDataTable(MySqlTransaction transaction, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(transaction, commandType, commandText, parms).Tables[0];
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集中的第一个数据表
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串</param>
+        /// <param name="tableName">数据表名称</param>
+        /// <returns>返回结果集中的第一个数据表</returns>
+        public DataTable ExecuteEmptyDataTable(string connectionString, string tableName)
+        {
+            return ExecuteDataSet(connectionString, CommandType.Text, string.Format("select * from {0} where 1=-1", tableName)).Tables[0];
+        }
+
+        #endregion ExecuteDataTable
+
+        #region ExecuteDataSet
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串</param>
+        /// <param name="commandText">SQL语句</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集</returns>
+        public DataSet ExecuteDataSet(string connectionString, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(connectionString, CommandType.Text, commandText,  parms);
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集</returns>
+        public DataSet ExecuteDataSet(string connectionString, CommandType commandType, string commandText,params MySqlParameter[] parms)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                return ExecuteDataSet(connection, commandType, commandText, parms);
+            }
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集</returns>
+        public  DataSet ExecuteDataSet(MySqlConnection connection, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(connection, null, commandType, commandText, parms);
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集
+        /// </summary>
+        /// <param name="transaction">事务</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集</returns>
+        public  DataSet ExecuteDataSet(MySqlTransaction transaction, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            return ExecuteDataSet(transaction.Connection, transaction, commandType, commandText, parms);
+        }
+
+        /// <summary>
+        /// 执行SQL语句,返回结果集
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="transaction">事务</param>
+        /// <param name="commandType">命令类型(存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">SQL语句或存储过程名称</param>
+        /// <param name="parms">查询参数</param>
+        /// <returns>返回结果集</returns>
+        private DataSet ExecuteDataSet(MySqlConnection connection, MySqlTransaction transaction, CommandType commandType, string commandText, params MySqlParameter[] parms)
+        {
+            var command = new MySqlCommand();
+     
+
+            PrepareCommand(command, connection, transaction, commandType, commandText, parms);
+            var adapter = new MySqlDataAdapter(command);
+
+            var ds = new DataSet();
+            adapter.Fill(ds);
+            if (commandText.IndexOf("@") > 0)
+            {
+                commandText = commandText.ToLower();
+                var index = commandText.IndexOf("where ");
+                if (index < 0)
+                {
+                    index = commandText.IndexOf("\nwhere");
+                }
+                ds.ExtendedProperties.Add("SQL", index > 0 ? commandText.Substring(0, index - 1) : commandText);
+            }
+            else
+            {
+                ds.ExtendedProperties.Add("SQL", commandText);  //将获取的语句保存在表的一个附属数组里，方便更新时生成CommandBuilder
+            }
+
+            foreach (DataTable dt in ds.Tables)
+            {
+                dt.ExtendedProperties.Add("SQL", ds.ExtendedProperties["SQL"]);
+            }
+
+            command.Parameters.Clear();
+            return ds;
+        }
+
+        #endregion ExecuteDataSet
+
         #region 辅助方法
 
         private void PrepareCommand(MySqlCommand command, MySqlConnection connection, MySqlTransaction transaction, CommandType commandType, string commandText, MySqlParameter[] parms)

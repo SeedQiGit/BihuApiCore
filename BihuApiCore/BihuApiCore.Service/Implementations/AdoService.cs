@@ -5,17 +5,18 @@ using BihuApiCore.Service.Interfaces;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Helper;
 using MySql.Data.MySqlClient;
 
 namespace BihuApiCore.Service.Implementations
 {
-    public class AdoService:IAdoService
+    public class AdoService : IAdoService
     {
-        private readonly MySqlAdoHelper _mySqlAdoHelper=new MySqlAdoHelper(ConfigurationManager.GetValue<string>("ConnectionStrings:EntityContext"));
+        private readonly MySqlAdoHelper _mySqlAdoHelper = new MySqlAdoHelper(ConfigurationManager.GetValue<string>("ConnectionStrings:EntityContext"));
 
-        public  AdoService()
+        public AdoService()
         {
 
         }
@@ -25,12 +26,12 @@ namespace BihuApiCore.Service.Implementations
         public async Task<BaseResponse> SqlServerCommand()
         {
             SqlConnection conn = new SqlConnection(ConfigurationManager.GetValue<string>("ConnectionStrings:SqlServer"));
-            if (conn.State!=ConnectionState.Open)
+            if (conn.State != ConnectionState.Open)
             {
                 await conn.OpenAsync();
             }
-          
-            using(SqlCommand cmd = new SqlCommand())//创建命令对象SqlCommand
+
+            using (SqlCommand cmd = new SqlCommand())//创建命令对象SqlCommand
             {
                 cmd.Connection = conn;//设置连接对象
                 cmd.CommandType = CommandType.Text;//设置Command对象执行语句的类型
@@ -66,18 +67,18 @@ namespace BihuApiCore.Service.Implementations
         {
             using (MySqlConnection conn = new MySqlConnection(ConfigurationManager.GetValue<string>("ConnectionStrings:EntityContext")))
             {
-                if (conn.State!=ConnectionState.Open)
+                if (conn.State != ConnectionState.Open)
                 {
                     await conn.OpenAsync();
                 }
-          
-                using(MySqlCommand cmd = new MySqlCommand())//创建命令对象SqlCommand
+
+                using (MySqlCommand cmd = new MySqlCommand())//创建命令对象SqlCommand
                 {
                     cmd.Connection = conn;//设置连接对象
                     cmd.CommandType = CommandType.Text;//设置Command对象执行语句的类型
                     cmd.CommandText = "Delete from zs_picc_call where id=89;";//设置执行的语句
                     return BaseResponse.Ok((await cmd.ExecuteNonQueryAsync()).ToString());
-                } 
+                }
             }
         }
 
@@ -115,10 +116,26 @@ namespace BihuApiCore.Service.Implementations
                 new MySqlParameter {  MySqlDbType=MySqlDbType.VarChar,ParameterName= "Description" , Value= "无敌是多么寂寞"}
             };
             //_mySqlAdoHelper.ExecuteNonQuery( sql, ps.ToArray());
-            return BaseResponse<string>.Ok(_mySqlAdoHelper.ExecuteNonQuery( sql, ps.ToArray()).ToString());
+            return BaseResponse<string>.Ok(_mySqlAdoHelper.ExecuteNonQuery(sql, ps.ToArray()).ToString());
         }
 
         #endregion
+
+        #region ExecuteDataTable
+
+        public async Task<BaseResponse> MysqlExecuteDataTable()
+        {
+            var getOverviewOfDataSql = string.Format("select * from bihu_apicore_test.product where id>?id ");
+            List<MySqlParameter> ps = new List<MySqlParameter>() {
+                new MySqlParameter { MySqlDbType = MySqlDbType.Int64,ParameterName = "id", Value = 0 }
+                 };
+            var list = _mySqlAdoHelper.ExecuteDataTable(getOverviewOfDataSql, ps.ToArray()).ToList<Product>();
+
+            return BaseResponse<List<Product>>.Ok(list);
+        }
+
+        #endregion
+
 
         #endregion
 
