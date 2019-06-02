@@ -9,149 +9,6 @@ namespace BihuApiCore.Infrastructure.Extensions
 
     public static class DataTableExtession
     {
-        public static bool IsNullOrEmpty(this DataTable table)
-        {
-            if (table == null)
-            {
-                return true;
-            }
-            return table.Rows.Count == 0;
-        }
-
-        public static T ToT<T>(this DataRow row)
-        {
-            if (row == null)
-            {
-                return default(T);
-            }
-            Type type = typeof(T);
-            bool isBaseType = type.IsValueType || type.Name == "String";
-            if (isBaseType)
-            {
-                return row[0].ToSimpleT(default(T));
-            }
-            T tReturn = Activator.CreateInstance<T>();
-            foreach (PropertyInfo pfi in typeof(T).GetProperties())
-            {
-                if (row.Table.Columns.Contains(pfi.Name))
-                {
-                    object objValue = row[pfi.Name];
-                    if (objValue == null || objValue == DBNull.Value)
-                    {
-
-                        continue;
-                    }
-                    if (pfi.PropertyType.BaseType == typeof(Enum))
-                    {
-                        objValue = Enum.Parse(pfi.PropertyType, objValue.ToString());
-                    }
-                    else if (pfi.PropertyType.IsGenericType)
-                    {
-                        Type typParameter = pfi.PropertyType.GetGenericArguments()[0];
-                        if (typParameter.BaseType == typeof(Enum))
-                        {
-                            objValue = Enum.Parse(typParameter, objValue.ToStringNullToEmpty());
-                        }
-                        else
-                        {
-                            objValue = Convert.ChangeType(objValue, typParameter);
-                        }
-                        pfi.SetValue(tReturn, objValue, null);
-                        continue;
-                    }
-                    pfi.SetValue(tReturn, Convert.ChangeType(objValue, pfi.PropertyType), null);
-                }
-            }
-            return tReturn;
-        }
-
-
-
-        public static T ConVert<T>(this DataRow row)
-        {
-            if (row == null)
-            {
-                return default(T);
-            }
-            Type type = typeof(T);
-            bool isBaseType = type.IsValueType || type.Name == "String";
-            if (isBaseType)
-            {
-                return row[0].ToSimpleT(default(T));
-            }
-            T tReturn = Activator.CreateInstance<T>();
-            foreach (PropertyInfo pfi in typeof(T).GetProperties())
-            {
-                if (row.Table.Columns.Contains(pfi.Name))
-                {
-                    object objValue = row[pfi.Name];
-                    if (objValue == null || objValue == DBNull.Value)
-                    {
-                        objValue = "";
-                        pfi.SetValue(tReturn, objValue);
-                    }
-                    if (pfi.PropertyType.BaseType == typeof(Enum))
-                    {
-                        objValue = Enum.Parse(pfi.PropertyType, objValue.ToString());
-                    }
-                    else if (pfi.PropertyType.IsGenericType)
-                    {
-                        Type typParameter = pfi.PropertyType.GetGenericArguments()[0];
-                        if (typParameter.BaseType == typeof(Enum))
-                        {
-                            objValue = Enum.Parse(typParameter, objValue.ToStringNullToEmpty());
-                        }
-                        else
-                        {
-                            objValue = Convert.ChangeType(objValue, typParameter);
-                        }
-                        pfi.SetValue(tReturn, objValue, null);
-                        continue;
-                    }
-                    pfi.SetValue(tReturn, Convert.ChangeType(objValue, pfi.PropertyType), null);
-                }
-            }
-            return tReturn;
-        }
-
-
-
-        /// <summary>
-        /// 在当前对象上指定bindLogic逻辑。
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="bindLogic"></param>
-        /// <returns></returns>
-        public static T DoFunction<T>(this T value, Action<T> bindLogic)
-        {
-            if (bindLogic == null)
-            {
-                return value;
-            }
-            bindLogic(value);
-            return value;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T1"></typeparam>
-        /// <param name="value">不参与运算，语法糖</param>
-        /// <param name="t1Value"></param>
-        /// <param name="bindLogic"></param>
-        /// <returns></returns>
-        public static T DoFunction<T, T1>(this T value, T1 t1Value, Action<T, T1> bindLogic)
-        {
-            if (bindLogic == null)
-            {
-                return value;
-            }
-            bindLogic(value, t1Value);
-            return value;
-        }
-
         /// <summary>
         /// 转换DataTable到IList强类型
         /// </summary>
@@ -159,31 +16,81 @@ namespace BihuApiCore.Infrastructure.Extensions
         /// <param name="table"></param>
         /// <param name="bindLogic">绑定逻辑</param>
         /// <returns></returns>
-        public static IList<T> ToList<T>(this DataTable table, Action<T, DataRow> bindLogic)
+        public static List<T> ToList<T>(this DataTable table, Action<T, DataRow> bindLogic)
         {
-            if (table.IsNullOrEmpty())
-            {
-                return new List<T>(0);
-            }
-            return (from DataRow row in table.Rows select row.ToT<T>().DoFunction<T, DataRow>(row, bindLogic)).ToList();
+            return table == null
+                ? new List<T>(0)
+                : (from DataRow row in table.Rows select row.ToT<T>().DoFunction(row, bindLogic)).ToList();
+            //DoFunction传入DataRow row对模型进行再次特殊处理（针对不能自动绑定的属性）
         }
 
         /// <summary>
-        /// 转换DataTable到IList强类型
+        /// 转换DataTable到List类型
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="table"></param>
         /// <returns></returns>
-        public static IList<T> ToList<T>(this DataTable table)
+        public static List<T> ToList<T>(this DataTable table)
         {
             return table.ToList<T>(null);
         }
 
-        public static IList<T> ToList<T>(this DataSet ds, int tableIndex = 0)
+        /// <summary>
+        ///  DataRow转换为指定类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static T ToT<T>(this DataRow row)
         {
-            if (ds == null || ds.Tables.Count <= tableIndex) return null;
-            return ds.Tables[tableIndex].ToList<T>();
-        }
-    }
+            if (row == null)
+            {
+                return default(T);
+            }
 
+            //值类型直接返回第一列
+            Type tp = typeof(T);
+            if (ObjectExtession.IsValueType(tp))
+            {
+                return (T)ObjectExtession.DbChangeType(row[0],tp);
+            }
+
+            T tReturn = Activator.CreateInstance<T>();
+
+            //属性列表
+            var properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo property in properties)
+            {
+                if (row.Table.Columns.Contains(property.Name))
+                {
+                    object objValue = row[property.Name];
+                  
+                    //忽略空值,忽略只读属性
+                    if (!ObjectExtession.IsNullOrDbNull(objValue) && property.CanWrite)
+                    {
+                        property.SetValue(tReturn, ObjectExtession.DbChangeType(objValue, property.PropertyType));
+                    }
+                }
+            }
+            return tReturn;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="t1Value"></param>
+        /// <param name="bindLogic">对于DataRow中需要进行特殊处理的字段进行再次赋值</param>
+        /// <returns></returns>
+        public static T DoFunction<T>(this T value, DataRow t1Value, Action<T, DataRow> bindLogic)
+        {
+            if (bindLogic == null)
+                return value;
+            bindLogic(value, t1Value);
+            return value;
+        }
+
+       
+    }
 }

@@ -1,6 +1,6 @@
 ﻿using BihuApiCore.EntityFrameworkCore.Models;
-using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.Repository.Repositories
 {
@@ -15,8 +15,9 @@ namespace BihuApiCore.Repository.Repositories
         public void DelUserExtent(long userId)
         {
             var sql11 = $@"delete from user_extent where UserId = {userId} ";
-            Context.ExecuteScalar(sql11);
+            Context.Database.ExecuteSqlCommand(sql11);
         }
+
         public void DelUserExtentContext(UserExtent user)
         {
             Context.UserExtent.Remove(user);

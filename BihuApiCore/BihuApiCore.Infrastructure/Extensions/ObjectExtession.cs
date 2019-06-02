@@ -1,47 +1,59 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace BihuApiCore.Infrastructure.Extensions
 {
     public static class ObjectExtession
     {
+        #region 数据库值转换为对应类型
+
         /// <summary>
-        /// 当前对象转换成特定类型，如果转换失败或者对象为null，返回defaultValue。
-        /// 如果传入的是可空类型：会试着转换成其真正类型后返回。
+        /// 判断值类型,string,datetime
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="defaultValue">转换出错或者对象为空的时候的返回值</param>
+        /// <param name="tp"></param>
         /// <returns></returns>
-        public static T ToSimpleT<T>(this object value, T defaultValue)
+        public static bool IsValueType(Type tp)
         {
-            if (value == null)
-            {
-                return defaultValue;
-            }
-            else if (value is T)
-            {
-                return (T)value;
-            }
-            try
-            {
-                if (typeof(T).BaseType == typeof(Enum))
-                {
-                    object objValue = Enum.Parse(typeof(T), value.ToString());
-                    return (T)objValue;
-                }
-                Type typ = typeof(T);
-                if (typ.BaseType == typeof(ValueType) && typ.IsGenericType)//可空泛型
-                {
-                    Type[] typs = typ.GetGenericArguments();
-                    return (T)Convert.ChangeType(value, typs[0]);
-                }
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch
-            {
-                return defaultValue;
-            }
+            return tp.IsValueType || tp == typeof(Nullable<>) || tp == typeof(string) || tp == typeof(DateTime);
         }
+ 
+        /// <summary>
+        /// 数据库值转换为对应类型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="conversionType">类型</param>
+        /// <returns></returns>
+        public static object DbChangeType(object value, Type conversionType)
+        {
+            if (conversionType.IsGenericType && conversionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                if (IsNullOrDbNull(value))
+                    return null;
+                NullableConverter nullableConverter = new NullableConverter(conversionType);
+                conversionType = nullableConverter.UnderlyingType;
+            }
+            //枚举值赋值需要特殊转换
+            if (conversionType.IsEnum)
+            {
+                //数字转换为枚举  ToObject还有很多其他重载，可以自己看
+                return Enum.ToObject(conversionType, value);
+            }
+
+            return Convert.ChangeType(value, conversionType);
+        }
+
+        /// <summary>
+        /// 空值判断 使用DbDataReader时候需要用这个判断
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool IsNullOrDbNull(object obj)
+        {
+            return obj == null || obj is DBNull;
+        }
+
+        #endregion
+       
 
         /// <summary>
         /// 更加安全的调用对象的ToString方法，如果是null，返回string.Empty；其它情况调用实际的ToString。

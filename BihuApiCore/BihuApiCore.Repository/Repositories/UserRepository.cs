@@ -1,4 +1,5 @@
-﻿using BihuApiCore.EntityFrameworkCore.Models;
+﻿using BihuApiCore.EntityFrameworkCore;
+using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Models;
 using BihuApiCore.Model.Request;
@@ -7,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BihuApiCore.Repository.Repositories
@@ -21,7 +21,7 @@ namespace BihuApiCore.Repository.Repositories
         public void CommandTest()
         {
             var sql = $@" delete from user where user.Id=100 ";
-            Context.ExecuteScalar(sql);
+            Context.Database.ExecuteSqlCommand(sql);
         }
 
         #region 列表方法
@@ -46,7 +46,7 @@ namespace BihuApiCore.Repository.Repositories
             string limit = request.LimitSql();
             string sql = string.Concat(select, limit);
            
-            var data =await Context.SqlQueryDtAsync<User>(sql,parmArr);
+            var data =await Context.SqlQueryAsync<User>(sql,parmArr);
 
             #endregion
 
@@ -77,16 +77,16 @@ namespace BihuApiCore.Repository.Repositories
 
         #region 测试sql方法
 
-        public async Task<List<string>> TestSql()
+        public async Task<List<IsVerifyEnum>> TestSql()
         {
             #region 查总数
 
             string sqlcount = @"
                         SELECT
-	                        UserName
+	                        IsVerify
                         FROM  user ";
 
-            var count = await Context.SqlQueryAsync<string>(sqlcount);
+            var count = await Context.SqlQueryAsync<IsVerifyEnum>(sqlcount);
 
             #endregion
 

@@ -7,128 +7,22 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Extensions;
 
 namespace BihuApiCore.Infrastructure.Helper
 {
-    public static class DatabaseExtensions
+    public static class EfSqlExtensions
     {
-        #region 查询 T : new类型(有公共无参的构造函数)
 
-        /// <summary>
-        ///  EF Core使用原生SQL的扩展方法  
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        #region EF查询数据，并转换为指定模型
+
         public static List<T> SqlQuery<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            where T : class,new()
-        {
-            //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
-            var conn = db.Database.GetDbConnection();
-            try
-            {
-                if (conn.State != ConnectionState.Open)
-                {
-                    conn.Open();
-                }
-                using (var reader = PreCommandReader(db.Database, sql, parameters))
-                {
-                    var type = typeof(T);
-                    var propts = type.GetProperties();
-                    var list = new List<T>();
-                    T model;
-                    object val;
-                    while (reader.Read())
-                    {
-                        if (IsValueType(type))
-                        {
-                            list.Add(DbChangeType<T>(reader[0]));
-                        }
-                        else
-                        {
-                            model = new T();
-                            foreach (var l in propts)
-                            {
-                                val = reader[l.Name];
-                                l.SetValue(model, val == DBNull.Value ? null : val);
-                            }
-                            list.Add(model);
-                        }
-                    }
-                    return list;
-                }
-            }
-            finally
-            {
-                conn.Close();
-            }
-        }
-
-        /// <summary>
-        ///  EF Core使用原生SQL的扩展方法  异步
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
-            //where T : class,new()
-        {
-            //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
-            var conn = db.Database.GetDbConnection();
-            try
-            {
-                if (conn.State != ConnectionState.Open)
-                {
-                    await conn.OpenAsync();
-                }
-                using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
-                {
-                    var type = typeof(T);
-                    var propts = type.GetProperties();
-                    var list = new List<T>();
-                   
-                    while (await reader.ReadAsync())
-                    {
-                        if (IsValueType(type))
-                        {
-                            list.Add(DbChangeType<T>(reader[0]));
-                        }
-                        else
-                        {
-                            T model =  Activator.CreateInstance<T>();
-                            object val;
-                            foreach (var l in propts)
-                            {
-                                val = reader[l.Name];
-                                l.SetValue(model, val == DBNull.Value ? null : val);
-                            }
-                            list.Add(model);
-                        }
-                    }
-                    return list;
-                }
-            }
-            finally
-            {
-                conn.Close();
-            }
-        }
-
-        #endregion
-
-        #region 使用DataTable的查询方法 
-
-        public static List<T> SqlQueryDt<T>(this DbContext db, string sql, params DbParameter[] parameters)
         {
             var dt = SqlQuery(db, sql, parameters);
             return dt.ToList<T>();
         }
 
-        public static async Task<List<T>> SqlQueryDtAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
+        public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, params DbParameter[] parameters)
         {
             var dt = await SqlQueryAsync(db, sql, parameters);
             return dt.ToList<T>();
@@ -186,129 +80,6 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion
 
-        #region 辅助方法
-
-        #region 类型判断方法
-
-        /// <summary>
-        /// 判断值类型,string,datetime
-        /// </summary>
-        /// <param name="tp"></param>
-        /// <returns></returns>
-        private static bool IsValueType(Type tp)
-        {
-            return tp.IsValueType || tp == typeof(Nullable<>) || tp == typeof(string) || tp == typeof(DateTime);
-        }
-
-        /// <summary>
-        /// 空值判断 使用DbDataReader时候需要用这个判断
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        private static bool IsNullOrDbNull<T>(T obj)
-        {
-            return obj == null || obj is DBNull;
-        }
-
-        #endregion
-
-        #region 数据转换辅助方法
-        
-        /// <summary>
-        /// 对可空类型进行判断转换，要不然会报错
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="conversionType"></param>
-        /// <returns></returns>
-        private static object DbChangeType(object value, Type conversionType)
-        {
-            if (conversionType.IsGenericType && conversionType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-            {
-                if (IsNullOrDbNull(value))
-                    return null;
-                NullableConverter nullableConverter = new NullableConverter(conversionType);
-                conversionType = nullableConverter.UnderlyingType;
-            }
-            //枚举值赋值需要特殊转换
-            if (conversionType.IsEnum)
-            {
-                var enumValue = Enum.ToObject(conversionType, value);
-                return enumValue;
-            }
-
-            return Convert.ChangeType(value, conversionType);
-        }
-
-        /// <summary>
-        /// 对可空类型进行判断转换，要不然会报错
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private static T DbChangeType<T>(object value)
-        {
-            Type conversionType = typeof(T);
-            if (conversionType.IsGenericType && conversionType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))//判断是否为可空类型
-            {
-                if (IsNullOrDbNull(value))
-                    return default(T);
-                NullableConverter nullableConverter = new NullableConverter(conversionType);
-                conversionType = nullableConverter.UnderlyingType;
-            }
-
-            return (T) Convert.ChangeType(value, conversionType);
-        }
-
-        /// <summary>
-        /// 数据表转为列表
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        public static List<T> ToList<T>(this DataTable dt)
-        {
-            var list = new List<T>();
-            //字段小写列表
-            var fields = new List<string>();
-            foreach (DataColumn dtColumn in dt.Columns)
-            {
-                fields.Add(dtColumn.ColumnName.ToLower());
-            }
-            //值类型直接返回第一列
-            Type tp = typeof(T);
-            if (IsValueType(tp))
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    list.Add(DbChangeType<T>(row[0]));
-                }
-
-                return list;
-            }
-
-            //属性列表
-            var properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-            foreach (DataRow row in dt.Rows)
-            {
-                T model = Activator.CreateInstance<T>();
-                foreach (PropertyInfo property in properties)
-                {
-                    string field = property.Name;
-                    //忽略字段大小写
-                    if (!fields.Contains(field.ToLower())) continue;
-                    //忽略空值,忽略只读属性
-                    if (!IsNullOrDbNull(row[field]) && property.CanWrite)
-                    {
-                        property.SetValue(model, DbChangeType(row[field], property.PropertyType), null);
-                    }
-                }
-                list.Add(model);
-            }
-
-            return list;
-        }
-
-        #endregion
-
         #region 语句预处理
 
         private static DbDataReader PreCommandReader(DatabaseFacade context, string query, params DbParameter[] parameters)
@@ -332,8 +103,6 @@ namespace BihuApiCore.Infrastructure.Helper
                 return await command.ExecuteReaderAsync();
             }
         }
-
-        #endregion
 
         #endregion
 
@@ -397,13 +166,9 @@ namespace BihuApiCore.Infrastructure.Helper
                     Type type = typeof(T);
                     if (await reader.ReadAsync())
                     {
-                        //if (type.IsValueType)//只兼容默认值类型的写法
-                        //{
-                        //    return (T) Convert.ChangeType(reader.GetValue(0), type);
-                        //}
-                        if (IsValueType(type))//增加对可空类型和string datetime兼容
+                        if (ObjectExtession.IsValueType(type))//增加对可空类型和string datetime兼容
                         {
-                            return DbChangeType<T>(reader[0]);
+                            return (T)ObjectExtession.DbChangeType(reader[0],type);
                         }
                         var propts = type.GetProperties();
                         T model = Activator.CreateInstance<T>();
@@ -451,9 +216,9 @@ namespace BihuApiCore.Infrastructure.Helper
                     var propts =type.GetProperties();
                     if (reader.Read())
                     {
-                        if (IsValueType(type))
+                        if (ObjectExtession.IsValueType(type))//增加对可空类型和string datetime兼容
                         {
-                            model=DbChangeType<T>(reader[0]);
+                            return (T)ObjectExtession.DbChangeType(reader[0],type);
                         }
                         else
                         {
@@ -480,7 +245,7 @@ namespace BihuApiCore.Infrastructure.Helper
 
         #endregion
 
-        #region 执行原生语句相当于原生ExecuteScalar
+        #region ExecuteScalar  直接使用  Context.Database.ExecuteSqlCommand(sql);
 
         public static async Task<object> ExecuteScalarAsync(this DbContext db, string query, params object[] parameters)
         {
@@ -509,7 +274,6 @@ namespace BihuApiCore.Infrastructure.Helper
             }
         }
 
-        
         public static object ExecuteScalar(this DbContext db, string query, params object[] parameters)
         {
             var conn = db.Database.GetDbConnection();
@@ -536,7 +300,49 @@ namespace BihuApiCore.Infrastructure.Helper
                 conn.Close();
             }
         }
+        
+        #endregion
+
+        #region 很久之前的方法查询方法，已经弃用，这个是while (reader.Read()) 然后直接循环属性赋值
+
+        public static async Task<List<T>> SqlQueryAsyncOri<T>(this DbContext db, string sql, params DbParameter[] parameters)
+            where T : class,new()
+        {
+            //注意：不要对GetDbConnection获取到的conn进行using或者调用Dispose，否则DbContext后续不能再进行使用了，会抛异常
+            var conn = db.Database.GetDbConnection();
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    await conn.OpenAsync();
+                }
+                using (var reader = await PreCommandReaderAsync(db.Database, sql, parameters))
+                {
+                    var propts = typeof(T).GetProperties();
+                    var list = new List<T>();
+                    T model;
+                    object val;
+                    while (await reader.ReadAsync())
+                    {
+                        model = new T();
+                        foreach (var l in propts)
+                        {
+                            val = reader[l.Name];
+                            l.SetValue(model, val == DBNull.Value ? null : val);
+                        }
+                        list.Add(model);
+                    }
+                    return list;
+                }
+            }
+            finally
+            {
+                conn.Close();
+
+            }
+        }
 
         #endregion
+
     }
 }

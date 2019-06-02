@@ -7,6 +7,7 @@ using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
 using System.Threading.Tasks;
+using BihuApiCore.EntityFrameworkCore;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -47,7 +48,7 @@ namespace BihuApiCore.Service.Implementations
         }
         public async Task<BaseResponse> TestSql()
         {
-            return BaseResponse<List<string>>.Ok( await _userRepository.TestSql());
+            return BaseResponse<List<IsVerifyEnum>>.Ok( await _userRepository.TestSql());
         }
     }
 }

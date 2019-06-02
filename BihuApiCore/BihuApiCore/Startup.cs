@@ -79,31 +79,30 @@ namespace BihuApiCore
             #endregion
 
             //Api限流
-            services.AddApiThrottle(options => {
-                //配置redis
-                //如果Cache和Storage使用同一个redis，则可以按如下配置
-                options.UseRedisCacheAndStorage(opts => {
-                    opts.ConnectionString =Configuration["ApiThrottleConnectionString"];
-                    //opts.KeyPrefix = "apithrottle"; //指定给所有key加上前缀，默认为apithrottle
-                });
-                //如果Cache和Storage使用不同redis库，可以按如下配置
-                //options.UseRedisCache(opts => {
-                //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=0";
-                //});
-                //options.UseRedisStorage(opts => {
-                //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=1";
-                //});
+            //services.AddApiThrottle(options => {
+            //    //配置redis
+            //    //如果Cache和Storage使用同一个redis，则可以按如下配置
+            //    options.UseRedisCacheAndStorage(opts => {
+            //        opts.ConnectionString =Configuration["ApiThrottleConnectionString"];
+            //        //opts.KeyPrefix = "apithrottle"; //指定给所有key加上前缀，默认为apithrottle
+            //    });
+            //    //如果Cache和Storage使用不同redis库，可以按如下配置
+            //    //options.UseRedisCache(opts => {
+            //    //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=0";
+            //    //});
+            //    //options.UseRedisStorage(opts => {
+            //    //    opts.ConnectionString = "localhost,connectTimeout=5000,allowAdmin=false,defaultDatabase=1";
+            //    //});
 
-                options.onIntercepted = (context, valve, where) =>
-                {
-                    //valve：引发拦截的valve
-                    //where：拦截发生的地方，有ActionFilter,PageFilter,Middleware(全局)
-                    context.Response.StatusCode = 429;
-                    return new JsonResult(new BaseResponse{ Code = (int)BusinessStatusType.FrequencyRequest, Message = "访问过于频繁，请稍后重试！" });
+            //    options.onIntercepted = (context, valve, where) =>
+            //    {
+            //        //valve：引发拦截的valve
+            //        //where：拦截发生的地方，有ActionFilter,PageFilter,Middleware(全局)
+            //        context.Response.StatusCode = 429;
+            //        return new JsonResult(new BaseResponse{ Code = (int)BusinessStatusType.FrequencyRequest, Message = "访问过于频繁，请稍后重试！" });
 
-                };
-
-            });
+            //    };
+            //});
             
 
             services.AddMvc(opt =>
@@ -115,7 +114,7 @@ namespace BihuApiCore
                 //日志记录，全局使用  已经直接使用中间件了
                 //opt.Filters.Add(new LogAttribute());
                 //这里添加ApiThrottleActionFilter拦截器
-                opt.Filters.Add(typeof(ApiThrottleActionFilter));
+                //opt.Filters.Add(typeof(ApiThrottleActionFilter));
             })
             .AddJsonOptions(options =>
             {
@@ -176,7 +175,7 @@ namespace BihuApiCore
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
             //Api限流
-            app.UseApiThrottle();
+            //app.UseApiThrottle();
 
             app.UseMvc(); 
             //HttpClientHelper.WarmUpClient();
