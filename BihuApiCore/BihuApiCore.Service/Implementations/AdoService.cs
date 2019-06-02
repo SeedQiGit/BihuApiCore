@@ -125,17 +125,16 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> MysqlExecuteDataTable()
         {
-            var getOverviewOfDataSql = string.Format("select * from bihu_apicore_test.product where id>?id ");
+            var sql = "select * from bihu_apicore_test.product where id>?id ";
             List<MySqlParameter> ps = new List<MySqlParameter>() {
                 new MySqlParameter { MySqlDbType = MySqlDbType.Int64,ParameterName = "id", Value = 0 }
                  };
-            var list = _mySqlAdoHelper.ExecuteDataTable(getOverviewOfDataSql, ps.ToArray()).ToList<Product>();
+            var list = _mySqlAdoHelper.ExecuteDataTable(sql, ps.ToArray()).ToList<Product>();
 
             return BaseResponse<List<Product>>.Ok(list);
         }
 
         #endregion
-
 
         #endregion
 
