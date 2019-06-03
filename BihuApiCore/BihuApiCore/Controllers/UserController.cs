@@ -1,14 +1,12 @@
-﻿using System.Security.Claims;
-using BihuApiCore.Filters;
+﻿using BihuApiCore.Filters;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using Dnc.Api.Throttle;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace BihuApiCore.Controllers
 {
@@ -19,12 +17,10 @@ namespace BihuApiCore.Controllers
     {
         private readonly IUserService _userService;
         private readonly IObserverService _observerService;
-        private readonly ILogger<UserController> _logger;
-
-        public UserController(IUserService userService, ILogger<UserController> logger, IObserverService observerService)
+   
+        public UserController(IUserService userService, IObserverService observerService)
         {
             _userService = userService;
-            _logger = logger;
             _observerService = observerService;
         }
 

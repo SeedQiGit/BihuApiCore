@@ -8,10 +8,8 @@ using BihuApiCore.Middlewares;
 using BihuApiCore.Model;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
-using Dnc.Api.Throttle;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,14 +19,12 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
-using BihuApiCore.Model.Enums;
-using BihuApiCore.Model.Response;
 
 namespace BihuApiCore
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                .SetBasePath(env.ContentRootPath)

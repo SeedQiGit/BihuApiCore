@@ -1,5 +1,4 @@
-﻿using BihuApiCore.Model.Request;
-using BihuApiCore.Model.Response;
+﻿using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
