@@ -10,6 +10,7 @@ using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -117,7 +118,8 @@ namespace BihuApiCore
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 //空值处理
                 options.SerializerSettings.ContractResolver = new NullToEmptyStringResolver();
-            });
+            }) 
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             //services.AddAutoMapper();  这里使用另一种automapper的注入方式
             AutoMapper.IConfigurationProvider config = new MapperConfiguration(cfg =>
