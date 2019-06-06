@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BihuApiCore</name>
+    </assembly>
+    <members>
+        <member name="T:BihuApiCore.Controllers.AsyncIoController">
+            <summary>
+            异步io控制器
+            </summary>
+        </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.SyncIoExcel">
+            <summary>
+            同步方法
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.AsyncIoExcel">
+            <summary>
+            异步方法
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.BaseController.Ok(System.String)">
+            <summary>
+              返回成功结果
+            </summary>
+            <param name="message">结果信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.BaseController.Ok``1(``0)">
+            <summary>
+            返回成功结果
+            </summary>
+            <param name="data">结果数据集</param>
+            <returns></returns>
+        </member>
+        <member name="T:BihuApiCore.Controllers.UserController">
+            <summary>
+            用户控制器
+            </summary>
+        </member>
+        <member name="M:BihuApiCore.Controllers.UserController.Test">
+            <summary>
+            测试get 同步
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.UserController.TestAsy">
+            <summary>
+            测试get 异步
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:BihuApiCore.Filters.LogAttribute">
+            <summary>
+            全局日志记录
+            </summary>
+        </member>
+        <member name="T:BihuApiCore.Middlewares.ErrorHandlerMiddleware">
+            <summary>
+            异常捕获中间件
+            </summary>
+        </member>
+        <member name="M:BihuApiCore.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            服务添加到服务容器中
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:BihuApiCore.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            我的理解是对组建进行配置,注册中间件到管道中
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+            <param name="loggerFactory"></param>
+        </member>
+    </members>
+</doc>
