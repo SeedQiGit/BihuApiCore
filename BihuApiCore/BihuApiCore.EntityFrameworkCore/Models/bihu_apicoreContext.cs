@@ -23,6 +23,7 @@ namespace BihuApiCore.EntityFrameworkCore.Models
         public virtual DbSet<UserConfig> UserConfig { get; set; }
         public virtual DbSet<UserExtent> UserExtent { get; set; }
         public virtual DbSet<ZsPiccCall> ZsPiccCall { get; set; }
+        public virtual DbSet<LoginInfo> LoginInfo { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -35,6 +36,11 @@ namespace BihuApiCore.EntityFrameworkCore.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Companies>(entity =>
+            {
+                entity.ToTable("login_records");
+            });
+
             modelBuilder.Entity<Companies>(entity =>
             {
                 entity.HasKey(e => e.CompId)
