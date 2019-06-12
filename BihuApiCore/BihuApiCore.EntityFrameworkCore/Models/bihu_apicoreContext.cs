@@ -36,9 +36,9 @@ namespace BihuApiCore.EntityFrameworkCore.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Companies>(entity =>
+            modelBuilder.Entity<LoginInfo>(entity =>
             {
-                entity.ToTable("login_records");
+                entity.ToTable("login_info");
             });
 
             modelBuilder.Entity<Companies>(entity =>

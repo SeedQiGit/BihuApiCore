@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 11/05/2019 21:21:27
+ Date: 12/06/2019 14:47:42
 */
 
 SET NAMES utf8mb4;
@@ -126,6 +126,32 @@ INSERT INTO `data_excel` VALUES (122, '黄绍英', '1038.0', '15338289287.0', '1
 INSERT INTO `data_excel` VALUES (123, '吴柏燕', '1012.0', '15813110972.0', '1012.0', '0760-23870590');
 
 -- ----------------------------
+-- Table structure for login_info
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info`;
+CREATE TABLE `login_info`  (
+  `Id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `OsName` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `OsVerson` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `BrowerName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `BrowerVersion` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `BrowerMajor` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `UserId` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `UserName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `Ip` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `LoginTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LogoutTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`Id`) USING BTREE,
+  INDEX `idx_login_records_UserId_LoginTime`(`UserId`, `LoginTime`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of login_info
+-- ----------------------------
+INSERT INTO `login_info` VALUES ('20cd9175-4b57-4aca-8174-7228ec3bd2ed', NULL, NULL, NULL, NULL, NULL, '00000000-0000-0000-0000-000000000000', 'test', '::1', '2019-06-12 14:42:16', '0001-01-01 00:00:00');
+INSERT INTO `login_info` VALUES ('723013f8-e4db-4647-a5d4-717381d81b0e', 'Windows', '10', 'Chrome', '71.0.3578.98', '71', '8b73fbfa-9747-4fe2-b1fe-ba62573029ec', 'test', '::1', '2019-06-12 14:44:39', '0001-01-01 00:00:00');
+
+-- ----------------------------
 -- Table structure for modules
 -- ----------------------------
 DROP TABLE IF EXISTS `modules`;
@@ -202,14 +228,14 @@ CREATE TABLE `user`  (
   `CertificateNo` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `Mobile` bigint(20) NOT NULL,
   `IsVerify` int(4) NOT NULL DEFAULT 0,
-  `LevelCode` varchar(5000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '层次码 上级层次码+,+当前主键Id+,。顶级层次码为：“,当前主键Id,”，前后均需加逗号',
+  `LevelCode` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '层次码 上级层次码+,+当前主键Id+,。顶级层次码为：“,当前主键Id,”，前后均需加逗号',
   `LevelNum` int(4) NOT NULL COMMENT '层次数 从1开始',
   `ParentId` bigint(20) NOT NULL COMMENT '父级id',
   PRIMARY KEY (`Id`) USING BTREE,
   INDEX `idx_account`(`UserAccount`) USING BTREE,
   INDEX `idx_parentId`(`ParentId`) USING BTREE,
-  FULLTEXT INDEX `idx_levelCode`(`LevelCode`)
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_levelCode`(`LevelCode`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
@@ -284,7 +310,6 @@ CREATE TABLE `zs_picc_call`  (
 -- ----------------------------
 -- Records of zs_picc_call
 -- ----------------------------
-INSERT INTO `zs_picc_call` VALUES (89, 0, '陈闪仪', 1, 0, '1001', '15016168577', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1001', '0760-23870578');
 INSERT INTO `zs_picc_call` VALUES (90, 0, '何丽荣', 1, 0, '1009', '18022018601', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1009', '0760-23870587');
 INSERT INTO `zs_picc_call` VALUES (91, 0, '何金花', 1, 0, '1011', '13528121603', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1011', '0760-23870589');
 INSERT INTO `zs_picc_call` VALUES (92, 0, '文大佑', 1, 0, '1004', '15007603245', '2018-11-27 20:45:08', '2018-11-27 20:45:07', '1004', '0760-23870581');

@@ -20,6 +20,7 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace BihuApiCore
 {
@@ -46,6 +47,8 @@ namespace BihuApiCore
         {
             services.AddDbContext<bihu_apicoreContext>(options => options.UseMySql(Configuration.GetConnectionString("EntityContext")).UseLoggerFactory(LogHelper.LoggerFactorySingleton));
             // Warning: Do not create a new ILoggerFactory instance each time
+
+            services.AddHttpContextAccessor();
 
             services.AddSwaggerGen(c =>
             {
@@ -100,8 +103,7 @@ namespace BihuApiCore
 
             //    };
             //});
-            
-
+    
             services.AddMvc(opt =>
             {
                 // 跨域
@@ -128,6 +130,7 @@ namespace BihuApiCore
             });
             services.AddSingleton(config);
             services.AddScoped<IMapper, Mapper>();
+           
 
             #region 配置
 
