@@ -20,7 +20,7 @@ namespace BihuApiCore.Infrastructure.Extensions.UserClientExtensions
 
         public ClientBrowser(string userAgent)
         {
-            foreach (var matchItem in _matchs)
+            foreach (var matchItem in Matchs)
             {
                 foreach (var regexItem in matchItem.Regexes)
                 {
@@ -56,7 +56,7 @@ namespace BihuApiCore.Infrastructure.Extensions.UserClientExtensions
             }
         }
 
-        private static List<MatchExpression> _matchs = new List<MatchExpression> {
+        private static readonly List<MatchExpression> Matchs = new List<MatchExpression> {
             new MatchExpression{
                 Regexes = new List<Regex>{
                     new Regex(@"(opera\smini)\/([\w\.-]+)",RegexOptions.IgnoreCase),// Opera Mini

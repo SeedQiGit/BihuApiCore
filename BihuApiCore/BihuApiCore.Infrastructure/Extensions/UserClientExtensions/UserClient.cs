@@ -6,7 +6,7 @@
         {
             _userAgent = userAgent;
         }
-        private string _userAgent;
+        private readonly string _userAgent;
 
         private ClientBrowser _browser;
         public ClientBrowser Browser
