@@ -22,7 +22,6 @@ namespace BihuApiCore.Filters
 
         public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
-
             var stopWatch = new Stopwatch();
             actionContext.HttpContext.Items[TimeKey] = stopWatch;
             stopWatch.Start();
