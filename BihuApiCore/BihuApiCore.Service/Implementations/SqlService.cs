@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Model.Models;
@@ -50,6 +51,23 @@ namespace BihuApiCore.Service.Implementations
         {
             return BaseResponse<List<IsVerifyEnum>>.Ok( await _userRepository.TestSql());
         }
+
+        public async Task<BaseResponse> TestCompareValueAndassign()
+        {
+            var userThis = await _userRepository.FirstOrDefaultAsync(c => c.Id == 6);
+            UserCompareValueAndassign userCompareValueAndassign = new UserCompareValueAndassign
+            {
+                UserAccount = "top",
+                UserName = "admin",
+                IsVerify=IsVerifyEnum.删除,
+                CreateTime = DateTime.Now
+            };
+            _userRepository.CompareValueAndassign(userThis,userCompareValueAndassign);
+            await _userRepository.SaveChangesAsync();
+            return BaseResponse.Ok();
+        }
+
+
     }
 }
 

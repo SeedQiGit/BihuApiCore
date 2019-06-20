@@ -14,7 +14,7 @@ namespace BihuApiCore.Infrastructure.Extensions
         /// <returns></returns>
         public static bool IsValueType(Type tp)
         {
-            return tp.IsValueType || tp == typeof(Nullable<>) || tp == typeof(string) || tp == typeof(DateTime);
+            return tp.IsValueType || tp == typeof(Nullable<>) ||tp==typeof(Enum)|| tp == typeof(string) || tp == typeof(DateTime);
         }
  
         /// <summary>

@@ -2,16 +2,20 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BihuApiCore.Repository.Repositories
 {
     public class EfRepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
     {
-        
+        private IDbContextTransaction _currentTransaction;
+
         public DbContext Context { get; set; }
 
         public EfRepositoryBase(DbContext context)
@@ -25,53 +29,8 @@ namespace BihuApiCore.Repository.Repositories
 
         public virtual DbSet<TEntity> Table => Context.Set<TEntity>();
 
-        public bool Any(Expression<Func<TEntity, bool>> predicate)
-        {
-            return GetAll().Any(predicate);
-        }
-
-        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
-        {
-
-            return await GetAll().AnyAsync(predicate);
-        }
-
-        public int Count()
-        {
-            return GetAll().Count();
-        }
-
-        public async Task<int> CountAsync()
-        {
-            return await GetAll().CountAsync();
-        }
-
-        public int Count(Expression<Func<TEntity, bool>> predicate)
-        {
-            return GetAll().Where(predicate).Count();
-        }
-
-        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
-        {
-            return await GetAll().Where(predicate).CountAsync();
-        }
-
-        public void Delete(TEntity entity)
-        {
-            AttachIfNot(entity);
-            Table.Remove(entity);
-        }
-
-        public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
-        {
-            return GetAll().FirstOrDefault(predicate);
-        }
-
-        public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
-        {
-            return await GetAll().FirstOrDefaultAsync(predicate);
-        }
-
+        #region Aggregates  
+        
         public IQueryable<TEntity> GetAll()
         {
             return GetAllIncluding();
@@ -111,25 +70,35 @@ namespace BihuApiCore.Repository.Repositories
         {
             return await GetAll().Where(predicate).ToListAsync();
         }
-
-        public void Insert(TEntity entity)
+        public bool Any(Expression<Func<TEntity, bool>> predicate)
         {
-            Table.Add(entity);
+            return GetAll().Any(predicate);
         }
 
-        public void Insert(List<TEntity> listEntity)
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            Table.AddRange(listEntity);
+
+            return await GetAll().AnyAsync(predicate);
         }
 
-        public async Task InsertAsync(TEntity entity)
+        public int Count()
         {
-            await Task.FromResult(Table.Add(entity));
+            return GetAll().Count();
         }
 
-        public async Task InsertAsync(List<TEntity> listEntity)
+        public async Task<int> CountAsync()
         {
-            await Table.AddRangeAsync(listEntity);
+            return await GetAll().CountAsync();
+        }
+
+        public int Count(Expression<Func<TEntity, bool>> predicate)
+        {
+            return GetAll().Where(predicate).Count();
+        }
+
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await GetAll().Where(predicate).CountAsync();
         }
 
         public long LongCount()
@@ -150,6 +119,46 @@ namespace BihuApiCore.Repository.Repositories
         public async Task<long> LongCountAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await GetAll().Where(predicate).LongCountAsync();
+        }
+
+        #endregion
+
+        #region single basic acion
+
+        public void Delete(TEntity entity)
+        {
+            AttachIfNot(entity);
+            Table.Remove(entity);
+        }
+
+        public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
+        {
+            return GetAll().FirstOrDefault(predicate);
+        }
+
+        public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await GetAll().FirstOrDefaultAsync(predicate);
+        }
+        
+        public void Insert(TEntity entity)
+        {
+            Table.Add(entity);
+        }
+
+        public void Insert(List<TEntity> listEntity)
+        {
+            Table.AddRange(listEntity);
+        }
+
+        public async Task InsertAsync(TEntity entity)
+        {
+            await Task.FromResult(Table.Add(entity));
+        }
+
+        public async Task InsertAsync(List<TEntity> listEntity)
+        {
+            await Table.AddRangeAsync(listEntity);
         }
 
         public int SaveChanges()
@@ -186,6 +195,13 @@ namespace BihuApiCore.Repository.Repositories
             }
         }
 
+        #endregion
+
+        /// <summary>
+        /// 用于执行部分更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="field"></param>
         public void SetFieldValue(TEntity entity, Expression<Func<TEntity, object>> field)
         {
             var property = Context.Entry(entity).Property(field);
@@ -205,20 +221,17 @@ namespace BihuApiCore.Repository.Repositories
             Table.Attach(entity);
         }
 
-        #region 同事的
+        #region 对比字段赋值
 
-          /// <summary>
-        ///     实体指定字段赋值，用以触发部分字段更新
-        ///     add by 李永光 2019-05-07
+        /// <summary>
+        ///  对比两个实体不同部分并赋值（排除主键、创建时间和创建人）
         /// </summary>
-        /// <typeparam name="T">数据对象类型</typeparam>
-        /// <param name="entity">待赋值实体</param>
-        /// <param name="data">源数据实体，根据属性名匹配（不区分大小写）</param>
-        /// <param name="fields">字段名列表，根据属性名匹配（不区分大小写）。若值为null，匹配字段赋值</param>
-        /// <returns></returns>
-        public void SetFieldValue<T>(TEntity entity, T data, IEnumerable<string> fields = null)
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity">被赋值实体</param>
+        /// <param name="data">提供更新值的实体（可以与被赋值实体类型相同或不同）</param>
+        public void CompareValueAndassign<T>(TEntity entity, T data)
         {
-            var cEntity = Context.Entry(entity);
+            var entityEntry = Context.Entry(entity);
             Type etype = entity.GetType();
             PropertyInfo[] eprops = etype.GetProperties();
 
@@ -228,33 +241,37 @@ namespace BihuApiCore.Repository.Repositories
             foreach (PropertyInfo pi in eprops)
             {
                 var fieldName = pi.Name;
-                //不在更新列表
-                if (fields != null && !fields.Contains(fieldName, StringComparer.OrdinalIgnoreCase))
+                if (fieldName=="CreateTime")
                 {
                     continue;
                 }
-                //不在源数据实体中
+                //不在新数据中
                 var dpi = FindPropertyInfo(dprops, fieldName);
                 if (dpi == null)
                 {
                     continue;
                 }
                 //忽略主键
-                var fieldProp = cEntity.Property(fieldName);
+                var fieldProp = entityEntry.Property(fieldName);
                 if (fieldProp != null && fieldProp.Metadata.IsPrimaryKey())
                 {
                     continue;
                 }
                 
+                //非值类型，跳过 
+                if (!ObjectExtession.IsValueType(pi.PropertyType)) continue;
+
+                //判断值是否相等  基本类型全部转换成字符串比较 
+                if (pi.GetValue(entity).ToString().Equals(dpi.GetValue(data).ToString())) continue;
+
                 //属性修改
-                object value = dpi.GetValue(data, null);
+                object value = dpi.GetValue(data);
                 SetFieldValue(entity, fieldName, value);
             }
         }
 
         /// <summary>
-        ///     实体属性查找
-        ///     add by 李永光 2019-05-07
+        /// 实体属性查找
         /// </summary>
         /// <param name="props">属性列表</param>
         /// <param name="field">属性名</param>
@@ -273,22 +290,6 @@ namespace BihuApiCore.Repository.Repositories
 
         /// <summary>
         ///     实体指定字段赋值用以触发部分字段更新
-        ///     add by 李永光 2019-05-07
-        /// </summary>
-        /// <param name="entity">实体</param>
-        /// <param name="field">需要赋值的字段</param>
-        /// <param name="value">新字段值</param>
-        public void SetFieldValue(TEntity entity, Expression<Func<TEntity, object>> field, object value)
-        {
-            var property = Context.Entry(entity).Property(field);
-            //字段复制
-            property.IsModified = true;
-            property.CurrentValue = value;
-        }
-
-        /// <summary>
-        ///     实体指定字段赋值用以触发部分字段更新
-        ///     add by 李永光 2019-05-07
         /// </summary>
         /// <param name="entity">实体</param>
         /// <param name="fieldName">需要赋值的字段</param>
@@ -302,28 +303,36 @@ namespace BihuApiCore.Repository.Repositories
             property.CurrentValue = value;
         }
 
+        #endregion
+
+        #region 事务控制
+
         /// <summary>
-        ///     修改部分字段
-        ///     add by 李永光 2019-05-07
-        ///     使用方法：1先使用SetValue方法给指定的字段赋值，不要使用实体直接赋值，否则不触发更新,2.调用Modify方法添加到更新队列，3调用SaveChanges提交
+        /// 开启事务
+        /// 范学朋 
+        /// 范围：多次savechange的业务场景
         /// </summary>
-        /// <param name="entity">Entity</param>
-        public void Modify(TEntity entity)
+        /// <returns></returns>
+        public async Task BeginTransactionAsync()
         {
-            AttachIfNot(entity);
+            _currentTransaction = _currentTransaction ?? await Context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
         }
 
         /// <summary>
-        ///     批量修改部分字段
-        ///     add by 李永光 2019-05-07
-        ///     使用方法：1先使用SetValue方法给指定的字段赋值，不要使用实体直接赋值，否则不触发更新,2.调用Modify方法添加到更新队列，3调用SaveChanges提交
+        /// 提交事务
         /// </summary>
-        /// <param name="listEntity"></param>
-        public void Modify(List<TEntity> listEntity)
+        /// <returns></returns>
+        public async Task CommitTransactionAsync()
         {
-            foreach (var item in listEntity)
+            try
             {
-                Modify(item);
+                await SaveChangesAsync();
+                _currentTransaction?.Commit();
+            }
+            finally
+            {
+                _currentTransaction?.Dispose();//这里等于先判断_currentTransaction不是空，才执行Dispose
+                //_currentTransaction = null;
             }
         }
 

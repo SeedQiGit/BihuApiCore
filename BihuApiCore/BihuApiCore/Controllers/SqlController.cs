@@ -37,6 +37,7 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
+     
         #region 测试
 
         [HttpGet]
@@ -44,6 +45,13 @@ namespace BihuApiCore.Controllers
         {
             return SetStatusCode(await _sqlService.TestSql());
         }
+
+        [HttpGet]
+        public async Task<BaseResponse> TestCompareValueAndassign()
+        {
+            return SetStatusCode(await _sqlService.TestCompareValueAndassign());
+        }
+
 
         #endregion
 

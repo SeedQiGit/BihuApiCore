@@ -225,5 +225,23 @@ namespace BihuApiCore.Repository.IRepository
         #endregion
 
         void AttachIfNot(TEntity entity);
+        void CompareValueAndassign<T>(TEntity entity, T data);
+
+        #region 事务控制
+
+        /// <summary>
+        /// 开启事务
+        /// 范围：多次savechange的业务场景
+        /// </summary>
+        /// <returns></returns>
+        Task BeginTransactionAsync();
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        /// <returns></returns>
+        Task CommitTransactionAsync();
+
+        #endregion
     }
 }

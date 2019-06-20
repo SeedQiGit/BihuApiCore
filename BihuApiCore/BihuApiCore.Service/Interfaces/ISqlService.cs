@@ -11,5 +11,6 @@ namespace BihuApiCore.Service.Interfaces
         Task<BaseResponse> TestTransaction();
         Task<BaseResponse<PageData<User>>> GetUserList(PageRequest request);
         Task<BaseResponse> TestSql();
+        Task<BaseResponse> TestCompareValueAndassign();
     }
 }
