@@ -261,12 +261,26 @@ namespace BihuApiCore.Repository.Repositories
                 //非值类型，跳过 
                 if (!ObjectExtession.IsValueType(pi.PropertyType)) continue;
 
-                //判断值是否相等  基本类型全部转换成字符串比较 
-                if (pi.GetValue(entity).ToString().Equals(dpi.GetValue(data).ToString())) continue;
+                var piValue = pi.GetValue(entity);
+
+                var dpiValue = dpi.GetValue(data);
+
+                
+                if (piValue==null||dpiValue==null)
+                {
+                    if (piValue==null&&dpiValue==null)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    //判断值是否相等 Equals是字符串类型的比较方法，所以基本类型全部转换成字符串比较，null值ToString会报错，要使用他内部的方法。
+                    if (piValue.Equals(dpiValue)) continue;
+                }
 
                 //属性修改
-                object value = dpi.GetValue(data);
-                SetFieldValue(entity, fieldName, value);
+                SetFieldValue(entity, fieldName, dpiValue);
             }
         }
 
