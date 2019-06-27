@@ -1,23 +1,13 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
+﻿using BihuApiCore.Infrastructure.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace BihuApiCore.Infrastructure.Bihu
 {
-    public class SecretCode
-    {
-        public void Test()
-        {
-            var str = "123456&1231231";
-            if (str.GetUrl().GetMd5() == str)
-            {
-                //KeyCode是一个字符串密钥
-                var strUrl = string.Format("Name={0}&Pwd={1}&CustKey={2}&KeyCode={3}", "", "", "","asdasd");
-            }
-        }
-    }
-
-
+    /// <summary>
+    /// 加密码扩展方法
+    /// </summary>
     public static class SecretCodeHelper
     {
         /// <summary>
@@ -25,26 +15,48 @@ namespace BihuApiCore.Infrastructure.Bihu
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string GetUrl(this string url)
+        public static string GetUrlMd5(this string url)
         {
             string[] arr = url.Split(new[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
-            Array.Sort(arr);
-            return string.Join("&", arr);
+            //排序  这里就根据属性顺序赋值吧，不然反射也没法相同顺序
+            //Array.Sort(arr);
+            return string.Join("&", arr).GetMd5();
         }
 
-        public static string GetMd5(this string message)
+        /// <summary>
+        /// 获取加密码
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static string GetSecretCode (this ISecretCode entity)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            using (MD5 md5 = MD5.Create())
+            Type etype = entity.GetType();
+            PropertyInfo[] props = etype.GetProperties();
+            
+            List<string> strList=new List<string>();
+            //遍历实体属性进行赋值
+            foreach (PropertyInfo pi in props)
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(message);
-                byte[] md5Bytes = md5.ComputeHash(bytes);
-                foreach (byte item in md5Bytes)
+                var fieldName = pi.Name;
+                if (fieldName=="SecretCode")
                 {
-                    stringBuilder.Append(item.ToString("x2"));
+                    continue;
                 }
+                string str=fieldName;
+                //非值类型，跳过 
+                if (!ObjectExtession.IsValueType(pi.PropertyType)) continue; 
+                var piValue = pi.GetValue(entity);
+                if (piValue==null)
+                {
+                    continue;
+                }
+                else
+                {
+                    str += "=" + piValue;
+                }
+                strList.Add(str);
             }
-            return stringBuilder.ToString();
+            return string.Join("&", strList).GetMd5();
         }
     }
 }
