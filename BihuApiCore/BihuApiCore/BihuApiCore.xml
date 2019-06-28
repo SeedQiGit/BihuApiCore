@@ -35,6 +35,12 @@
             <param name="data">结果数据集</param>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RedisController.Test">
+            <summary>
+            测试get 同步
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:BihuApiCore.Controllers.UserController">
             <summary>
             用户控制器

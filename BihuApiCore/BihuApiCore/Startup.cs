@@ -130,7 +130,17 @@ namespace BihuApiCore
             });
             services.AddSingleton(config);
             services.AddScoped<IMapper, Mapper>();
-           
+
+            #region redis配置
+
+            var section = Configuration.GetSection("RedisCacheSettings");
+            string connectionString = section.GetSection("RedisConnectionString").Value;
+            string instanceName = section.GetSection("InstanceName").Value;
+            int defaultDb = int.Parse(section.GetSection("Database").Value ?? "0");
+            services.AddSingleton(new RedisCacheClient(connectionString, instanceName, defaultDb));
+
+            #endregion
+            
 
             #region 配置
 
