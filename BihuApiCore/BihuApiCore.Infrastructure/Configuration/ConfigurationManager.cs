@@ -22,6 +22,8 @@ namespace BihuApiCore.Infrastructure.Configuration
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("host.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"host.{environmentName}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
