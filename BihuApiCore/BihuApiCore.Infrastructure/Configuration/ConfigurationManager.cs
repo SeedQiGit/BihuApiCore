@@ -55,7 +55,7 @@ namespace BihuApiCore.Infrastructure.Configuration
             return Configuration.GetValue<T>(key);
         }
         
-        public static IConfiguration GetSection(string key)
+        public static IConfigurationSection GetSection(string key)
         {
             return Configuration.GetSection(key);
         }
