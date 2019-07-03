@@ -211,7 +211,10 @@ namespace BihuApiCore
             // 配置跨域
             app.UseCors("AllowSpecificOrigin");
 
-            //日志记录中间件
+            //Api限流
+            //app.UseApiThrottle();
+
+            //日志记录中间件  先注册这个，其他的中间件后注册
             app.UseHttpLogMiddleware();
             //异常处理中间件
             app.UseExceptionHandling();
@@ -222,9 +225,7 @@ namespace BihuApiCore
                     name: "default",
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
-            //Api限流
-            //app.UseApiThrottle();
-
+            
             app.UseMvc();
             //HttpClientHelper.WarmUpClient();
         }
