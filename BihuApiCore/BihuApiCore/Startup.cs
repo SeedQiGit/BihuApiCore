@@ -6,6 +6,8 @@ using BihuApiCore.Infrastructure.Extensions;
 using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Middlewares;
 using BihuApiCore.Model;
+using BihuApiCore.Model.Enums;
+using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +22,7 @@ using NLog.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
-using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace BihuApiCore
 {
@@ -73,10 +75,12 @@ namespace BihuApiCore
 
             services.RegisterAssembly("BihuApiCore.Repository", Lifecycle.Scoped);
             services.AddScoped(typeof(IRepositoryBase<>), typeof(EfRepositoryBase<>));
-         
+
             services.AddScoped<DbContext, bihu_apicoreContext>();
 
             #endregion
+
+            #region 限流，这个插件还不是很成熟
 
             //Api限流
             //services.AddApiThrottle(options => {
@@ -103,7 +107,10 @@ namespace BihuApiCore
 
             //    };
             //});
-    
+
+            #endregion
+            
+
             services.AddMvc(opt =>
             {
                 // 跨域
@@ -120,8 +127,37 @@ namespace BihuApiCore
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 //空值处理
                 options.SerializerSettings.ContractResolver = new NullToEmptyStringResolver();
-            }) 
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                //options.SuppressModelStateInvalidFilter = true;
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    //var problemDetails = new ValidationProblemDetails(context.ModelState)
+                    //{
+                    //	Type = "https://contoso.com/probs/modelvalidation",
+                    //	Title = "One or more model validation errors occurred.",
+                    //	Status = StatusCodes.Status400BadRequest,
+                    //	Detail = "See the errors property for details.",
+                    //	Instance = context.HttpContext.Request.Path
+                    //};
+
+                    var validationErrors = context.ModelState
+                        .Keys
+                        .SelectMany(k => context.ModelState[k].Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToArray();
+                    var json = BaseResponse.GetBaseResponse(BusinessStatusType.ParameterError, string.Join(",", validationErrors));
+
+                    return new BadRequestObjectResult(json)
+                    {
+                        ContentTypes = { "application/problem+json" }
+                    };
+                };
+            })
+            .AddControllersAsServices();
+
 
             //services.AddAutoMapper();  这里使用另一种automapper的注入方式
             AutoMapper.IConfigurationProvider config = new MapperConfiguration(cfg =>
@@ -140,7 +176,6 @@ namespace BihuApiCore
             services.AddSingleton(new RedisCacheClient(connectionString, instanceName, defaultDb));
 
             #endregion
-            
 
             #region 配置
 
@@ -176,9 +211,11 @@ namespace BihuApiCore
             // 配置跨域
             app.UseCors("AllowSpecificOrigin");
 
+            //日志记录中间件
+            app.UseHttpLogMiddleware();
             //异常处理中间件
             app.UseExceptionHandling();
-            app.UseBufferedResponseBody();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -188,7 +225,7 @@ namespace BihuApiCore
             //Api限流
             //app.UseApiThrottle();
 
-            app.UseMvc(); 
+            app.UseMvc();
             //HttpClientHelper.WarmUpClient();
         }
     }

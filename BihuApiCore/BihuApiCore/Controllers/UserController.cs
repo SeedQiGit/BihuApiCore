@@ -1,4 +1,5 @@
-﻿using BihuApiCore.Filters;
+﻿using System;
+using BihuApiCore.Filters;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;
@@ -59,6 +60,7 @@ namespace BihuApiCore.Controllers
         [ProducesResponseType(typeof(UserDto), 1)]
         public BaseResponse Test()
         {
+            //throw new Exception("");
             return _userService.Test();
         }
 

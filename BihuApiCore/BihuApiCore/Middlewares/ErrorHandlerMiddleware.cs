@@ -56,12 +56,13 @@ namespace BihuApiCore.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception ex, string body)
         {
             WriteErrorLog(context, ex, body);
-            Stream stream = context.Items["Stream"] as Stream;
-            context.Response.Body = stream;
+            //Stream stream = context.Items["Stream"] as Stream;
+            //context.Response.Body = stream;
             var data = BaseResponse.GetBaseResponse(BusinessStatusType.Error);
             var result = JsonConvert.SerializeObject(data);
+            context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json;charset=utf-8";
-            LogHelper.Info(context.Items["LogString"] + Environment.NewLine + "请求返回值：请求出现异常");
+            //LogHelper.Info(context.Items["LogString"] + Environment.NewLine + "请求返回值：请求出现异常");
             return context.Response.WriteAsync(result);
         }
 
@@ -76,7 +77,7 @@ namespace BihuApiCore.Middlewares
                 logBuilder.Append($"请求Body:");
                 logBuilder.Append(new JsonObject(body).Json + Environment.NewLine);
             }
-            logBuilder.Append("异常信息：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException + Environment.NewLine);
+            logBuilder.Append("异常信息：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
             _logger.LogError(logBuilder.ToString());
         }
     }

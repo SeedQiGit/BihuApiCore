@@ -35,7 +35,7 @@ namespace BihuApiCore.Middlewares
 
                 StringBuilder logSb = new StringBuilder();
                 var requestUri = context.Request.Host.ToString() + context.Request.Path.ToString() + context.Request.QueryString.Value;
-                logSb.Append(Environment.NewLine + "请求地址：" + requestUri + Environment.NewLine);
+                logSb.Append("请求地址：" + requestUri + Environment.NewLine);
 
                 await _next(context);//there is running MVC
 
@@ -43,6 +43,10 @@ namespace BihuApiCore.Middlewares
                 if (employeeIdClaim != null)
                 {
                     logSb.Append("token解析到的用户id:" + employeeIdClaim.Value + Environment.NewLine);
+                }
+                else
+                {
+                    logSb.Append("传入token："+context.Request.Headers["Authorization"]+ Environment.NewLine);
                 }
 
                 if (context.Request.Method.ToUpper() == "POST")
