@@ -47,10 +47,6 @@ namespace BihuApiCore.Service.UnitTest
             var response =await _service.MockAsy();
             Assert.True(response.Code==1);
         }
-        
-
-
-
 
         //[Fact]
         //public void Add_Mock_Ok(int nb1, int nb2, int result)
@@ -58,7 +54,6 @@ namespace BihuApiCore.Service.UnitTest
         //    var isCreateOk = _service.Add(nb1,nb2);
         //    Assert.True(result==isCreateOk);
         //}
-
 
     }
     

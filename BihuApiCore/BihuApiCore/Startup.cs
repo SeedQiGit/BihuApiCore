@@ -176,7 +176,7 @@ namespace BihuApiCore
             services.AddSingleton(new RedisCacheClient(connectionString, instanceName, defaultDb));
 
             #endregion
-
+            services.AddResponseCompression();
             #region 配置
 
             //获取api地址
@@ -218,7 +218,7 @@ namespace BihuApiCore
             app.UseHttpLogMiddleware();
             //异常处理中间件
             app.UseExceptionHandling();
-
+            app.UseResponseCompression();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
