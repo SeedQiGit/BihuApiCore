@@ -1,4 +1,5 @@
-﻿using BihuApiCore.Repository.IRepository;
+﻿using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,15 +8,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using BihuApiCore.Infrastructure.Extensions;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BihuApiCore.Repository.Repositories
 {
     public class EfRepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
     {
-        private IDbContextTransaction _currentTransaction;
-
         public DbContext Context { get; set; }
 
         public EfRepositoryBase(DbContext context)
@@ -323,13 +320,12 @@ namespace BihuApiCore.Repository.Repositories
 
         /// <summary>
         /// 开启事务
-        /// 范学朋 
         /// 范围：多次savechange的业务场景
         /// </summary>
         /// <returns></returns>
         public async Task BeginTransactionAsync()
         {
-            _currentTransaction = _currentTransaction ?? await Context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+           await Context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
         }
 
         /// <summary>
@@ -341,11 +337,11 @@ namespace BihuApiCore.Repository.Repositories
             try
             {
                 await SaveChangesAsync();
-                _currentTransaction?.Commit();
+                Context.Database.CurrentTransaction?.Commit();
             }
             finally
             {
-                _currentTransaction?.Dispose();//这里等于先判断_currentTransaction不是空，才执行Dispose
+                Context.Database.CurrentTransaction?.Dispose();//这里等于先判断_currentTransaction不是空，才执行Dispose
                 //_currentTransaction = null;
             }
         }
