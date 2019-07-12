@@ -19,10 +19,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using RabbitMQ.Client.Events;
 
 namespace BihuApiCore
 {
@@ -176,7 +179,16 @@ namespace BihuApiCore
             services.AddSingleton(new RedisCacheClient(connectionString, instanceName, defaultDb));
 
             #endregion
+
+            #region 配置rabbitmq
+
+            services.AddRabbitmq(Configuration);
+
+            #endregion
+
+            //返回压缩
             services.AddResponseCompression();
+
             #region 配置
 
             //获取api地址
@@ -225,9 +237,68 @@ namespace BihuApiCore
                     name: "default",
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
-            
+            //ConfigureRabbitMq(app);
             app.UseMvc();
             //HttpClientHelper.WarmUpClient();
+        }
+
+        private void ConfigureRabbitMq(IApplicationBuilder app)
+        {
+            var connectionFactory = app.ApplicationServices.GetRequiredService<ConnectionFactory>();
+            var connection = connectionFactory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.QueueDeclare(queue: "hello",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+            //因为它会异步推送我们的消息，我们提供了一个回调。那是EventingBasicConsumer接收事件处理程序所做的
+            var consumer = new EventingBasicConsumer(channel);
+            //订阅事件  接受到事件对象consumer
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body;
+                var message = Encoding.UTF8.GetString(body);
+                LogHelper.Info($" [x] Received {message}" );
+            };
+            //用来监听channel，触发EventingBasicConsumer
+            //这里原来是noAck  我改成autoAck
+            //acknowledgment 是 consumer 告诉 broker 当前消息是否成功 consume，至于 broker 如何处理 NACK，取决于 consumer 是否设置了 
+            channel.BasicConsume(queue: "hello", autoAck: true, consumer: consumer);
+
+        }
+    }
+    public static class CustomExtensionsMethods
+    {
+        /// <summary>
+        /// 个性化集成
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddRabbitmq(this IServiceCollection services, IConfiguration configuration)
+        {
+            var section = configuration.GetSection("RabbitMqSettings");
+            string connectionString = section.GetSection("RabbitMqConnection").Value;
+            string userName = section.GetSection("RabbitMqUserName").Value;
+            string password = section.GetSection("RabbitMqPwd").Value;
+            
+            var factory = new ConnectionFactory()
+            {
+                HostName = connectionString
+            };
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                factory.UserName = userName;
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                factory.Password = password;
+            }
+            services.AddSingleton(factory);
+            return services;
         }
     }
 }

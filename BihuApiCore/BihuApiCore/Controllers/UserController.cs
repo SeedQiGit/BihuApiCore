@@ -8,6 +8,7 @@ using BihuApiCore.Service.Interfaces;
 using Dnc.Api.Throttle;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Helper;
 
 namespace BihuApiCore.Controllers
 {
@@ -85,6 +86,7 @@ namespace BihuApiCore.Controllers
         public async Task<BaseResponse> TestAsy()
         {
             //var a =HttpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            LogHelper.Info("TestAsy");
             return await _userService.TestAsy();
             //return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
         }
