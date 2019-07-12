@@ -22,6 +22,7 @@ using NLog.Extensions.Logging;
 using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -238,11 +239,16 @@ namespace BihuApiCore
                     name: "default",
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
-            //ConfigureRabbitMq(app);
+            ConfigureRabbitMqDirect(app);
             app.UseMvc();
             //HttpClientHelper.WarmUpClient();
         }
+        #region 配置mq订阅
 
+        /// <summary>
+        /// 配置mq订阅
+        /// </summary>
+        /// <param name="app"></param>
         private void ConfigureRabbitMq(IApplicationBuilder app)
         {
             var connectionFactory = app.ApplicationServices.GetRequiredService<ConnectionFactory>();
@@ -266,8 +272,47 @@ namespace BihuApiCore
             //这里原来是noAck  我改成autoAck
             //acknowledgment 是 consumer 告诉 broker 当前消息是否成功 consume，至于 broker 如何处理 NACK，取决于 consumer 是否设置了 
             channel.BasicConsume(queue: "hello", autoAck: true, consumer: consumer);
-
         }
+
+        /// <summary>
+        /// 配置mq订阅Direct模式
+        /// </summary>
+        /// <param name="app"></param>
+        private void ConfigureRabbitMqDirect(IApplicationBuilder app)
+        {
+            var connectionFactory = app.ApplicationServices.GetRequiredService<ConnectionFactory>();
+            var connection = connectionFactory.CreateConnection();
+            var channel = connection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: "direct_logs",
+                type: "direct");
+            var queueName = channel.QueueDeclare().QueueName;
+
+            //为每个我们感兴趣的严重性创建一个新的绑定。只有我们给定的状态值才会接受
+            foreach (var severity in new List<string>{"info","error"})
+            {
+                //QueueBind 绑定键，针对特定的routingKey进行绑定
+                channel.QueueBind(queue: queueName,
+                    exchange: "direct_logs",
+                    routingKey: severity);
+            }       
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body;
+                var message = Encoding.UTF8.GetString(body);
+                var routingKey = ea.RoutingKey;
+
+                LogHelper.Info($" [x] Received {routingKey} ,{message}" );
+            };
+            //注册消费者
+            channel.BasicConsume(queue: queueName,
+                autoAck: true,
+                consumer: consumer);
+        }
+
+        #endregion
+        
     }
     public static class CustomExtensionsMethods
     {

@@ -35,6 +35,18 @@
             <param name="data">结果数据集</param>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
+            <summary>
+            Send hello world
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect(System.String)">
+            <summary>
+            SendDirect
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RedisController.Test">
             <summary>
             测试get 同步
@@ -81,6 +93,18 @@
             <param name="app"></param>
             <param name="env"></param>
             <param name="loggerFactory"></param>
+        </member>
+        <member name="M:BihuApiCore.Startup.ConfigureRabbitMq(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            配置mq订阅
+            </summary>
+            <param name="app"></param>
+        </member>
+        <member name="M:BihuApiCore.Startup.ConfigureRabbitMqDirect(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            配置mq订阅Direct模式
+            </summary>
+            <param name="app"></param>
         </member>
         <member name="M:BihuApiCore.CustomExtensionsMethods.AddRabbitmq(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
