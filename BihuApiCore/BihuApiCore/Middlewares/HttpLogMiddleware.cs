@@ -75,7 +75,7 @@ namespace BihuApiCore.Middlewares
                     stopWatch.Stop();
                     logSb.Append($"[接口执行时间(ms):{stopWatch.Elapsed.TotalMilliseconds}]" + Environment.NewLine);
 
-                    LogHelper.Info(logSb + "请求返回值：" + sr.ReadToEnd());
+                    _logger.LogInformation(logSb + "请求返回值：" + sr.ReadToEnd());
                     //将原有的返回值复制给基类stream
                     ms.Seek(0, SeekOrigin.Begin);
                     await ms.CopyToAsync(orgBodyStream);

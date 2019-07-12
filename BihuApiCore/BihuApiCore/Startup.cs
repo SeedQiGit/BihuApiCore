@@ -112,7 +112,6 @@ namespace BihuApiCore
             //});
 
             #endregion
-            
 
             services.AddMvc(opt =>
             {
@@ -207,6 +206,8 @@ namespace BihuApiCore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            //这个尽量放在最外层，不然会对你的返回值进行压缩
+            app.UseResponseCompression();
             loggerFactory.AddNLog();
             if (env.IsDevelopment())
             {
@@ -219,7 +220,7 @@ namespace BihuApiCore
                 c.RoutePrefix = "swagger";
             });
             app.UseSwagger();
-
+           
             // 配置跨域
             app.UseCors("AllowSpecificOrigin");
 
@@ -230,7 +231,7 @@ namespace BihuApiCore
             app.UseHttpLogMiddleware();
             //异常处理中间件
             app.UseExceptionHandling();
-            app.UseResponseCompression();
+           
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
