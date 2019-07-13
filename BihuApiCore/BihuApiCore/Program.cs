@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using BihuApiCore.Infrastructure.Configuration;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace BihuApiCore
@@ -12,6 +13,7 @@ namespace BihuApiCore
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseUrls(ConfigurationManager.GetValue("HostUrl").Split(','));
     }
 }
