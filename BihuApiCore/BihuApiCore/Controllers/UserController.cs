@@ -9,6 +9,7 @@ using Dnc.Api.Throttle;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using BihuApiCore.Infrastructure.Helper;
+using Microsoft.Extensions.Logging;
 
 namespace BihuApiCore.Controllers
 {
@@ -61,6 +62,7 @@ namespace BihuApiCore.Controllers
         [ProducesResponseType(typeof(UserDto), 1)]
         public BaseResponse Test()
         {
+            //LoggerExtensions.LogInformation("测试core自带log全局扩展");
             //throw new Exception("");
             return _userService.Test();
         }

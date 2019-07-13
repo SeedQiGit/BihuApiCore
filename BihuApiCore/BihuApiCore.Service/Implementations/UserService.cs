@@ -174,6 +174,8 @@ namespace BihuApiCore.Service.Implementations
 
         public BaseResponse Test()
         {
+            _logger.LogInformation("_logger测试日志输出");
+            LogHelper.Info("LogHelper测试日志输出");
             User userThis;
             using (bihu_apicoreContext ef = new bihu_apicoreContext())
             {

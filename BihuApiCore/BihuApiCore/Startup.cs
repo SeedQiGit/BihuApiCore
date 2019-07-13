@@ -18,15 +18,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using RabbitMQ.Client.Events;
 
 namespace BihuApiCore
 {
@@ -53,6 +52,9 @@ namespace BihuApiCore
         {
             services.AddDbContext<bihu_apicoreContext>(options => options.UseMySql(Configuration.GetConnectionString("EntityContext")).UseLoggerFactory(LogHelper.LoggerFactorySingleton));
             // Warning: Do not create a new ILoggerFactory instance each time
+
+            //全局日志工厂，之后使用依赖注入的Ilogger都是这个工厂生成的。
+            services.AddSingleton(LogHelper.LoggerFactorySingleton);
 
             services.AddHttpContextAccessor();
 
@@ -209,7 +211,8 @@ namespace BihuApiCore
         {
             //这个尽量放在最外层，不然会对你的返回值进行压缩
             app.UseResponseCompression();
-            loggerFactory.AddNLog();
+
+            //loggerFactory.AddNLog();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -243,6 +246,7 @@ namespace BihuApiCore
             app.UseMvc();
             //HttpClientHelper.WarmUpClient();
         }
+
         #region 配置mq订阅
 
         /// <summary>
