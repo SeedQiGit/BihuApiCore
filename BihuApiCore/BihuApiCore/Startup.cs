@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Swashbuckle.AspNetCore.Swagger;
@@ -26,7 +27,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using Polly.Extensions.Http;
 
 namespace BihuApiCore
 {
@@ -196,9 +199,16 @@ namespace BihuApiCore
             {
                 client.BaseAddress= new Uri("http://client_1.com");
                 client.DefaultRequestHeaders.Add("header_1","header_1");
-            });
+            })
+            .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+            {
+                TimeSpan.FromSeconds(10)
+            }));
+               
 
-            services.AddHttpClient<DefaultClient>();
+            services.AddHttpClient<DefaultClient>()
+                .AddPolicyHandler(GetRetryPolicy())
+                ;
             services.AddHttpClient();
 
             #region 配置
@@ -209,6 +219,15 @@ namespace BihuApiCore
 
             #endregion
         }
+        static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        }
+
+
 
         /// <summary>
         /// 我的理解是对组建进行配置,注册中间件到管道中
@@ -227,7 +246,7 @@ namespace BihuApiCore
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            //必须在认证和mvc之间注册swagger
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
