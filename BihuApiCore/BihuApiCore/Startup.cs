@@ -4,6 +4,7 @@ using BihuApiCore.Filters;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Extensions;
 using BihuApiCore.Infrastructure.Helper;
+using BihuApiCore.Infrastructure.Helper.Http;
 using BihuApiCore.Middlewares;
 using BihuApiCore.Model;
 using BihuApiCore.Model.Enums;
@@ -190,6 +191,15 @@ namespace BihuApiCore
 
             //返回压缩
             services.AddResponseCompression();
+           
+            services.AddHttpClient("client_1",client=>  //这里指定的name=client_1，可以方便我们后期服用该实例
+            {
+                client.BaseAddress= new Uri("http://client_1.com");
+                client.DefaultRequestHeaders.Add("header_1","header_1");
+            });
+
+            services.AddHttpClient<DefaultClient>();
+            services.AddHttpClient();
 
             #region 配置
 
