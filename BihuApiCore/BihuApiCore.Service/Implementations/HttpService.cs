@@ -35,5 +35,11 @@ namespace BihuApiCore.Service.Implementations
 
             return BaseResponse.Ok(response);
         }
+
+        public async Task<BaseResponse> FormFileRequest()
+        {
+           
+            return BaseResponse.Ok();
+        }
     }
 }
