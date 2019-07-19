@@ -4,6 +4,25 @@
         <name>BihuApiCore</name>
     </assembly>
     <members>
+        <member name="T:BihuApiCore.Controllers.ApiBaseController">
+            <summary>
+            Api基础控制器
+            </summary>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ApiBaseController.Ok(System.String)">
+            <summary>
+              返回成功结果
+            </summary>
+            <param name="message">结果信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ApiBaseController.Ok``1(``0)">
+            <summary>
+            返回成功结果
+            </summary>
+            <param name="data">结果数据集</param>
+            <returns></returns>
+        </member>
         <member name="T:BihuApiCore.Controllers.AsyncIoController">
             <summary>
             异步io控制器
@@ -33,6 +52,23 @@
             返回成功结果
             </summary>
             <param name="data">结果数据集</param>
+            <returns></returns>
+        </member>
+        <member name="T:BihuApiCore.Controllers.HttpController">
+            <summary>
+            http请求控制器
+            </summary>
+        </member>
+        <member name="M:BihuApiCore.Controllers.HttpController.FormRequest">
+            <summary>
+            表单请求
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.HttpController.Test">
+            <summary>
+            测试Authorize
+            </summary>
             <returns></returns>
         </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">

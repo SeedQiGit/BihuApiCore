@@ -66,6 +66,8 @@ namespace BihuApiCore
             {
                 //配置第一个Doc
                 c.SwaggerDoc("v1", new Info { Title = "My API_1", Version = "v1" });
+                c.OperationFilter<SwashbuckleOperationFilter>();
+
                 c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BihuApiCore.xml"));
             });
             services.AddCors(options =>
@@ -205,10 +207,11 @@ namespace BihuApiCore
                 TimeSpan.FromSeconds(10)
             }));
                
-
             services.AddHttpClient<DefaultClient>()
+                .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(GetRetryPolicy())
                 ;
+
             services.AddHttpClient();
 
             #region 配置
