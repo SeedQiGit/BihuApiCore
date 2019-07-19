@@ -66,9 +66,11 @@ namespace BihuApiCore
             {
                 //配置第一个Doc
                 c.SwaggerDoc("v1", new Info { Title = "My API_1", Version = "v1" });
+                //增加返回值操作类型，并对验证进行判断，是否加入token
                 c.OperationFilter<SwashbuckleOperationFilter>();
-
+                c.CustomSchemaIds(type => type.FullName); // 解决相同类名会报错的问题
                 c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BihuApiCore.xml"));
+            
             });
             services.AddCors(options =>
             {
@@ -206,7 +208,8 @@ namespace BihuApiCore
             {
                 TimeSpan.FromSeconds(10)
             }));
-               
+
+            services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
             services.AddHttpClient<DefaultClient>()
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(GetRetryPolicy())
