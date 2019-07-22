@@ -11,10 +11,12 @@ namespace BihuApiCore.Controllers
     public class SqlController:BaseController
     {
         private readonly ISqlService _sqlService;
-  
-        public SqlController(ISqlService sqlService)
+        private readonly IDapperService _dapperService;
+
+        public SqlController(ISqlService sqlService, IDapperService dapperService)
         {
             _sqlService = sqlService;
+            _dapperService = dapperService;
         }
 
         #region 获取列表，带分页
@@ -37,7 +39,6 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
-     
         #region 测试
 
         [HttpGet]
@@ -54,6 +55,34 @@ namespace BihuApiCore.Controllers
 
 
         #endregion
+
+        #region Dapper相关
+
+        
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> DapperGetList()
+        {
+            return SetStatusCode(await _dapperService.DapperGetList());
+        }
+
+
+
+        /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> DapperBulkInsert()
+        {
+            return SetStatusCode(await _dapperService.DapperBulkInsert());
+        }
+
+        #endregion
+
 
     }
 }

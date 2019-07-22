@@ -25,10 +25,12 @@ using RabbitMQ.Client.Events;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using MySql.Data.MySqlClient;
 using Polly.Extensions.Http;
 
 namespace BihuApiCore
@@ -56,6 +58,9 @@ namespace BihuApiCore
         {
             services.AddDbContext<bihu_apicoreContext>(options => options.UseMySql(Configuration.GetConnectionString("EntityContext")).UseLoggerFactory(LogHelper.LoggerFactorySingleton));
             // Warning: Do not create a new ILoggerFactory instance each time
+            
+            //使用dapper方式
+            services.AddScoped<IDbConnection, MySqlConnection>(c=>new MySqlConnection(Configuration.GetConnectionString("EntityContext")));
 
             //全局日志工厂，之后使用依赖注入的Ilogger都是这个工厂生成的。
             services.AddSingleton(LogHelper.LoggerFactorySingleton);
