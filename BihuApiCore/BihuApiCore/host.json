@@ -1,3 +1,8 @@
 {
-  "HostUrl": "http://localhost:5111"
+  //程序默认启动地址
+  "HostUrl": "127.0.0.1",
+  "Port": "5111",
+  "SPort": "50111",
+  "File": "91bihu.com.pfx",
+  "Password": "bihuchexian91"
 }

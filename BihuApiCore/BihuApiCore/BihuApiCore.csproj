@@ -43,6 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="91bihu.com.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="BihuApiCore.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
