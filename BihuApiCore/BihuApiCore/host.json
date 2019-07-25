@@ -1,6 +1,8 @@
 {
   //程序默认启动地址
-  "HostUrl": "127.0.0.1",
+  "HostIp": "127.0.0.1",
+  //这么写没意义啊。。。。所以暂时注释了
+  "HostUrl": "http://apicore.91bihu.com,https://apicore.91bihu.com",
   "Port": "5111",
   "SPort": "50111",
   "File": "91bihu.com.pfx",

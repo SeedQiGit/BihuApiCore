@@ -18,15 +18,16 @@ namespace BihuApiCore
 #if !DEBUG
                 .UseKestrel(opts =>
                 {
-                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostUrl")), ConfigurationManager.GetValue<int>("Port"));
-                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostUrl")), ConfigurationManager.GetValue<int>("SPort"), lopts =>
+                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("Port"));
+                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("SPort"), lopts =>
                     {
                         lopts.UseHttps(Path.Combine(Directory.GetCurrentDirectory(), ConfigurationManager.GetValue("File"))  , ConfigurationManager.GetValue("Password"));
                     });
                 })
 #endif
-                .UseStartup<Startup>()
                 //.UseUrls(ConfigurationManager.GetValue("HostUrl").Split(','))
+                .UseStartup<Startup>()
+              
                 ;
     }
 }
