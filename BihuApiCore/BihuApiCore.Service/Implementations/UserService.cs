@@ -176,16 +176,18 @@ namespace BihuApiCore.Service.Implementations
         {
             _logger.LogInformation("_logger测试日志输出");
             LogHelper.Info("LogHelper测试日志输出");
-            User userThis;
-            using (bihu_apicoreContext ef = new bihu_apicoreContext())
-            {
-                userThis = ef.User.FirstOrDefault();
-            }
+            //User userThis;
+            //using (bihu_apicoreContext ef = new bihu_apicoreContext())
+            //{
+            //    userThis = ef.User.FirstOrDefault();
+            //}
 
-            userThis.UserAccount = null;
-            userThis = JsonConvert.DeserializeObject<User>(JsonConvert.SerializeObject(userThis));
+            //userThis.UserAccount = null;
+            //userThis = JsonConvert.DeserializeObject<User>(JsonConvert.SerializeObject(userThis));
             //userThis = _userRepository.FirstOrDefault(w=>w.Id==1);
-            return BaseResponse<User>.Ok(userThis);
+            //return BaseResponse<User>.Ok(userThis);
+
+            return BaseResponse.Ok(ConfigurationManager.GetValue("UrlModel:BihuApi"));
             //UserDto userDto = _mapper.Map<UserDto>(userThis);
             //return BaseResponse<UserDto>.GetBaseResponse(BusinessStatusType.OK, userDto);
         }

@@ -67,7 +67,7 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> AsyncIoExcel()
         {
-            string url = "http://image.91bihu.com//images/2019/3/12/user/de51f32e-60be-439f-9f17-a6e3302e1db7.xls";
+            string url = "http://image.91bihu.com/images/2019/3/12/user/de51f32e-60be-439f-9f17-a6e3302e1db7.xls";
          
             try
             {

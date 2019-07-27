@@ -54,6 +54,12 @@
             <param name="data">结果数据集</param>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.ExcelController.ListToExcelFile">
+            <summary>
+            列表转换为本地文件，并返回绝对路径
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:BihuApiCore.Controllers.HttpController">
             <summary>
             http请求控制器
