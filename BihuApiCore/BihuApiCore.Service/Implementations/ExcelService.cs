@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Extensions;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -32,15 +33,19 @@ namespace BihuApiCore.Service.Implementations
             string fileNam = "导出数据-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
             string fullPath = storePath +"\\"+ fileNam;
 
-            HSSFWorkbook  hssfworkbook=await GetWorkbook(list,"导出通话记录");
+            //HSSFWorkbook  hssfworkbook=await GetWorkbook(list,"导出通话记录");
+            HSSFWorkbook  hssfworkbook=ListToExcelExtention.ListWorkbookExchange(list,"导出通话记录");
             //把这个HSSFWorkbook实例写入文件
             FileStream file = new FileStream(fullPath, FileMode.Create);
             hssfworkbook.Write(file);
             file.Close();
 
-
             return BaseResponse.Ok();
         }
+
+        #endregion
+
+        #region 测试代码
 
         public async Task<HSSFWorkbook> GetWorkbook(List<ExcelTestClass> list,string sheetName)
         {
@@ -71,9 +76,6 @@ namespace BihuApiCore.Service.Implementations
             await ListToSheet(workbook, list, headStyle, sheetName);
             return workbook;
         }
-
-        #endregion
-        
         public async Task ListToSheet<T>(HSSFWorkbook workbook, List<T> list, HSSFCellStyle headStyle, string sheetName)
         {
             //值类型直接返回第一列
@@ -112,12 +114,10 @@ namespace BihuApiCore.Service.Implementations
                 #endregion
 
                 HSSFRow dataRow = (HSSFRow)sheet.CreateRow(i + 1);
-             
+                var data = list[i];
                 for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
                 {
                     var property = properties[cellIndex];
-                    var data = list[cellIndex];
-                    var a =property.GetValue(data);
                     HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
                     newCell.SetCellValue(  property.GetValue(data).ToString());
                     newCell.CellStyle = styleCell;
@@ -149,15 +149,50 @@ namespace BihuApiCore.Service.Implementations
 
         }
 
+        #endregion 
+
         #region 写入流的方法返回
 
-        
+        public async Task<MemoryStream> ListToExcelStream()
+        {
+            List<ExcelTestClass> list=ExcelTestClass.GetList();
+            string fileNam = "导出数据-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+
+            //HSSFWorkbook  hssfworkbook=await GetWorkbook(list,"导出通话记录");
+            HSSFWorkbook  hssfworkbook=ListToExcelExtention.ListWorkbookExchange(list,"导出通话记录");
+            using (MemoryStream ms = new MemoryStream())
+            {
+                hssfworkbook.Write(ms);
+                await ms.FlushAsync();
+                ms.Position = 0;
+                hssfworkbook.Close();
+                var buf = ms.ToArray();
+                return ms;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<byte[]> ListToExcelByte()
+        {
+            List<ExcelTestClass> list=ExcelTestClass.GetList();
+            string fileNam = "导出数据-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls";
+
+            //HSSFWorkbook  hssfworkbook=await GetWorkbook(list,"导出通话记录");
+            HSSFWorkbook  hssfworkbook=ListToExcelExtention.ListWorkbookExchange(list,"导出通话记录");
+            using (MemoryStream ms = new MemoryStream())
+            {
+                hssfworkbook.Write(ms);
+                await ms.FlushAsync();
+                ms.Position = 0;
+                hssfworkbook.Close();
+                byte[] buf = ms.ToArray();
+                return buf;
+            }
+        }
 
         #endregion
-
-
-
-
     }
     public class ExcelTestClass
     {

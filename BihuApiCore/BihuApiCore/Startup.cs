@@ -272,7 +272,7 @@ namespace BihuApiCore
             //app.UseApiThrottle();
 
             //日志记录中间件  先注册这个，其他的中间件后注册
-            app.UseHttpLogMiddleware();
+            //app.UseHttpLogMiddleware();
             //异常处理中间件
             app.UseExceptionHandling();
            
