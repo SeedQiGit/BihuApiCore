@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Model.Models;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Implementations;
 using Moq;
+using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BihuApiCore.Service.UnitTest
@@ -30,7 +27,7 @@ namespace BihuApiCore.Service.UnitTest
         [Fact]
         public async Task GetUserList_Test()
         {
-            _userRepositoryMock.Setup(x => x.GetUserList(It.IsAny<PageRequest>(),It.IsAny<string>())).Returns(Task.FromResult<PageData<User>>(new PageData<User>())) ;
+            _userRepositoryMock.Setup(x => x.GetUserList(It.IsAny<PageRequest>(),It.IsAny<string>())).Returns(Task.FromResult(new PageData<User>())) ;
             _userRepositoryMock.Setup(x => x.FirstOrDefaultAsync(It.IsAny<Expression<Func<User, bool>>>())).Returns(Task.FromResult(new User())) ;
 
             var sqlService = new SqlService(

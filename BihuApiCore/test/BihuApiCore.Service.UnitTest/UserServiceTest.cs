@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Repository.IRepository;
@@ -10,6 +6,7 @@ using BihuApiCore.Service.Implementations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BihuApiCore.Service.UnitTest
