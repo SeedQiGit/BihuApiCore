@@ -16,6 +16,7 @@ namespace BihuApiCore.Service.UnitTest
 {
     public class UserServiceTest
     {
+
         private readonly UserService _service;
         public UserServiceTest()
         {
