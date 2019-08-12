@@ -103,7 +103,13 @@
         </member>
         <member name="M:BihuApiCore.Controllers.RedisController.Test">
             <summary>
-            测试get 同步
+            测试
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.RedisController.RedisConcurrentLock">
+            <summary>
+            使用redis作为并发锁
             </summary>
             <returns></returns>
         </member>
