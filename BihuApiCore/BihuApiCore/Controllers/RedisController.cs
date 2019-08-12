@@ -51,8 +51,8 @@ namespace BihuApiCore.Controllers
 
             //string token = "12312";
 
-            bool lockResult = await _database.LockTakeAsync(key, token, TimeSpan.FromSeconds(300));
-
+            bool lockResult = await _database.LockTakeAsync(key, token, TimeSpan.FromSeconds(5));
+            bool lockResult1 = await _database.LockTakeAsync(key, 2, TimeSpan.FromSeconds(5));
             //获取锁的token  这里应该是12312
             var userInfoLockObj2 = (await _database.LockQueryAsync(key));
             
@@ -62,7 +62,7 @@ namespace BihuApiCore.Controllers
 
             //获取锁的token  这里应该是没有的
             var userInfoLockObj3 = await _database.LockQueryAsync(key);
-
+            bool lockResult2 = await _database.LockTakeAsync(key, 2, TimeSpan.FromSeconds(5));
             return BaseResponse.Ok();
         }
         
