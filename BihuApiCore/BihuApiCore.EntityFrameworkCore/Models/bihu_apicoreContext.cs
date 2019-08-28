@@ -30,7 +30,10 @@ namespace BihuApiCore.EntityFrameworkCore.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=123456;Database= bihu_apicore ");
-              
+//#if DEBUG
+//                optionsBuilder.UseLoggerFactory(LogHelper.LoggerFactorySingleton);
+//                optionsBuilder.EnableSensitiveDataLogging();
+//#endif
             }
         }
 

@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace BihuApiCore.Infrastructure.Helper
+namespace BihuApiCore.Infrastructure.Helper.Http
 {
-    public static class HttpWebAsk
+    public static class HttpWebHelper
     {
         #region form请求
 
