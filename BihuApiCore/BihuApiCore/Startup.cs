@@ -283,7 +283,7 @@ namespace BihuApiCore
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
             ConfigureRabbitMqDirect(app);
-            app.UseMvc();
+            //app.UseMvc();
             //HttpClientHelper.WarmUpClient();
         }
 

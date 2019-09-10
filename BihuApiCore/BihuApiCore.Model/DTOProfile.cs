@@ -23,6 +23,9 @@ namespace BihuApiCore.Model
                 .ForMember(dest => dest.nodes, opt => opt.MapFrom(src => src.Nodes))
                 .ForMember(dest => dest.attrs, opt => opt.MapFrom(src => src.Nodes))
                 ;
+
+
+
         }
 
     }
