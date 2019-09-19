@@ -89,6 +89,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.PayController.AliPay">
+            <summary>
+            短信支付跳转页面   所有充值都是给自己充值，避免我充值，其他人消费了
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
             <summary>
             Send hello world

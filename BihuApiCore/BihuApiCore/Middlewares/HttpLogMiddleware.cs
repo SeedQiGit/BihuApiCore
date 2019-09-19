@@ -25,6 +25,11 @@ namespace BihuApiCore.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
+            //if (expr)
+            //{
+                
+            //}
+
             using (var ms = new MemoryStream())
             {
                 var orgBodyStream = context.Response.Body;
@@ -69,18 +74,27 @@ namespace BihuApiCore.Middlewares
                     }
                 }
 
-                using (var sr = new StreamReader(ms))
+                try
                 {
-                    ms.Seek(0, SeekOrigin.Begin);
-                    stopWatch.Stop();
-                    logSb.Append($"[接口执行时间(ms):{stopWatch.Elapsed.TotalMilliseconds}]" + Environment.NewLine);
+                    using (var sr = new StreamReader(ms))
+                    {
+                        ms.Seek(0, SeekOrigin.Begin);
+                        stopWatch.Stop();
+                        logSb.Append($"[接口执行时间(ms):{stopWatch.Elapsed.TotalMilliseconds}]" + Environment.NewLine);
 
-                    _logger.LogInformation(logSb + "请求返回值：" + sr.ReadToEnd());
-                    //将原有的返回值复制给基类stream
-                    ms.Seek(0, SeekOrigin.Begin);
-                    await ms.CopyToAsync(orgBodyStream);
-                    context.Response.Body = orgBodyStream;
+                        _logger.LogInformation(logSb + "请求返回值：" + sr.ReadToEnd());
+                        //将原有的返回值复制给基类stream
+                        ms.Seek(0, SeekOrigin.Begin);
+                        await ms.CopyToAsync(orgBodyStream);
+                        context.Response.Body = orgBodyStream;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("异常信息：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
+                    throw;
+                }
+               
             }
         }
     }
