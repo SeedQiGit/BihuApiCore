@@ -10,90 +10,56 @@ using NPOI.SS.UserModel;
 
 namespace BihuApiCore.Infrastructure.Extensions
 {
-    public class ListToExcelExtention
+    public static class ListToExcelExtention
     {
-        public static HSSFWorkbook ListWorkbookExchange<T>(List<T> list,string sheetName)
+       public static HSSFWorkbook ListWorkbookExchange<T>(List<T> list,string sheetName)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
 
             #region 右击文件 属性信息
             {
                 DocumentSummaryInformation dsi = PropertySetFactory.CreateDocumentSummaryInformation();
-                dsi.Company = "耐心的雪球有限公司";
+                dsi.Company = "北京易天正诚信息技术有限公司";
                 workbook.DocumentSummaryInformation = dsi;
 
                 SummaryInformation si = PropertySetFactory.CreateSummaryInformation();
-                si.Author = "耐心"; //填加xls文件作者信息
-                si.LastAuthor = "耐心"; //填加xls文件最后保存者信息
-                si.Comments = "耐心"; //填加xls文件作者信息
+                si.Author = "壁虎车险"; //填加xls文件作者信息
+                si.LastAuthor = "壁虎车险"; //填加xls文件最后保存者信息
+                si.Comments = "壁虎车险"; //填加xls文件作者信息
                 si.Subject = sheetName;//填加文件主题信息
                 si.CreateDateTime = DateTime.Now;
                 workbook.SummaryInformation = si;
             }
             #endregion
 
+            ListToSheet(workbook, list, sheetName);
+
+            return workbook;
+        }
+
+        /// <summary>
+        /// 获取表头样式
+        /// </summary>
+        /// <param name="workbook"></param>
+        /// <returns></returns>
+        public static HSSFCellStyle GetHeadStyle(this HSSFWorkbook workbook)
+        {
             HSSFCellStyle headStyle = (HSSFCellStyle)workbook.CreateCellStyle();
             headStyle.Alignment = HorizontalAlignment.Center;
             HSSFFont font = (HSSFFont)workbook.CreateFont();
             font.FontHeightInPoints = 12;
             font.Boldweight = 700;
             headStyle.SetFont(font);
-            ListToSheet(workbook, list, headStyle, sheetName);
-
-            return workbook;
+            return headStyle;
         }
 
-        public static void ListToSheet<T>(HSSFWorkbook workbook, List<T> list, HSSFCellStyle headStyle, string sheetName)
+        /// <summary>
+        /// 统一设置列宽度
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="fieldCount"></param>
+        public static void SetColumnWidth(this HSSFSheet sheet,int fieldCount)
         {
-            //值类型直接返回第一列
-            Type tp = typeof(T);
-            //属性列表
-            PropertyInfo[] properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-            //property.Name是属性的英文名，怎么转换成中文？使用DescriptionAttribute特性
-            List<string> fieldStringArray = new List<string>();
-            foreach (var property in properties)
-            {
-                fieldStringArray.Add(property.GetEnumDescription());
-            }
-            HSSFSheet sheet = (HSSFSheet)workbook.CreateSheet(sheetName);
-
-            int fieldCount = fieldStringArray.Count;
-            HSSFRow headerRow = (HSSFRow)sheet.CreateRow(0);
-            headerRow.HeightInPoints = 20;
-            for (int i = 0; i < fieldCount; i++)
-            {
-                #region 表头及样式
-                headerRow.CreateCell(i).SetCellValue(fieldStringArray[i]);
-                headerRow.GetCell(i).CellStyle = headStyle;
-                sheet.AutoSizeColumn(i);
-                #endregion
-            }
-
-            var count = list.Count();
-            for (int i = 0; i < count; i++)
-            {
-                #region 单元格样式
-
-                ICellStyle styleCell = workbook.CreateCellStyle();
-                styleCell.Alignment = HorizontalAlignment.Center;//居中 
-                styleCell.VerticalAlignment = VerticalAlignment.Center;//垂直居中 
-
-                #endregion
-
-                HSSFRow dataRow = (HSSFRow)sheet.CreateRow(i + 1);
-
-                for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
-                {
-                    var property = properties[cellIndex];
-                    var data = list[cellIndex];
-                    HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
-                    newCell.SetCellValue(property.GetValue(data).ToString());
-                    newCell.CellStyle = styleCell;
-                }
-            }
-
-            #region  统一设置列宽度
-
             for (int columnNum = 0; columnNum <= fieldCount; columnNum++)
             {
                 int columnWidth = sheet.GetColumnWidth(columnNum) / 256;//获取当前列宽度  
@@ -110,11 +76,66 @@ namespace BihuApiCore.Infrastructure.Extensions
                 }
 
                 sheet.SetColumnWidth(columnNum, (((columnWidth > 50 ? columnWidth / 4 : columnWidth) + 3) * 256));
-
             }
+        }
+
+        public static void ListToSheet<T>(HSSFWorkbook workbook, List<T> list, string sheetName)
+        {
+            HSSFSheet sheet = (HSSFSheet)workbook.CreateSheet(sheetName);
+            HSSFCellStyle headStyle=workbook.GetHeadStyle();
+
+            //值类型直接返回第一列
+            Type tp = typeof(T);
+            //属性列表
+            PropertyInfo[] properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+            //property.Name是属性的英文名，怎么转换成中文？使用DescriptionAttribute特性
+            List<string> fieldStringArray = new List<string>();
+            foreach (var property in properties)
+            {
+                fieldStringArray.Add(property.GetEnumDescription());
+            }
+  
+            int fieldCount = fieldStringArray.Count;
+            HSSFRow headerRow = (HSSFRow)sheet.CreateRow(0);
+            headerRow.HeightInPoints = 20;
+            for (int i = 0; i < fieldCount; i++)
+            {
+                #region 表头及样式
+                headerRow.CreateCell(i).SetCellValue(fieldStringArray[i]);
+                headerRow.GetCell(i).CellStyle = headStyle;
+                sheet.AutoSizeColumn(i);
+                #endregion
+            }
+
+            var count = list.Count();
+
+            #region 单元格样式
+
+            ICellStyle styleCell = workbook.CreateCellStyle();
+            styleCell.Alignment = HorizontalAlignment.Center;//居中 
+            styleCell.VerticalAlignment = VerticalAlignment.Center;//垂直居中 
 
             #endregion
 
+            for (int i = 0; i < count; i++)
+            {
+                HSSFRow dataRow = (HSSFRow)sheet.CreateRow(i + 1);
+                var data = list[i];
+                for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
+                {
+                    var property = properties[cellIndex];
+                    HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
+                    newCell.SetCellValue(property.GetValue(data).ToString());
+                    newCell.CellStyle = styleCell;
+                }
+            }
+
+            //统一设置列宽度
+            sheet.SetColumnWidth(fieldCount);
         }
     }
+
+
+    
+    
 }
