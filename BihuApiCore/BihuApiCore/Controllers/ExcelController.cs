@@ -1,15 +1,11 @@
 ﻿using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
-using Microsoft.AspNetCore.Http.Headers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNetCore.Http;
 
 namespace BihuApiCore.Controllers
 {
