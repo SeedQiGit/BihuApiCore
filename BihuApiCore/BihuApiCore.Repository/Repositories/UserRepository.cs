@@ -18,6 +18,16 @@ namespace BihuApiCore.Repository.Repositories
         {
         }
 
+        public async Task ContextTest()
+        {
+            User user=new User(); 
+            Context.Set<User>().Add(user);
+            Companies companies=new Companies();
+            Context.Set<Companies>().Add(companies);
+            await Context.SaveChangesAsync();
+
+        }
+
         public void CommandTest()
         {
             var sql = $@" delete from user where user.Id=100 ";

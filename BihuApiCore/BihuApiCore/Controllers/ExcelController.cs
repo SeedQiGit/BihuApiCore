@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -39,8 +40,10 @@ namespace BihuApiCore.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponse), 1)]
         public async Task<IActionResult > ActionResultFile()
-        {	
+        {
+
             var result=await _excelService.ListToExcelByte();
+
             //第一种:使用FileContentResult
             return File(result, "application/ms-excel", "fileContents.xls");
  
