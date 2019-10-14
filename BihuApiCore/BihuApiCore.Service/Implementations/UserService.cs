@@ -1,24 +1,20 @@
 ﻿using AutoMapper;
+using BihuApiCore.EntityFrameworkCore;
 using BihuApiCore.EntityFrameworkCore.Models;
 using BihuApiCore.Infrastructure.Configuration;
 using BihuApiCore.Infrastructure.Helper;
-using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
 using BihuApiCore.Model.Request;
 using BihuApiCore.Model.Response;
 using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
-using BihuApiCore.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace BihuApiCore.Service.Implementations
 {
