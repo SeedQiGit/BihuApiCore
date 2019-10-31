@@ -1,6 +1,7 @@
 ﻿using BihuApiCore.Model.Response;
 using BihuApiCore.Service.Interfaces;
 using System.Threading.Tasks;
+using BihuApiCore.Model.Request;
 
 namespace BihuApiCore.Controllers
 {
@@ -20,5 +21,10 @@ namespace BihuApiCore.Controllers
             return Ok();
         }
 
+        public async Task<BaseResponse> ModelTest(ModelTestRequest request)
+        {						
+            
+            return Ok();
+        }
     }
 }
