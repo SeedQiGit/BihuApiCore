@@ -17,6 +17,7 @@ namespace BihuApiCore.Controllers
         {
             _loginService = loginService;          
         }
+
         /// <summary>
         /// 表单请求
         /// </summary>
