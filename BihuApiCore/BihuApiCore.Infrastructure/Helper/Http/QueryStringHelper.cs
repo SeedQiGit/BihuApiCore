@@ -12,7 +12,27 @@ namespace BihuApiCore.Infrastructure.Helper.Http
 {
     public static class QueryStringHelper
     {
-         public static string PostSecCode<T>(this T source) where T : new()
+        /// <summary>
+        /// 简单的获取get请求参数
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string QueryStringSimple(this Object request)
+        {
+            StringBuilder query = new StringBuilder("?");
+            PropertyInfo[] propertys = request.GetType().GetProperties();
+            foreach (PropertyInfo pi in propertys)
+            {
+                if (pi.CanRead)
+                {
+                    query.Append($@"{pi.Name}={pi.GetValue(request)}&");
+                }
+            }
+            query = query.Remove(query.Length - 1, 1);
+            return query.ToString();
+        }
+
+        public static string PostSecCode<T>(this T source) where T : new()
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             System.Reflection.PropertyInfo[] properties = source.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
@@ -44,27 +64,6 @@ namespace BihuApiCore.Infrastructure.Helper.Http
             var tmp = dic.Where(x => !string.IsNullOrWhiteSpace(x.Value)).OrderBy(y => y.Key);
             string result = string.Join("&", tmp.Select(p => p.Key + '=' + p.Value).ToArray());
             return result.GetMd5().ToLower();
-        }
-
-
-        /// <summary>
-        /// 简单的获取get请求参数
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static string QueryStringSimple(this Object request)
-        {
-            StringBuilder query = new StringBuilder("?");
-            PropertyInfo[] propertys = request.GetType().GetProperties();
-            foreach (PropertyInfo pi in propertys)
-            {
-                if (pi.CanRead)
-                {
-                    query.Append($@"{pi.Name}={pi.GetValue(request)}&");
-                }
-            }
-            query = query.Remove(query.Length - 1, 1);
-            return query.ToString();
         }
 
 
@@ -119,7 +118,7 @@ namespace BihuApiCore.Infrastructure.Helper.Http
                     parstr.Insert(0, '?');
                 return parstr.ToString();
             }
-            
+
             parstr.AppendFormat($"{(parstr.Length == 0 ? "" : "&")}");
 
             var secCode = parstr.ToString().GetMd5();
