@@ -30,6 +30,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using BihuApiCore.Events.EventHandler;
+using BihuApiCore.Infrastructure.Helper.RabbitMq;
 using MySql.Data.MySqlClient;
 using Polly.Extensions.Http;
 
@@ -229,6 +231,8 @@ namespace BihuApiCore
             //上面语句类似于 services.AddSingleton<UrlModel>(Configuration.GetSection("UrlModel"));
 
             #endregion
+
+            ConfigureRabbitMqClient(services);
         }
         static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         {
@@ -356,7 +360,23 @@ namespace BihuApiCore
         }
 
         #endregion
-        
+
+        #region 配置RabbitMqClient订阅
+
+        /// <summary>
+        /// 配置RabbitMqClient订阅
+        /// </summary>
+        /// <param name="services"></param>
+        private void ConfigureRabbitMqClient(IServiceCollection services)
+        {
+            services.AddSingleton<RabbitMqClient, RabbitMqClient>();
+            services.AddHostedService<NomalListener>();
+            //services.AddHostedService<ConsumerReviewStartRabbitListener>();
+          
+        }
+
+        #endregion
+
     }
     public static class CustomExtensionsMethods
     {

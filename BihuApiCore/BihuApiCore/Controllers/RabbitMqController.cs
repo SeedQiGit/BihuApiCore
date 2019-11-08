@@ -4,17 +4,37 @@ using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
 using System.Text;
 using System.Threading.Tasks;
+using BihuApiCore.Events.Event;
+using BihuApiCore.Infrastructure.Helper.RabbitMq;
 
 namespace BihuApiCore.Controllers
 {
     public class RabbitMqController:BaseController
     {
         private readonly ConnectionFactory _connectionFactory;
-
-        public RabbitMqController( ConnectionFactory connectionFactory  )
+        private RabbitMqClient _rabbitMqClient;
+        public RabbitMqController( ConnectionFactory connectionFactory ,RabbitMqClient rabbitMqClient )
         {
             _connectionFactory = connectionFactory;
+            _rabbitMqClient=rabbitMqClient;
         }
+
+        #region RabbitMqClient相关方法
+
+        /// <summary>
+        /// SendNomal
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> MqClientSendNomal()
+        {
+            NomalEvent nomalEvent=new NomalEvent{Content=" hello "};
+            _rabbitMqClient.SendMessage(nomalEvent);
+
+            return BaseResponse.Ok();
+        }
+
+        #endregion
 
         /// <summary>
         /// Send hello world
