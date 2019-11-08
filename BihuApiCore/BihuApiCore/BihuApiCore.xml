@@ -101,6 +101,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.MqClientSendDead">
+            <summary>
+            SendDead
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.MqClientSendDelay">
+            <summary>
+            SendDelay
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
             <summary>
             Send hello world
@@ -154,17 +166,37 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:BihuApiCore.Events.EventHandler.NomalListener">
+        <member name="T:BihuApiCore.Events.EventHandler.NormalEventHandler">
             <summary>
             
             </summary>
         </member>
-        <member name="T:BihuApiCore.Events.Event.NomalEvent">
+        <member name="T:BihuApiCore.Events.Event.DeadEvent">
+            <summary>
+            死信事件
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.DeadEvent.Content">
+            <summary>
+            内容
+            </summary>
+        </member>
+        <member name="T:BihuApiCore.Events.Event.DelayEvent">
+            <summary>
+            死信事件
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.DelayEvent.Content">
+            <summary>
+            内容
+            </summary>
+        </member>
+        <member name="T:BihuApiCore.Events.Event.NormalEvent">
             <summary>
             普通事件
             </summary>
         </member>
-        <member name="P:BihuApiCore.Events.Event.NomalEvent.Content">
+        <member name="P:BihuApiCore.Events.Event.NormalEvent.Content">
             <summary>
             内容
             </summary>

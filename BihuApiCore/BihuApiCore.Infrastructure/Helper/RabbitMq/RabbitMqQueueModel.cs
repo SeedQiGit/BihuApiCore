@@ -70,12 +70,12 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         /// 插件延时消息队列名称  【必填】
         /// </summary>
-        public string DelayQueueName { get; set; } = "crm_queue_delay";
+        public string DelayQueueName { get; set; } = "bihu_api_delay";
 
         /// <summary>
         /// 插件延时消息路由Key名称 【必填】
         /// </summary>
-        public string DelayRouteKey { get; set; } = "crm_delay_routekey";
+        public string DelayRouteKey { get; set; } = "bihu_api_delay_routekey";
 
         /// <summary>
         /// 插件延时交换机类型
@@ -89,17 +89,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         /// 死信延时消息交换机名称 默认和ExchangeName一样
         /// </summary>
-        public string DeadExchangeName { get; set; } = "crm_dead_exc";
+        public string DeadExchangeName { get; set; } = "bihu_api_dead_exc";
 
         /// <summary>
         /// 死信延时消息队列名称 【必填】
         /// </summary>
-        public string DeadQueueName { get; set; } = "crm_queue_dead";
+        public string DeadQueueName { get; set; } = "bihu_api_dead";
 
         /// <summary>
         /// 死信延时消息路由Key名称 【必填】
         /// </summary>
-        public string DeadRouteKey { get; set; } = "crm_dead_routekey";
+        public string DeadRouteKey { get; set; } = "bihu_api_dead_routekey";
 
         /// <summary>
         /// 死信延时交换机类型

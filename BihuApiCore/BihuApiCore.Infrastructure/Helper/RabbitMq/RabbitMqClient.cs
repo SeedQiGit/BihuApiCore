@@ -69,6 +69,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             result.QueueName = string.Concat(result.QueueName,"_", rolekey);
             result.DelayQueueName = string.Concat(result.DelayQueueName, "_", rolekey);
             result.DeadQueueName = string.Concat(result.DeadQueueName, "_", rolekey);
+
             return result;
         }
 
@@ -160,7 +161,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
                 queueInfo.ExchangeType, queueInfo.Durable);
             var properties = channel.CreateBasicProperties();
-            properties.DeliveryMode = 2;
+            properties.DeliveryMode = 2;//数据持久化
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
             channel.BasicPublish(queueInfo.ExchangeName, queueInfo.RouteKey, properties, body);
         }
@@ -237,19 +238,19 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         #region 延迟消息，死信
 
         /// <summary>
-        ///     发送延迟消息 通过死信实现
+        ///  发送延迟消息 通过死信实现
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="messageObj"></param>
         /// <param name="publishTime">消息推送时间，即服务接收到消息的时间</param>
         public void SendMessageDead<T>(T messageObj, DateTime publishTime) where T : class
         {
-            long delay = (long) (publishTime - DateTime.Now).TotalSeconds;
+            long delay = (long) (publishTime - DateTime.Now).TotalMilliseconds;
             SendMessageDead(messageObj, delay);
         }
 
         /// <summary>
-        ///     发送延迟消息 通过死信实现
+        /// 发送延迟消息 通过死信实现
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="messageObj"></param>
@@ -264,32 +265,22 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             IDictionary<string, object> queueArgs = new Dictionary<string, object>
             {
                 {"x-dead-letter-exchange", queueInfo.DeadExchangeName},
-                {"x-dead-letter-routing-key", queueInfo.DeadRouteKey}
+                {"x-dead-letter-routing-key", queueInfo.DeadRouteKey},
+                {"x-message-ttl", seconds},
             };
 
-            var channel = _modelDic.GetOrAdd(queueInfo.QueueName, key =>
+            //创建一个名叫"wait_dead_queue"的固定等死消息队列
+            var channel = _modelDic.GetOrAdd("wait_dead_queue", key =>
             {
                 //声明原交换机，队列，并绑定
                 var model = _conn.CreateModel();
-                ExchangeDeclare(model, queueInfo.ExchangeName, queueInfo.ExchangeType, queueInfo.Durable);
-                QueueDeclare(model, queueInfo.QueueName, queueInfo.Durable, false, queueArgs);
-                model.QueueBind(queueInfo.QueueName, queueInfo.ExchangeName, queueInfo.RouteKey, null);
-
-                //声明死信交换机，死信队列，并绑定
-                ExchangeDeclare(model, queueInfo.DeadExchangeName, queueInfo.DeadExchangeType, queueInfo.Durable);
-                QueueDeclare(model, queueInfo.DeadQueueName, queueInfo.Durable);
-                model.QueueBind(queueInfo.DeadQueueName, queueInfo.DeadExchangeName, queueInfo.DeadRouteKey, null);
-
-                _modelDic[queueInfo.QueueName] = model;
+                QueueDeclare(model, "wait_dead_queue", queueInfo.Durable, false, queueArgs);
+                _modelDic["wait_dead_queue"] = model;
                 return model;
             });
-
-            var properties = channel.CreateBasicProperties();
-            properties.Expiration = (seconds*1000).ToString(); //设置消息过期时间
-            properties.DeliveryMode = 2;
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
-            //发送消息到原队列
-            channel.BasicPublish(queueInfo.ExchangeName, queueInfo.RouteKey, properties, body);
+            //发送消息到等死队列
+            channel.BasicPublish("", "wait_dead_queue", null, body);
         }
 
         #endregion
@@ -383,15 +374,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         public void ReceiveMessageDead<T>(Func<T, Task> handler)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
-
             if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Dead)
                 throw new ArgumentException("消息上不具有任何特性");
+
             if (handler == null) throw new NullReferenceException("处理事件为null");
+
             var channel = GetOrAddModel(queueInfo.DeadExchangeName, queueInfo.DeadQueueName, queueInfo.DeadRouteKey,
                 queueInfo.DeadExchangeType, queueInfo.Durable);
+            //同一时间不处理超过一条消息
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.DeadQueueName, false, consumer);
+            channel.BasicConsume(queueInfo.DeadQueueName, true, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
         }
 

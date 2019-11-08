@@ -1,4 +1,5 @@
-﻿using BihuApiCore.Infrastructure.Helper;
+﻿using System;
+using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Model.Response;
 using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
@@ -38,18 +39,31 @@ namespace BihuApiCore.Controllers
         }
 
         /// <summary>
-        /// SendNomal
+        /// SendDead
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         public async Task<BaseResponse> MqClientSendDead()
         {
-            NormalEvent nomalEvent=new NormalEvent{Content=" hello "};
-            _rabbitMqClient.SendMessage(nomalEvent);
+            DeadEvent nomalEvent=new DeadEvent{Content=" hello "};
+            _rabbitMqClient.SendMessageDead(nomalEvent,DateTime.Now.AddSeconds(15));
 
             return BaseResponse.Ok();
         }
 
+        /// <summary>
+        /// SendDelay
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> MqClientSendDelay()
+        {
+            DelayEvent nomalEvent=new DelayEvent{Content=" hello "};
+            _rabbitMqClient.SendMessageDelay(nomalEvent,DateTime.Now.AddSeconds(15));
+
+            return BaseResponse.Ok();
+        }
+        
         #endregion
 
         /// <summary>

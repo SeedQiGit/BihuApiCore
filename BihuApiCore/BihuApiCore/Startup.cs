@@ -371,8 +371,8 @@ namespace BihuApiCore
         {
             services.AddSingleton<RabbitMqClient, RabbitMqClient>();
             services.AddHostedService<NormalEventHandler>();
-            //services.AddHostedService<ConsumerReviewStartRabbitListener>();
-          
+            services.AddHostedService<DeadEventHandler>();
+            services.AddHostedService<DelayEventHandler>();
         }
 
         #endregion

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace BihuApiCore.Events.EventHandler
 {
-    public class DeadEventHandler : BaseRabbitListener<DeadEvent>
+    public class DelayEventHandler : BaseRabbitListener<DelayEvent>
     {
-        public DeadEventHandler(RabbitMqClient mqClient) : base(mqClient)
+        public DelayEventHandler(RabbitMqClient mqClient) : base(mqClient)
         {
           
         }
 
-        public override async Task Handle(DeadEvent message)
+        public override async Task Handle(DelayEvent message)
         {
             LogHelper.Info("收到信息："+JsonConvert.SerializeObject(message)+"时间："+DateTime.Now);
         }
