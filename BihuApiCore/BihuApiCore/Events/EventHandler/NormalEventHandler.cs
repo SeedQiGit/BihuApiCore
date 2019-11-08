@@ -10,16 +10,16 @@ namespace BihuApiCore.Events.EventHandler
     /// <summary>
     /// 
     /// </summary>
-    public class NomalListener : BaseRabbitListener<NomalEvent>
+    public class NormalEventHandler : BaseRabbitListener<NormalEvent>
     {
         
        
-        public NomalListener(RabbitMqClient mqClient) : base(mqClient)
+        public NormalEventHandler(RabbitMqClient mqClient) : base(mqClient)
         {
           
         }
 
-        public override async Task Handle(NomalEvent message)
+        public override async Task Handle(NormalEvent message)
         {
             LogHelper.Info("收到信息："+JsonConvert.SerializeObject(message)+"时间："+DateTime.Now);
         }

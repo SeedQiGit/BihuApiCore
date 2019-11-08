@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 {
-     /// <summary>
+    /// <summary>
     /// RabbitMQ客户端辅助类
     /// </summary>
     public class RabbitMqClient:IDisposable
@@ -20,8 +19,6 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         #region 构造函数及字段
 
         private  IConnection _conn;
-
-        private static readonly object LockObj = new object();
 
         /// <summary>
         ///  Common AMQP model,usually call it channel
@@ -31,42 +28,19 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         private readonly ILogger<RabbitMqClient> _logger;
 
         /// <summary>
-        /// 单例创建ConnectionFactory
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="userName"></param>
-        /// <param name="pwd"></param>
-        private void Open(string host, string userName, string pwd)
-        {
-            if (_conn != null) return;
-            lock (LockObj)
-            {
-                if (_conn != null) return;
-                var factory = new ConnectionFactory
-                {
-                    HostName = host,
-                    UserName = userName,
-                    Password = pwd,
-                    AutomaticRecoveryEnabled = true,
-                    RequestedHeartbeat = 15
-                };
-                _conn = _conn ?? factory.CreateConnection();
-            }
-        }
-
-        /// <summary>
         /// 构造函数，单例启动
         /// </summary>
-        /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public RabbitMqClient(IConfiguration configuration,ILogger<RabbitMqClient> logger)
+        /// <param name="connectionFactory"></param>
+        public RabbitMqClient(ILogger<RabbitMqClient> logger,ConnectionFactory connectionFactory)
         {
-            string host = configuration.GetSection("EventBusConnection").Value;
-            string userName = configuration.GetSection("EventBusUserName").Value;
-            string pwd = configuration.GetSection("EventBusPassword").Value;
-
+            _conn =_conn ?? connectionFactory.CreateConnection();
             _logger = logger;
-            Open(host, userName, pwd);
+
+            //string host = configuration.GetSection("EventBusConnection").Value;
+            //string userName = configuration.GetSection("EventBusUserName").Value;
+            //string pwd = configuration.GetSection("EventBusPassword").Value;
+            //Open(host, userName, pwd);
         }
 
         public void Dispose()
@@ -143,6 +117,36 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             channel.QueueDeclare(queue, durable, exclusive, autoDelete, arguments);
         }
 
+        #region 单例创建连接工厂，已经改为di 单例
+
+        private static readonly object LockObj = new object();
+
+        /// <summary>
+        /// 单例创建ConnectionFactory  这里直接用di ConnectionFactory的单例就行
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="userName"></param>
+        /// <param name="pwd"></param>
+        private void Open(string host, string userName, string pwd)
+        {
+            if (_conn != null) return;
+            lock (LockObj)
+            {
+                if (_conn != null) return;
+                // 不过这个写法也留着吧 这都是不同的方法，无关大局
+                var factory = new ConnectionFactory
+                {
+                    HostName = host,
+                    UserName = userName,
+                    Password = pwd,
+                    AutomaticRecoveryEnabled = true,
+                    RequestedHeartbeat = 15
+                };
+                _conn = _conn ?? factory.CreateConnection();
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -151,7 +155,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         public void SendMessage<T>(T messageObj) where T : class
         {
             var queueInfo = GetRabbitMqAttribute<T>();
-            if (queueInfo == null|| queueInfo.MessageKind != RabbitMsgKind.Nomal)
+            if (queueInfo == null|| queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
             var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
                 queueInfo.ExchangeType, queueInfo.Durable);
@@ -296,7 +300,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         {
             var queueInfo = GetRabbitMqAttribute<T>();
 
-            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Nomal)
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
             if (handler == null) throw new NullReferenceException("处理事件为null");
             var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
@@ -311,19 +315,21 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         {
             var queueInfo = GetRabbitMqAttribute<T>();
 
-            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Nomal)
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
             if (handler == null) throw new NullReferenceException("处理事件为null");
             var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
                 queueInfo.ExchangeType, queueInfo.Durable);
+            //同一时间不处理超过一条消息
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.QueueName, false, consumer);
+            //autoAck =true 自动应答，一旦我们完成任务，消费者会自动发送应答。通知RabbitMQ消息已被处理，可以从内存删除
+            channel.BasicConsume(queueInfo.QueueName, true, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
         }
 
         /// <summary>
-        ///     接收消息
+        ///  接收消息
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="queueInfo"></param>
@@ -370,7 +376,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         }
 
         /// <summary>
-        ///     接收延迟消息 通过死信方式
+        ///  接收延迟消息 通过死信方式
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
@@ -407,6 +413,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             }
             finally
             {
+                //如果autoAck =true 可以不用再次确认收到
                 channel.BasicAck(ea.DeliveryTag, false);
             }
         }
@@ -426,6 +433,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             }
             finally
             {
+                //如果autoAck =true 可以不用再次确认收到
                 channel.BasicAck(ea.DeliveryTag, false);
             }
         }

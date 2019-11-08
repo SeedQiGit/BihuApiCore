@@ -95,6 +95,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.MqClientSendNomal">
+            <summary>
+            SendNomal
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
             <summary>
             Send hello world
@@ -148,6 +154,21 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:BihuApiCore.Events.EventHandler.NomalListener">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:BihuApiCore.Events.Event.NomalEvent">
+            <summary>
+            普通事件
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.NomalEvent.Content">
+            <summary>
+            内容
+            </summary>
+        </member>
         <member name="T:BihuApiCore.Filters.LogAttribute">
             <summary>
             全局日志记录
@@ -183,6 +204,12 @@
             配置mq订阅Direct模式
             </summary>
             <param name="app"></param>
+        </member>
+        <member name="M:BihuApiCore.Startup.ConfigureRabbitMqClient(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            配置RabbitMqClient订阅
+            </summary>
+            <param name="services"></param>
         </member>
         <member name="M:BihuApiCore.CustomExtensionsMethods.AddRabbitmq(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>

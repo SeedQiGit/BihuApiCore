@@ -69,7 +69,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             Func<T, Task> handler = Handle;
             switch (MessageKind)
             {
-                case RabbitMsgKind.Nomal:
+                case RabbitMsgKind.Normal:
                     MqClient.ReceiveMessage(handler);
                     break;
                 case RabbitMsgKind.Delay:

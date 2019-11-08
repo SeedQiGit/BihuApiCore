@@ -30,7 +30,7 @@ namespace BihuApiCore.Service.Implementations
                 client_id="wechat",
                 client_secret="secret"
             };
-            var response = await _defaultClient.Client.FormRequest("http://identity.91bihu.me/connect/token", request);
+            var response = await _defaultClient.Client.FormDataRequest("http://identity.91bihu.me/connect/token", request);
 
             return BaseResponse.Ok(response);
         }

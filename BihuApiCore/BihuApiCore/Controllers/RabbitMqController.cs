@@ -12,8 +12,11 @@ namespace BihuApiCore.Controllers
     public class RabbitMqController:BaseController
     {
         private readonly ConnectionFactory _connectionFactory;
-        private RabbitMqClient _rabbitMqClient;
-        public RabbitMqController( ConnectionFactory connectionFactory ,RabbitMqClient rabbitMqClient )
+        private readonly RabbitMqClient _rabbitMqClient;
+
+        public RabbitMqController(
+            ConnectionFactory connectionFactory ,
+            RabbitMqClient rabbitMqClient )
         {
             _connectionFactory = connectionFactory;
             _rabbitMqClient=rabbitMqClient;
@@ -28,7 +31,20 @@ namespace BihuApiCore.Controllers
         [HttpGet]
         public async Task<BaseResponse> MqClientSendNomal()
         {
-            NomalEvent nomalEvent=new NomalEvent{Content=" hello "};
+            NormalEvent nomalEvent=new NormalEvent{Content=" hello "};
+            _rabbitMqClient.SendMessage(nomalEvent);
+
+            return BaseResponse.Ok();
+        }
+
+        /// <summary>
+        /// SendNomal
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> MqClientSendDead()
+        {
+            NormalEvent nomalEvent=new NormalEvent{Content=" hello "};
             _rabbitMqClient.SendMessage(nomalEvent);
 
             return BaseResponse.Ok();

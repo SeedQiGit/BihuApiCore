@@ -199,7 +199,7 @@ namespace BihuApiCore
 
             #region 配置rabbitmq
 
-            //services.AddRabbitmq(Configuration);
+            services.AddRabbitmq(Configuration);
 
             #endregion
 
@@ -370,7 +370,7 @@ namespace BihuApiCore
         private void ConfigureRabbitMqClient(IServiceCollection services)
         {
             services.AddSingleton<RabbitMqClient, RabbitMqClient>();
-            services.AddHostedService<NomalListener>();
+            services.AddHostedService<NormalEventHandler>();
             //services.AddHostedService<ConsumerReviewStartRabbitListener>();
           
         }
@@ -395,7 +395,9 @@ namespace BihuApiCore
             
             var factory = new ConnectionFactory()
             {
-                HostName = connectionString
+                HostName = connectionString,
+                AutomaticRecoveryEnabled = true,
+                RequestedHeartbeat = 15
             };
 
             if (!string.IsNullOrEmpty(userName))

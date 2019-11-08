@@ -10,7 +10,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         /// 普通
         /// </summary>
-        Nomal = 1,
+        Normal = 1,
         /// <summary>
         /// 延时
         /// </summary>
@@ -29,22 +29,25 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         /// 消息类别
         /// </summary>
-        public RabbitMsgKind MessageKind { get; set; } = RabbitMsgKind.Nomal;
-
+        public RabbitMsgKind MessageKind { get; set; } = RabbitMsgKind.Normal;
+        
         #region 普通消息
 
         /// <summary>
         /// 交换机名称
         /// </summary>
-        public string ExchangeName { get; set; } = "car_order_exc";
+        public string ExchangeName { get; set; } = "bihu_api_exc";
+
         /// <summary>
         /// 队列名称【必填】
         /// </summary>
-        public string QueueName { get; set; } = "car_order";
+        public string QueueName { get; set; } = "bihu_api";
+
         /// <summary>
         /// 是否持久化
         /// </summary>
         public bool Durable { get; set; } = true;
+
         /// <summary>
         /// 路由名称【必填】
         /// </summary>
@@ -62,7 +65,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         /// 插件延迟消息交换机名称
         /// </summary>
-        public string DelayExchangeName { get; set; } = "crm_delay_exc";
+        public string DelayExchangeName { get; set; } = "bihu_api_delay_exc";
 
         /// <summary>
         /// 插件延时消息队列名称  【必填】

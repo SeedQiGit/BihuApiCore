@@ -3,11 +3,12 @@
 namespace BihuApiCore.Events.Event
 {
     /// <summary>
-    /// 普通事件
+    /// 死信事件
     /// </summary>
-    [RabbitMqQueue(MessageKind = RabbitMsgKind.Nomal)]
-    public class NomalEvent
+    [RabbitMqQueue(MessageKind = RabbitMsgKind.Dead)]
+    public class DeadEvent
     {
+
         /// <summary>
         /// 内容
         /// </summary>
