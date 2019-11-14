@@ -54,7 +54,7 @@ namespace BihuApiCore.Controllers
         #region 测试接口
 
         /// <summary>
-        /// 测试get 同步
+        /// 测试get 同步  重试
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -62,6 +62,7 @@ namespace BihuApiCore.Controllers
         [ProducesResponseType(typeof(UserDto), 1)]
         public BaseResponse Test()
         {
+
             //LoggerExtensions.LogInformation("测试core自带log全局扩展");
             //throw new Exception("");
             return _userService.Test();
