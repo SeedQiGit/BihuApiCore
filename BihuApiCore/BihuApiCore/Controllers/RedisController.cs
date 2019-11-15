@@ -118,8 +118,6 @@ namespace BihuApiCore.Controllers
             bool lockResult2 = await _database.LockTakeAsync(key, 2, TimeSpan.FromSeconds(5));
             return BaseResponse.Ok();
         }
-        
-
 
         #endregion
 
