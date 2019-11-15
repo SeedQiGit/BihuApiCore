@@ -1,8 +1,10 @@
 ﻿using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Infrastructure.Extensions.Redis;
 using BihuApiCore.Model.Response;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BihuApiCore.Controllers
@@ -38,6 +40,57 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        public async Task<BaseResponse> RedisDistributedLock()
+        {
+            string lockKey = "test_" +   DateTime.Now.ToString("yyyy-MM-dd");
+            string token = DateTime.Now.ToLongTimeString() + Guid.NewGuid().ToString();
+  
+            var res = await _database.TryAcquire(lockKey,token,TimeSpan.FromSeconds(30),TimeSpan.FromSeconds(10),500);
+
+            if (res)
+            {
+                //先查再增数据库
+            }
+
+            bool release = await _database.LockReleaseAsync(lockKey, token);
+
+            return BaseResponse.Ok();
+        }
+
+        /// <summary>
+        /// 使用redis作为并发锁
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> RedisDistributedLockMy()
+        {
+            string lockKey = "test_" +   DateTime.Now.ToString("yyyy-MM-dd");
+            string token = DateTime.Now.ToLongTimeString() + Guid.NewGuid().ToString();
+            bool lockRedis = false;
+
+            while (!lockRedis)
+            {
+                lockRedis = await _database.LockTakeAsync(lockKey, token, TimeSpan.FromSeconds(20));
+                if (!lockRedis)
+                {
+                    Thread.Sleep(3000);//等待3s
+                }
+            }
+
+            //先查再增数据库
+            
+            await _database.LockReleaseAsync(lockKey, token);
+
+            bool release = await _database.LockReleaseAsync(lockKey, token);
+
+            return BaseResponse.Ok();
+        }
+
+        /// <summary>
+        /// 使用redis作为并发锁
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<BaseResponse> RedisConcurrentLock()
         {
             string key = "test_lock1122112312311111";//如果把这个key当作锁，那么对应的token 就是他的值
@@ -66,6 +119,7 @@ namespace BihuApiCore.Controllers
             return BaseResponse.Ok();
         }
         
+
 
         #endregion
 
