@@ -68,7 +68,7 @@ namespace BihuApiCore.Controllers
             string token = DateTime.Now.ToLongTimeString() + Guid.NewGuid().ToString();
             bool lockRedis = false;
 
-            while (!lockRedis)
+            while (!lockRedis)//这个是一直获取的写法
             {
                 lockRedis = await _database.LockTakeAsync(lockKey, token, TimeSpan.FromSeconds(20));
                 if (!lockRedis)
