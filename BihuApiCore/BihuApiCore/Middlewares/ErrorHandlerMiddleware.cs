@@ -75,7 +75,8 @@ namespace BihuApiCore.Middlewares
             if (!string.IsNullOrWhiteSpace(body) && httpContent.Request.ContentType.ToLower().Contains("json"))
             {
                 logBuilder.Append($"请求Body:");
-                logBuilder.Append(new JsonObject(body).Json + Environment.NewLine);
+                //logBuilder.Append(new JsonObject(body).Json + Environment.NewLine);
+                logBuilder.Append( body + Environment.NewLine);
             }
             logBuilder.Append("异常信息：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
             _logger.LogError(logBuilder.ToString());

@@ -18,12 +18,14 @@ namespace BihuApiCore.Infrastructure.Configuration
             provider.Load();
             provider.TryGet("ASPNETCORE_ENVIRONMENT", out string environmentName);
 
+            //使用reloadOnChange为true会造成有线程监听配置文件   可以考虑使用依赖注入配置文件或者改为false
+            //https://blog.csdn.net/hiliqi/article/details/80953502
             var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
-            .AddJsonFile("host.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"host.{environmentName}.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("host.json", optional: true, reloadOnChange: false)
+            .AddJsonFile($"host.{environmentName}.json", optional: true, reloadOnChange: false)
             .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
