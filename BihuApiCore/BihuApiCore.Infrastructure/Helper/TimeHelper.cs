@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BihuApiCore.Infrastructure.Helper
 {
@@ -15,6 +13,17 @@ namespace BihuApiCore.Infrastructure.Helper
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0); 
             return Convert.ToInt64(ts.TotalSeconds).ToString(); 
         } 
+
+        /// <summary> 
+        /// 根据utc时间获取本机时间 
+        /// </summary> 
+        /// <returns></returns> 
+        public static DateTime UtcToCurrent(this DateTime utc) 
+        { 
+            TimeSpan ts = DateTime.UtcNow -  DateTime.Now; 
+            return utc-ts; 
+        } 
+
 
         /// <summary>
         /// 时间戳转为C#格式时间
