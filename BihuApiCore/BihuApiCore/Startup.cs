@@ -286,6 +286,7 @@ namespace BihuApiCore
                     name: "default",
                     template: "api/{controller=User}/{action=Test}/{id?}");
             });
+            ServiceProviderExtension.ServiceProvider = app.ApplicationServices;
             //ConfigureRabbitMqDirect(app);
             //app.UseMvc();
             //HttpClientHelper.WarmUpClient();
