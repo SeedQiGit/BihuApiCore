@@ -50,7 +50,7 @@ namespace BihuApiCore.Infrastructure.Helper.Http
         /// <param name="postData"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async Task<string> HttpClientPostFromAsync(string postData, string url)
+        public static async Task<string> HttpClientPostFromAsync(string url,string postData)
         {
             var client = HttpClientHelper.GetClient();
             Task<string> result = Task.FromResult(string.Empty);
