@@ -59,7 +59,52 @@ namespace BihuApiCore.Controllers
             return BaseResponse.Ok(Convert.ToBase64String(stream.ToArray()));
         }
 
+        /// <summary>
+        /// 小程序获取行驶本
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(BaseResponse), 1)]
+        [HttpPost("GetEtOcr")]
+        public async Task<BaseResponse> GetEtOcr([FromBody]string data)
+        {
+            var url ="http://123.56.207.191/OcrWeb/EtOcr";
 
+            //string dic;
+            //var dic =  GetRequestPost();
+           
+            //读图片转为Base64String
+            System.Drawing.Bitmap bmp1 = new System.Drawing.Bitmap(Path.Combine("D:\\", "1.png"));
+            string  userPhoto;
+            using (MemoryStream ms1 = new MemoryStream())
+            {
+                bmp1.Save(ms1, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] arr1 = new byte[ms1.Length];
+                ms1.Position = 0;
+                ms1.Read(arr1, 0, (int)ms1.Length);
+                ms1.Close();
+                userPhoto = Convert.ToBase64String(arr1);
+            }
+
+            var dic=$"filedata={userPhoto}&pid=5";
+            return BaseResponse.Ok(dic);
+        }
+        
+        /// <summary>
+        /// 获取post的参数组
+        /// </summary>
+        /// <returns></returns>
+        private string GetRequestPost()
+        {
+            StringBuilder query = new StringBuilder("");
+            var coll = Request.Form;
+            foreach (var item in coll)
+            {
+                query.Append($@"{item.Key}={item.Value}&");
+            }
+            query = query.Remove(query.Length - 1, 1);
+            return query.ToString();
+        }
 
         /// <summary>
         /// 同步方法
