@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -92,7 +93,10 @@ namespace BihuApiCore.Infrastructure.Extensions
             List<string> fieldStringArray = new List<string>();
             foreach (var property in properties)
             {
-                fieldStringArray.Add(property.GetEnumDescription());
+                if (Attribute.IsDefined(property, typeof(DescriptionAttribute)))
+                {
+                    fieldStringArray.Add(property.GetEnumDescription());
+                }
             }
   
             int fieldCount = fieldStringArray.Count;
