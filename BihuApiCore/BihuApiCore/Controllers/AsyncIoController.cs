@@ -24,6 +24,8 @@ namespace BihuApiCore.Controllers
             _asyncIoService = asyncIoService;
         }
 
+        #region 小程序及二维码图片
+
         /// <summary>
         /// 传入连接字符串 获取对应的二维码图片Base64
         /// </summary>
@@ -106,6 +108,11 @@ namespace BihuApiCore.Controllers
             return query.ToString();
         }
 
+        #endregion
+        
+
+        #region Io方法
+
         /// <summary>
         /// 同步方法
         /// </summary>
@@ -125,5 +132,33 @@ namespace BihuApiCore.Controllers
         {
             return await _asyncIoService.AsyncIoExcel();
         }
+
+        #endregion
+
+        #region 多线程方法
+
+        public async Task<BaseResponse> StartWork(long compId)
+        {
+            Task<BaseResponse>[] taskArray = new Task<BaseResponse>[2];
+            // 创建task并启动
+            taskArray[0]= Task.Factory.StartNew(()=> BaseResponse.Ok());
+            taskArray[1]= Task.Factory.StartNew(()=> BaseResponse.Ok());
+            Task.WaitAll(taskArray);
+          
+            if (taskArray[0].Result.Code==1&& taskArray[1].Result.Code==1)
+            {
+                return BaseResponse.Ok();
+            }
+            else
+            {
+                return BaseResponse.Failed();
+            }
+
+        }
+
+
+
+
+        #endregion
     }
 }
