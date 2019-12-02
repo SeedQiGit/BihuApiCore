@@ -91,11 +91,13 @@ namespace BihuApiCore.Infrastructure.Extensions
             PropertyInfo[] properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
             //property.Name是属性的英文名，怎么转换成中文？使用DescriptionAttribute特性
             List<string> fieldStringArray = new List<string>();
+            List<PropertyInfo> propertiesUsed=new List<PropertyInfo>();
             foreach (var property in properties)
             {
                 if (Attribute.IsDefined(property, typeof(DescriptionAttribute)))
                 {
                     fieldStringArray.Add(property.GetEnumDescription());
+                    propertiesUsed.Add(property);
                 }
             }
   
@@ -127,7 +129,7 @@ namespace BihuApiCore.Infrastructure.Extensions
                 var data = list[i];
                 for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
                 {
-                    var property = properties[cellIndex];
+                    var property = propertiesUsed[cellIndex];
                     HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
                     newCell.SetCellValue(property.GetValue(data).ToString());
                     newCell.CellStyle = styleCell;
