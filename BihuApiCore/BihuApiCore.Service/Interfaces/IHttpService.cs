@@ -6,5 +6,6 @@ namespace BihuApiCore.Service.Interfaces
     public interface IHttpService
     {
        Task<BaseResponse> FormRequest();
+       Task<BaseResponse> PressureTest();
     }
 }

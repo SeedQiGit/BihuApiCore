@@ -206,21 +206,21 @@ namespace BihuApiCore
             //返回压缩
             services.AddResponseCompression();
            
-            services.AddHttpClient("client_1",client=>  //这里指定的name=client_1，可以方便我们后期服用该实例
-            {
-                client.BaseAddress= new Uri("http://client_1.com");
-                client.DefaultRequestHeaders.Add("header_1","header_1");
-            })
-            .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(10)
-            }));
+            //services.AddHttpClient("client_1",client=>  //这里指定的name=client_1，可以方便我们后期服用该实例
+            //{
+            //    client.BaseAddress= new Uri("http://client_1.com");
+            //    client.DefaultRequestHeaders.Add("header_1","header_1");
+            //})
+            //.AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+            //{
+            //    TimeSpan.FromSeconds(10)
+            //}));
 
-            services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
+            //services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
             services.AddHttpClient<DefaultClient>()
-                .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
-                .AddPolicyHandler(GetRetryPolicy())
-                ;
+            //    .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
+            //    .AddPolicyHandler(GetRetryPolicy())
+               ;
 
             services.AddHttpClient();
 
@@ -370,7 +370,7 @@ namespace BihuApiCore
         /// <param name="services"></param>
         private void ConfigureRabbitMqClient(IServiceCollection services)
         {
-            services.AddSingleton<RabbitMqClient, RabbitMqClient>();
+            services.AddSingleton<RabbitMqClient>();
             services.AddHostedService<NormalEventHandler>();
             services.AddHostedService<DeadEventHandler>();
             services.AddHostedService<DelayEventHandler>();

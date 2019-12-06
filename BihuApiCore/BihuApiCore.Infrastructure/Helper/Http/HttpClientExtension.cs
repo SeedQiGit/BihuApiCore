@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 
 namespace BihuApiCore.Infrastructure.Helper.Http
 {
-    public static class HttpWebHelper
+    public static class HttpClientExtension
     {
+
+
+
         #region form请求
 
         /// <summary>
@@ -76,14 +79,21 @@ namespace BihuApiCore.Infrastructure.Helper.Http
 
         #endregion
 
-
-        public static async Task<string> HttpClientPostAsync(string postData, string url)
+        /// <summary>
+        /// 如果不成功
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="url"></param>
+        /// <param name="postData">发送数据的字符串格式</param>
+        /// <returns></returns>
+        public static async Task<string> HelperPsotAsync(this HttpClient client,string url,string postData)
         {
-            var client = HttpClientHelper.GetClient();
-            Task<string> result = Task.FromResult(string.Empty);
+            //Task<string> result = Task.FromResult(string.Empty);
             HttpContent content = new StringContent(postData);
-            MediaTypeHeaderValue typeHeader = new MediaTypeHeaderValue("application/json");
-            typeHeader.CharSet = "UTF-8";
+            MediaTypeHeaderValue typeHeader = new MediaTypeHeaderValue("application/json")
+            {
+                CharSet = "UTF-8"
+            };
             content.Headers.ContentType = typeHeader;
 
             #region  增加tls设置
@@ -94,24 +104,30 @@ namespace BihuApiCore.Infrastructure.Helper.Http
             #endregion
 
             HttpResponseMessage response = await client.PostAsync(url, content);
-            if (response.IsSuccessStatusCode)
-            {
-                result = response.Content.ReadAsStringAsync();
-            }
-            return await result;
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    result = response.Content.ReadAsStringAsync();
+            //}
+
+            return await  response.Content.ReadAsStringAsync();           
         }
 
-
-        public static async Task<string> HttpClientGetAsync(string url)
+        /// <summary>
+        /// 如果不成功
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="url">发送链接</param>
+        /// <returns></returns>
+        public static async Task<string> HelperGetAsync(this HttpClient client,string url)
         {
-            var client = HttpClientHelper.GetClient();
-            Task<string> result = Task.FromResult(string.Empty);
-            var response = client.GetAsync(url).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                result = response.Content.ReadAsStringAsync();
-            }
-            return await result;
+            string result;
+            //Task<> result = Task.FromResult(string.Empty);
+            var response = await client.GetAsync(url);
+          
+            result= await response.Content.ReadAsStringAsync();
+            LogHelper.Info("请求连接"+url+"返回值"+result);
+            return result;
         }
+
     }
 }

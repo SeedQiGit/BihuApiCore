@@ -34,6 +34,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.GetEtOcr(System.String)">
+            <summary>
+            小程序获取行驶本
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.GetRequestPost">
+            <summary>
+            获取post的参数组
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.AsyncIoController.SyncIoExcel">
             <summary>
             同步方法
@@ -44,6 +56,13 @@
             <summary>
             异步方法
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.Monitor(System.Int64)">
+            <summary>
+            监视多线程执行
+            </summary>
+            <param name="compId"></param>
             <returns></returns>
         </member>
         <member name="M:BihuApiCore.Controllers.BaseController.Ok(System.String)">
@@ -95,11 +114,41 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.HttpController.PressureTest">
+            <summary>
+            测试Authorize
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.PayController.AliPay">
             <summary>
             短信支付跳转页面   所有充值都是给自己充值，避免我充值，其他人消费了
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.PayController.MessagePayReturnUrl">
+            <summary>
+            短信支付后回调地址 ReturnUrl
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.PayController.GetRequestGet">
+            <summary>
+            获取支付宝GET过来通知消息，并以“参数名=参数值”的形式组成数组
+            </summary>
+            <returns>request回来的信息组成的数组</returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.PayController.MessagePayNotify">
+            <summary>
+             短信支付后阿里通知地址
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.PayController.GetRequestPost">
+            <summary>
+            获取支付宝POST过来通知消息，并以“参数名=参数值”的形式组成数组
+            </summary>
+            <returns>request回来的信息组成的数组</returns>
         </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.MqClientSendNomal">
             <summary>
@@ -125,7 +174,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect(System.String)">
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect">
+            <summary>
+            SendDirect
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect2">
             <summary>
             SendDirect
             </summary>

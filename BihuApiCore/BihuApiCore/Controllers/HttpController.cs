@@ -18,6 +18,8 @@ namespace BihuApiCore.Controllers
             _loginService = loginService;          
         }
 
+        #region 各种请求
+
         /// <summary>
         /// 表单请求
         /// </summary>
@@ -41,7 +43,23 @@ namespace BihuApiCore.Controllers
             return await _loginService.FormRequest();
         }
 
+        #endregion
 
-        
+        #region 压力测试
+
+        /// <summary>
+        /// 测试Authorize
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("PressureTest")]
+        [ProducesResponseType(typeof(BaseResponse), 1)]
+        public async Task<BaseResponse> PressureTest()
+        {						
+            return await _loginService.PressureTest();
+        }
+
+
+        #endregion
+
     }
 }

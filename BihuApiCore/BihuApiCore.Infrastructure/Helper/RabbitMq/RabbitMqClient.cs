@@ -23,7 +23,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <summary>
         ///  Common AMQP model,usually call it channel
         /// </summary>
-        private  readonly ConcurrentDictionary<string, IModel> _modelDic =new ConcurrentDictionary<string, IModel>();
+        protected  readonly ConcurrentDictionary<string, IModel> ModelDic =new ConcurrentDictionary<string, IModel>();
 
         private readonly ILogger<RabbitMqClient> _logger;
 
@@ -45,7 +45,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         public void Dispose()
         {
-            foreach (var item in _modelDic) item.Value.Dispose();
+            foreach (var item in ModelDic) item.Value.Dispose();
             _conn.Dispose();
         }
 
@@ -90,7 +90,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             bool autoDelete = false, IDictionary<string, object> exchangeArgs = null,
             IDictionary<string, object> queueArgs = null)
         {
-            return _modelDic.GetOrAdd(queue, key =>
+            return ModelDic.GetOrAdd(queue, key =>
             {
                 var model = _conn.CreateModel();
                 //声明订阅通道
@@ -99,7 +99,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
                 QueueDeclare(model, queue, durable, autoDelete, queueArgs);
                 //绑定队列
                 model.QueueBind(queue, exchange, routingKey);
-                _modelDic[queue] = model;
+                ModelDic[queue] = model;
                 return model;
             });
         }
@@ -270,12 +270,12 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             };
 
             //创建一个名叫"wait_dead_queue"的固定等死消息队列
-            var channel = _modelDic.GetOrAdd("wait_dead_queue", key =>
+            var channel = ModelDic.GetOrAdd("wait_dead_queue", key =>
             {
                 //声明原交换机，队列，并绑定
                 var model = _conn.CreateModel();
                 QueueDeclare(model, "wait_dead_queue", queueInfo.Durable, false, queueArgs);
-                _modelDic["wait_dead_queue"] = model;
+                ModelDic["wait_dead_queue"] = model;
                 return model;
             });
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
@@ -302,10 +302,9 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
         }
 
-        public void ReceiveMessage<T>(Func<T, Task> handler)
+        public IModel ReceiveMessage<T>(Func<T, Task> handler)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
-
             if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
             if (handler == null) throw new NullReferenceException("处理事件为null");
@@ -317,6 +316,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             //autoAck =true 自动应答，一旦我们完成任务，消费者会自动发送应答。通知RabbitMQ消息已被处理，可以从内存删除
             channel.BasicConsume(queueInfo.QueueName, true, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            return channel;
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <typeparam name="T"></typeparam>
         /// <param name="queueInfo"></param>
         /// <param name="handler"></param>
-        public void ReceiveMessage<T>(RabbitMqQueueModel queueInfo, Func<T, CancellationToken, Task> handler)
+        public IModel ReceiveMessage<T>(RabbitMqQueueModel queueInfo, Func<T, CancellationToken, Task> handler)
         {
             if (queueInfo == null)
                 throw new ArgumentException("消息上不具有任何特性");
@@ -336,6 +336,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             var consumer = new EventingBasicConsumer(channel);
             channel.BasicConsume(queueInfo.QueueName, false, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            return channel;
         }
 
         #region 延时消息
@@ -345,7 +346,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void ReceiveMessageDelay<T>(Func<T, Task> handler)
+        public IModel ReceiveMessageDelay<T>(Func<T, Task> handler)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
 
@@ -364,6 +365,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             var consumer = new EventingBasicConsumer(channel);
             channel.BasicConsume(queueInfo.DelayQueueName, false, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            return channel;
         }
 
         /// <summary>
@@ -371,7 +373,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public void ReceiveMessageDead<T>(Func<T, Task> handler)
+        public IModel ReceiveMessageDead<T>(Func<T, Task> handler)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
             if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Dead)
@@ -386,6 +388,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             var consumer = new EventingBasicConsumer(channel);
             channel.BasicConsume(queueInfo.DeadQueueName, true, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            return channel;
         }
 
         #endregion

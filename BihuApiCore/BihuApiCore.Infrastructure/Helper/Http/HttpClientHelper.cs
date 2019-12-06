@@ -1,9 +1,12 @@
-﻿using BihuApiCore.Infrastructure.Configuration;
-using System;
+﻿using System;
 using System.Net.Http;
+using BihuApiCore.Infrastructure.Configuration;
 
-namespace BihuApiCore.Infrastructure.Helper
+namespace BihuApiCore.Infrastructure.Helper.Http
 {
+    /// <summary>
+    /// 已经用官方的_httpClientFactory类了，这个就不使用了。
+    /// </summary>
     public class HttpClientHelper
     {
         //私用的静态变量应该是线程安全的，静态方法也是线程安全的。

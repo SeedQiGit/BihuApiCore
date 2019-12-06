@@ -41,6 +41,11 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            //    channel.close();
+            //connection.close();
+
+
+            //channel
             //this.connection.Close();
             return Task.CompletedTask;
         }
@@ -58,7 +63,6 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         {
             throw new NotImplementedException();
         }
-
 
         /// <summary>
         ///     注册消费者监听

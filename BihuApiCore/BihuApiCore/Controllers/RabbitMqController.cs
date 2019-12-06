@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BihuApiCore.Events.Event;
 using BihuApiCore.Infrastructure.Helper.RabbitMq;
+using Newtonsoft.Json;
 
 namespace BihuApiCore.Controllers
 {
@@ -64,6 +65,29 @@ namespace BihuApiCore.Controllers
             return BaseResponse.Ok();
         }
         
+        /// <summary>
+        /// SendDirect
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> SendDirectNormalEvent( )
+        {
+            using (var connection = _connectionFactory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare(exchange: "bihu_api_exc",
+                    type: "direct",true);
+                NormalEvent normalEvent=new NormalEvent();
+                var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(normalEvent));
+                channel.BasicPublish(exchange: "bihu_api_exc",
+                    routingKey: "NormalEvent",
+                    basicProperties: null,
+                    body: body);
+                LogHelper.Info($"已发送:{"NormalEvent"},direct Message!");
+            }
+            return BaseResponse.Ok();
+        }
+
         #endregion
 
         /// <summary>
@@ -96,29 +120,5 @@ namespace BihuApiCore.Controllers
             }
             return BaseResponse.Ok();
         }
-
-        /// <summary>
-        /// SendDirect
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<BaseResponse> SendDirect(string routingKey)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.ExchangeDeclare(exchange: "direct_logs",
-                    type: "direct");
-
-                var body = Encoding.UTF8.GetBytes("direct Message!");
-                channel.BasicPublish(exchange: "direct_logs",
-                    routingKey: routingKey??"info",
-                    basicProperties: null,
-                    body: body);
-                LogHelper.Info($"已发送:{routingKey??"info"},direct Message!");
-            }
-            return BaseResponse.Ok();
-        }
-        
     }
 }
