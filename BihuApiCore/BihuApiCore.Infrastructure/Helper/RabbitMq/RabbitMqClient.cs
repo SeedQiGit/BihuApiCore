@@ -314,7 +314,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             channel.BasicQos(0, 1, false);
             var consumer = new EventingBasicConsumer(channel);
             //autoAck =true 自动应答，一旦我们完成任务，消费者会自动发送应答。通知RabbitMQ消息已被处理，可以从内存删除
-            channel.BasicConsume(queueInfo.QueueName, true, consumer);
+            channel.BasicConsume(queueInfo.QueueName, false, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
             return channel;
         }

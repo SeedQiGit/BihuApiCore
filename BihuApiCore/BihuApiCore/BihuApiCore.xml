@@ -168,21 +168,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirectNormalEvent">
+            <summary>
+            SendDirect
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
             <summary>
             Send hello world
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect">
-            <summary>
-            SendDirect
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BihuApiCore.Controllers.RabbitMqController.SendDirect2">
-            <summary>
-            SendDirect
             </summary>
             <returns></returns>
         </member>
