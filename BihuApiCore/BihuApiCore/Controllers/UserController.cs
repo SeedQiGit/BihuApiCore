@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using BihuApiCore.Filters;
 using BihuApiCore.Model.Dto;
 using BihuApiCore.Model.Enums;
@@ -62,7 +66,7 @@ namespace BihuApiCore.Controllers
         [ProducesResponseType(typeof(UserDto), 1)]
         public BaseResponse Test()
         {
-
+         
             //LoggerExtensions.LogInformation("测试core自带log全局扩展");
             //throw new Exception("");
             return _userService.Test();
@@ -98,7 +102,12 @@ namespace BihuApiCore.Controllers
         [ModelVerifyFilter]
         public async Task<BaseResponse> TestPost([FromBody] BaseRequest request)
         {
-            return await Task.Run(()=> { return BaseResponse.GetBaseResponse(BusinessStatusType.OK); });
+            var ip =NetworkInterface
+                .GetAllNetworkInterfaces()
+                .Select(p => p.GetIPProperties())
+                .SelectMany(p => p.UnicastAddresses)
+                .FirstOrDefault(p => p.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(p.Address))?.Address.ToString();
+            return await Task.Run(()=> { return BaseResponse.Ok(ip); });
         }
 
         [HttpPost]

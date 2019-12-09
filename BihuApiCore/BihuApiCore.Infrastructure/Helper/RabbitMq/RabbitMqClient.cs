@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 
 namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 {
@@ -26,17 +27,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         protected  readonly ConcurrentDictionary<string, IModel> ModelDic =new ConcurrentDictionary<string, IModel>();
 
         private readonly ILogger<RabbitMqClient> _logger;
-
+        private readonly  IHostingEnvironment _env;
         /// <summary>
         /// 构造函数，单例启动
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="connectionFactory"></param>
-        public RabbitMqClient(ILogger<RabbitMqClient> logger,ConnectionFactory connectionFactory)
+        public RabbitMqClient(ILogger<RabbitMqClient> logger,ConnectionFactory connectionFactory,IHostingEnvironment env)
         {
             _conn =_conn ?? connectionFactory.CreateConnection();
             _logger = logger;
-
+            _env=env;
             //string host = configuration.GetSection("EventBusConnection").Value;
             //string userName = configuration.GetSection("EventBusUserName").Value;
             //string pwd = configuration.GetSection("EventBusPassword").Value;
@@ -66,9 +67,9 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             result.RouteKey = rolekey;
             result.DelayRouteKey = rolekey;
             result.DeadRouteKey = rolekey;
-            result.QueueName = string.Concat(result.QueueName,"_", rolekey);
-            result.DelayQueueName = string.Concat(result.DelayQueueName, "_", rolekey);
-            result.DeadQueueName = string.Concat(result.DeadQueueName, "_", rolekey);
+            result.QueueName = string.Concat(result.QueueName,$"_{_env}_", rolekey);
+            result.DelayQueueName = string.Concat(result.DelayQueueName, $"_{_env}_", rolekey);
+            result.DeadQueueName = string.Concat(result.DeadQueueName, $"_{_env}_", rolekey);
 
             return result;
         }
