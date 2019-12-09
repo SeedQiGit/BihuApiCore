@@ -67,9 +67,9 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             result.RouteKey = rolekey;
             result.DelayRouteKey = rolekey;
             result.DeadRouteKey = rolekey;
-            result.QueueName = string.Concat(result.QueueName,$"_{_env}_", rolekey);
-            result.DelayQueueName = string.Concat(result.DelayQueueName, $"_{_env}_", rolekey);
-            result.DeadQueueName = string.Concat(result.DeadQueueName, $"_{_env}_", rolekey);
+            result.QueueName = string.Concat(result.QueueName,$"_{_env.EnvironmentName}_", rolekey);
+            result.DelayQueueName = string.Concat(result.DelayQueueName, $"_{_env.EnvironmentName}_", rolekey);
+            result.DeadQueueName = string.Concat(result.DeadQueueName, $"_{_env.EnvironmentName}_", rolekey);
 
             return result;
         }
