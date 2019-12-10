@@ -257,8 +257,8 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="messageObj"></param>
-        /// <param name="seconds">延时的秒数</param>
-        public void SendMessageDead<T>(T messageObj, long seconds) where T : class
+        /// <param name="milliseconds">延时的秒数</param>
+        public void SendMessageDead<T>(T messageObj, long milliseconds) where T : class
         {
             var queueInfo = GetRabbitMqAttribute<T>();
             if (queueInfo == null||queueInfo.MessageKind!=RabbitMsgKind.Dead)
@@ -269,8 +269,8 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             {
                 {"x-dead-letter-exchange", queueInfo.DeadExchangeName},
                 {"x-dead-letter-routing-key", queueInfo.DeadRouteKey},
-                {"x-message-ttl", seconds}, // 这个时间要一致
-                {"x-expires", seconds+10},
+                {"x-message-ttl", milliseconds}, // 这个时间要一致 //单位毫秒！！
+                {"x-expires", milliseconds+5000},//单位毫秒！！
             };
  
             //创建一个名叫"wait_dead_queuexxxxxx"的固定等死消息队列
