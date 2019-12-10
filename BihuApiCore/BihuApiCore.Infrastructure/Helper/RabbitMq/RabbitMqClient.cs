@@ -28,11 +28,13 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         private readonly ILogger<RabbitMqClient> _logger;
         private readonly  IHostingEnvironment _env;
+
         /// <summary>
         /// 构造函数，单例启动
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="connectionFactory"></param>
+        /// <param name="env"></param>
         public RabbitMqClient(ILogger<RabbitMqClient> logger,ConnectionFactory connectionFactory,IHostingEnvironment env)
         {
             _conn =_conn ?? connectionFactory.CreateConnection();
@@ -63,13 +65,13 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         {
             var result1 = Attribute.GetCustomAttribute(typeof(T), typeof(RabbitMqQueueAttribute));
             var result = result1!=null ? result1 as RabbitMqQueueAttribute : new RabbitMqQueueAttribute();
-            string rolekey= typeof(T).Name;
+            string rolekey= typeof(T).Name+$"_{_env.EnvironmentName}_";
             result.RouteKey = rolekey;
             result.DelayRouteKey = rolekey;
             result.DeadRouteKey = rolekey;
-            result.QueueName = string.Concat(result.QueueName,$"_{_env.EnvironmentName}_", rolekey);
-            result.DelayQueueName = string.Concat(result.DelayQueueName, $"_{_env.EnvironmentName}_", rolekey);
-            result.DeadQueueName = string.Concat(result.DeadQueueName, $"_{_env.EnvironmentName}_", rolekey);
+            result.QueueName = string.Concat(result.QueueName,"_", rolekey);
+            result.DelayQueueName = string.Concat(result.DelayQueueName, "_", rolekey);
+            result.DeadQueueName = string.Concat(result.DeadQueueName, $"_", rolekey);
 
             return result;
         }
@@ -267,21 +269,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             {
                 {"x-dead-letter-exchange", queueInfo.DeadExchangeName},
                 {"x-dead-letter-routing-key", queueInfo.DeadRouteKey},
-                {"x-message-ttl", seconds},
+                {"x-message-ttl", seconds}, // 这个时间要一致
+                {"x-expires", seconds+10},
             };
-
-            //创建一个名叫"wait_dead_queue"的固定等死消息队列
-            var channel = ModelDic.GetOrAdd("wait_dead_queue", key =>
-            {
-                //声明原交换机，队列，并绑定
-                var model = _conn.CreateModel();
-                QueueDeclare(model, "wait_dead_queue", queueInfo.Durable, false, queueArgs);
-                ModelDic["wait_dead_queue"] = model;
-                return model;
-            });
+ 
+            //创建一个名叫"wait_dead_queuexxxxxx"的固定等死消息队列
+            string queueName ="wait_dead_queue"+Guid.NewGuid().ToString();
+            var model = _conn.CreateModel();
+            model.QueueDeclare(queueName, false,false, true, queueArgs);
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
             //发送消息到等死队列
-            channel.BasicPublish("", "wait_dead_queue", null, body);
+            model.BasicPublish("", queueName, null, body);
         }
 
         #endregion

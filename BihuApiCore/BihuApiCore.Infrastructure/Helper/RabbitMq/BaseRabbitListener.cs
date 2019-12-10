@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using RabbitMQ.Client;
 
 namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 {
@@ -15,6 +16,8 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         protected RabbitMqClient MqClient;
         protected RabbitMsgKind MessageKind;
+        protected IModel RabbitModel;
+
 
         public BaseRabbitListener(RabbitMqClient mqClient)
         {
@@ -33,20 +36,25 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         #region 服务启动或停止
 
+        /// <summary>
+        /// 实现IHostedService的启动事件
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
             Register(cancellationToken);
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 实现IHostedService的停止事件
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            //    channel.close();
-            //connection.close();
-
-
-            //channel
-            //this.connection.Close();
+            RabbitModel.Close();
             return Task.CompletedTask;
         }
 
@@ -74,13 +82,13 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             switch (MessageKind)
             {
                 case RabbitMsgKind.Normal:
-                    MqClient.ReceiveMessage(handler);
+                    RabbitModel =MqClient.ReceiveMessage(handler);
                     break;
                 case RabbitMsgKind.Delay:
-                    MqClient.ReceiveMessageDelay(handler);
+                    RabbitModel=MqClient.ReceiveMessageDelay(handler);
                     break;
                 case RabbitMsgKind.Dead:
-                    MqClient.ReceiveMessageDead(handler);
+                    RabbitModel=MqClient.ReceiveMessageDead(handler);
                     break;
             }
         }
