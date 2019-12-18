@@ -13,7 +13,7 @@ namespace BihuApiCore.Infrastructure.Extensions
 {
     public static class ListToExcelExtention
     {
-       public static HSSFWorkbook ListWorkbookExchange<T>(List<T> list,string sheetName)
+        public static HSSFWorkbook ListWorkbookExchange<T>(List<T> list, string sheetName)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
 
@@ -59,7 +59,7 @@ namespace BihuApiCore.Infrastructure.Extensions
         /// </summary>
         /// <param name="sheet"></param>
         /// <param name="fieldCount"></param>
-        public static void SetColumnWidth(this HSSFSheet sheet,int fieldCount)
+        public static void SetColumnWidth(this HSSFSheet sheet, int fieldCount)
         {
             for (int columnNum = 0; columnNum <= fieldCount; columnNum++)
             {
@@ -75,15 +75,20 @@ namespace BihuApiCore.Infrastructure.Extensions
                         columnWidth = length + 1;
                     }//若当前单元格内容宽度大于列宽，则调整列宽为当前单元格宽度，后面的+1是我人为的将宽度增加一个字符  
                 }
-
-                sheet.SetColumnWidth(columnNum, (((columnWidth > 50 ? columnWidth / 4 : columnWidth) + 3) * 256));
+                int width=(((columnWidth > 50 ? columnWidth / 4 : columnWidth) + 3) * 256);
+                //The maximum column width for an individual cell is 255 characters
+                if (width>255)
+                {
+                    width=255;
+                }
+                sheet.SetColumnWidth(columnNum, width);
             }
         }
 
         public static void ListToSheet<T>(HSSFWorkbook workbook, List<T> list, string sheetName)
         {
             HSSFSheet sheet = (HSSFSheet)workbook.CreateSheet(sheetName);
-            HSSFCellStyle headStyle=workbook.GetHeadStyle();
+            HSSFCellStyle headStyle = workbook.GetHeadStyle();
 
             //值类型直接返回第一列
             Type tp = typeof(T);
@@ -91,7 +96,7 @@ namespace BihuApiCore.Infrastructure.Extensions
             PropertyInfo[] properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
             //property.Name是属性的英文名，怎么转换成中文？使用DescriptionAttribute特性
             List<string> fieldStringArray = new List<string>();
-            List<PropertyInfo> propertiesUsed=new List<PropertyInfo>();
+            List<PropertyInfo> propertiesUsed = new List<PropertyInfo>();
             foreach (var property in properties)
             {
                 if (Attribute.IsDefined(property, typeof(DescriptionAttribute)))
@@ -100,7 +105,7 @@ namespace BihuApiCore.Infrastructure.Extensions
                     propertiesUsed.Add(property);
                 }
             }
-  
+
             int fieldCount = fieldStringArray.Count;
             HSSFRow headerRow = (HSSFRow)sheet.CreateRow(0);
             headerRow.HeightInPoints = 20;
@@ -142,6 +147,6 @@ namespace BihuApiCore.Infrastructure.Extensions
     }
 
 
-    
-    
+
+
 }

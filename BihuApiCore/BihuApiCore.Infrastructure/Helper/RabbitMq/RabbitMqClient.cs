@@ -19,7 +19,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
     {
         #region 构造函数及字段
 
-        private  IConnection _conn;
+        private readonly  IConnection _conn;
 
         /// <summary>
         ///  Common AMQP model,usually call it channel
@@ -123,32 +123,32 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         #region 单例创建连接工厂，已经改为di 单例
 
-        private static readonly object LockObj = new object();
+        //private static readonly object LockObj = new object();
 
-        /// <summary>
-        /// 单例创建ConnectionFactory  这里直接用di ConnectionFactory的单例就行
-        /// </summary>
-        /// <param name="host"></param>
-        /// <param name="userName"></param>
-        /// <param name="pwd"></param>
-        private void Open(string host, string userName, string pwd)
-        {
-            if (_conn != null) return;
-            lock (LockObj)
-            {
-                if (_conn != null) return;
-                // 不过这个写法也留着吧 这都是不同的方法，无关大局
-                var factory = new ConnectionFactory
-                {
-                    HostName = host,
-                    UserName = userName,
-                    Password = pwd,
-                    AutomaticRecoveryEnabled = true,
-                    RequestedHeartbeat = 15
-                };
-                _conn = _conn ?? factory.CreateConnection();
-            }
-        }
+        ///// <summary>
+        ///// 单例创建ConnectionFactory  这里直接用di ConnectionFactory的单例就行
+        ///// </summary>
+        ///// <param name="host"></param>
+        ///// <param name="userName"></param>
+        ///// <param name="pwd"></param>
+        //private void Open(string host, string userName, string pwd)
+        //{
+        //    if (_conn != null) return;
+        //    lock (LockObj)
+        //    {
+        //        if (_conn != null) return;
+        //        // 不过这个写法也留着吧 这都是不同的方法，无关大局
+        //        var factory = new ConnectionFactory
+        //        {
+        //            HostName = host,
+        //            UserName = userName,
+        //            Password = pwd,
+        //            AutomaticRecoveryEnabled = true,
+        //            RequestedHeartbeat = 15
+        //        };
+        //        _conn = _conn ?? factory.CreateConnection();
+        //    }
+        //}
 
         #endregion
 
@@ -382,10 +382,10 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
             var channel = GetOrAddModel(queueInfo.DeadExchangeName, queueInfo.DeadQueueName, queueInfo.DeadRouteKey,
                 queueInfo.DeadExchangeType, queueInfo.Durable);
-            //同一时间不处理超过一条消息
-            channel.BasicQos(0, 1, false);
+            //同一时间不处理超过20条消息
+            channel.BasicQos(0, 20, false);
             var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.DeadQueueName, true, consumer);
+            channel.BasicConsume(queueInfo.DeadQueueName, false, consumer);
             consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
             return channel;
         }
@@ -404,11 +404,11 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError($"_doAsync处理异常：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
             }
             finally
             {
-                //如果autoAck =true 可以不用再次确认收到
+                //如果autoAck =true 可以不用再次确认收到   所以这里我再统一应答，各个方法使用自己的写法
                 channel.BasicAck(ea.DeliveryTag, false);
             }
         }
@@ -424,7 +424,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError($"_doAsync处理异常：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
             }
             finally
             {
