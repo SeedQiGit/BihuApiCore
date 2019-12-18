@@ -63,6 +63,7 @@ namespace BihuApiCore.Infrastructure.Extensions
         {
             for (int columnNum = 0; columnNum <= fieldCount; columnNum++)
             {
+                //除以256才是一个字的长度
                 int columnWidth = sheet.GetColumnWidth(columnNum) / 256;//获取当前列宽度  
                 for (int rowNum = 1; rowNum <= sheet.LastRowNum; rowNum++)//在这一列上循环行  
                 {
@@ -77,9 +78,9 @@ namespace BihuApiCore.Infrastructure.Extensions
                 }
                 int width=(((columnWidth > 50 ? columnWidth / 4 : columnWidth) + 3) * 256);
                 //The maximum column width for an individual cell is 255 characters
-                if (width>255)
+                if (width>255* 256)
                 {
-                    width=255;
+                    width=255* 256;
                 }
                 sheet.SetColumnWidth(columnNum, width);
             }
