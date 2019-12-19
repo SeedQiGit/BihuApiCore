@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -11,6 +13,8 @@ namespace BihuApiCore.Infrastructure.Helper.Http
 
 
         #region form请求
+
+        #region form-data  置表单的MIME编码 可以传递文件
 
         /// <summary>
         /// 模拟表单请求，不能上传文件 （上传文件方法需要自己写） 只能处理简单类型
@@ -46,6 +50,24 @@ namespace BihuApiCore.Infrastructure.Helper.Http
             return await result;
         }
 
+        #endregion
+
+        #region form-urlencoded 窗体数据被编码为名称/值对。这是标准的编码格式。
+
+        /// <summary>
+        /// form-urlencoded请求 
+        /// </summary>
+        /// <param name="paraList"></param>
+        /// <param name="client"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static async Task<string> HttpClientFromAsync(this HttpClient client,string url,List<KeyValuePair<String, String>> paraList)
+        { 
+            HttpResponseMessage response =await client.PostAsync(url, new FormUrlEncodedContent(paraList));
+            String result = await response.Content.ReadAsStringAsync();
+            return  result;
+        }
+
         /// <summary>
         /// form-urlencoded请求
         /// 数据格式是data=xxx & queueName=xxxx
@@ -77,6 +99,8 @@ namespace BihuApiCore.Infrastructure.Helper.Http
             return await result;
         }
 
+        #endregion
+        
         #endregion
 
         /// <summary>
