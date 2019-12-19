@@ -29,8 +29,14 @@ namespace BihuApiCore.Controllers
         {	
             #region 获取token
 
-            //string token = (await _database.StringGetAsync(ConfigurationManager.GetValue("BaiduOauth"))).ToString();
-            //if (string.IsNullOrWhiteSpace(token))
+            //string token;
+            //string key =ConfigurationManager.GetValue("BaiduOauth");
+            //if (string.IsNullOrEmpty(key))
+            //{
+            //    key="baiduOauth_token";
+            //}
+            //var tokenObject = await _database.StringGetAsync(key);
+            //if (!tokenObject.HasValue)
             //{
             //    var res=await BaiduOauth();
             //    if (res.Code!=1)
@@ -38,7 +44,11 @@ namespace BihuApiCore.Controllers
             //        return res;
             //    }
             //    token=res.Data["access_token"].ToString();
-            //    await _database.StringSetAsync(ConfigurationManager.GetValue("BaiduOauth"), token, TimeSpan.FromSeconds((int)res.Data["expires_in"]));
+            //    await _database.StringSetAsync(key, token, TimeSpan.FromSeconds((int)res.Data["expires_in"]));
+            //}
+            //else
+            //{
+            //    token=tokenObject.ToString();
             //}
 
             #endregion
