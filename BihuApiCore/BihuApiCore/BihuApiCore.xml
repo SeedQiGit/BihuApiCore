@@ -71,6 +71,24 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.BaiduController.VehicleLicense">
+            <summary>
+            表单请求
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.BaiduController.VehicleLicenseObject">
+            <summary>
+            表单请求
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.BaiduController.Base64Photo">
+            <summary>
+            获取行驶本的Base64
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.BaseController.Ok(System.String)">
             <summary>
               返回成功结果
@@ -125,6 +143,18 @@
             测试Authorize
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.LoggerController.DownLoadFile(System.String)">
+            <summary>
+            文件下载
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.LoggerController.GetLogs">
+            <summary>
+            查询文件
+            </summary>
         </member>
         <member name="M:BihuApiCore.Controllers.PayController.AliPay">
             <summary>

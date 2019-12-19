@@ -63,7 +63,8 @@ namespace BihuApiCore.Infrastructure.Helper.Http
         /// <returns></returns>
         public static async Task<string> HttpClientFromAsync(this HttpClient client,string url,List<KeyValuePair<String, String>> paraList)
         { 
-            HttpResponseMessage response =await client.PostAsync(url, new FormUrlEncodedContent(paraList));
+            var content =new FormUrlEncodedContent(paraList);
+            HttpResponseMessage response =await client.PostAsync(url, content);
             String result = await response.Content.ReadAsStringAsync();
             return  result;
         }
@@ -73,13 +74,15 @@ namespace BihuApiCore.Infrastructure.Helper.Http
         /// 数据格式是data=xxx & queueName=xxxx
         /// </summary>
         /// <param name="postData"></param>
+        /// <param name="client"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async Task<string> HttpClientPostFromAsync(string url,string postData)
+        public static async Task<string> FromCodedObjectAsync(this HttpClient client,string url,Object postData)
         {
-            var client = HttpClientHelper.GetClient();
-            Task<string> result = Task.FromResult(string.Empty);
-            HttpContent content = new StringContent(postData);
+            var postStr =postData.QueryStringSimple();
+            postStr =postStr.Substring(1, postStr.Length - 1);
+         
+            HttpContent content = new StringContent(postStr);
             MediaTypeHeaderValue typeHeader = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             typeHeader.CharSet = "UTF-8";
             content.Headers.ContentType = typeHeader;
@@ -92,11 +95,10 @@ namespace BihuApiCore.Infrastructure.Helper.Http
             #endregion
 
             HttpResponseMessage response = await client.PostAsync(url, content);
-            if (response.IsSuccessStatusCode)
-            {
-                result = response.Content.ReadAsStringAsync();
-            }
-            return await result;
+            String result = await response.Content.ReadAsStringAsync();
+            LogHelper.Info("请求地址："+url+"，请求参数："+postStr+"，返回值："+result);
+
+            return result;
         }
 
         #endregion
