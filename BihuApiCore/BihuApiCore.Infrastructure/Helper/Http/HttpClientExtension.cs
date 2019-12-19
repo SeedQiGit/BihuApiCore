@@ -71,7 +71,6 @@ namespace BihuApiCore.Infrastructure.Helper.Http
 
         /// <summary>
         /// form-urlencoded请求
-        /// 数据格式是data=xxx & queueName=xxxx
         /// </summary>
         /// <param name="postData"></param>
         /// <param name="client"></param>

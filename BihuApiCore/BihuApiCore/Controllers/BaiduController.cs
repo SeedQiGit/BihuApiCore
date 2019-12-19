@@ -26,7 +26,24 @@ namespace BihuApiCore.Controllers
         [HttpGet("BaiduOauth")]
         [ProducesResponseType(typeof(BaseResponse), 1)]
         public async Task<BaseResponse> BaiduOauth()
-        {				
+        {	
+            #region 获取token
+
+            //string token = (await _database.StringGetAsync(ConfigurationManager.GetValue("BaiduOauth"))).ToString();
+            //if (string.IsNullOrWhiteSpace(token))
+            //{
+            //    var res=await BaiduOauth();
+            //    if (res.Code!=1)
+            //    {
+            //        return res;
+            //    }
+            //    token=res.Data["access_token"].ToString();
+            //    await _database.StringSetAsync(ConfigurationManager.GetValue("BaiduOauth"), token, TimeSpan.FromSeconds((int)res.Data["expires_in"]));
+            //}
+
+            #endregion
+
+
             String url = "https://aip.baidubce.com/oauth/2.0/token";
             List<KeyValuePair<String, String>> paraList = new List<KeyValuePair<string, string>>();
             paraList.Add(new KeyValuePair<string, string>("grant_type", "client_credentials"));
