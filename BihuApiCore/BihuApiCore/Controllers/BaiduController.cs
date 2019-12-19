@@ -106,6 +106,7 @@ namespace BihuApiCore.Controllers
                 userPhoto = Convert.ToBase64String(arr1);
             }
 
+            //百度要求对base64进行编码
             var encodedPhoto=System.Web.HttpUtility.UrlEncode(userPhoto);
             object data = new { image = encodedPhoto ,detect_direction="false",accuracy="normal",vehicle_license_side="front"};
 
@@ -117,7 +118,7 @@ namespace BihuApiCore.Controllers
                 return BaseResponse.Failed(jObject["error_code"].ToString()+";"+jObject["error_msg"].ToString());
             }; 
 
-            return BaseResponse.Ok(result);
+            return BaseResponse<object>.Ok(jObject);
         }
 
         /// <summary>
