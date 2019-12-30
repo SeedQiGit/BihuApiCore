@@ -157,7 +157,7 @@ namespace BihuApiCore.Controllers
         public async Task<BaseResponse> Base64Photo()
         {
             //读图片转为Base64String
-            System.Drawing.Bitmap bmp1 = new System.Drawing.Bitmap(Path.Combine("D:\\", "1.png"));
+            System.Drawing.Bitmap bmp1 = new System.Drawing.Bitmap(Path.Combine("D:\\", "1.jpg"));
             string userPhoto;
             using (MemoryStream ms1 = new MemoryStream())
             {
