@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore", "BihuApiCore\BihuApiCore.csproj", "{646794ED-FF7F-49B7-BC1C-E9BF72642C2E}"
 EndProject
@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Infrastructure.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Repository.UnitTest", "test\BihuApiCore.Repository.UnitTest\BihuApiCore.Repository.UnitTest.csproj", "{D6B474A6-B1AE-4A34-AB9C-82842E914534}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BihuApiCore.Model.UnitTest", "BihuApiCore.Model.UnitTest\BihuApiCore.Model.UnitTest.csproj", "{8DC2D69C-3357-4911-BBAF-1D88C38BDE5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BihuApiCore.Model.UnitTest", "BihuApiCore.Model.UnitTest\BihuApiCore.Model.UnitTest.csproj", "{8DC2D69C-3357-4911-BBAF-1D88C38BDE5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

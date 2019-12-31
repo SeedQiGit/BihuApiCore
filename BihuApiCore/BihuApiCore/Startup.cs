@@ -272,6 +272,8 @@ namespace BihuApiCore
             // 配置跨域
             app.UseCors("AllowSpecificOrigin");
 
+            app.UseStaticFiles();
+
             //Api限流
             //app.UseApiThrottle();
 

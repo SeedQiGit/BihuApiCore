@@ -1,0 +1,39 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>INDEX</title>
+</head>
+<body>
+asd
+
+<button onclick="check()">asdasdadasd</button>>
+
+
+    <script src="~/js/jquery-1.4.4.js"></script>
+    <script>
+        function check() {
+            $.ajax({
+                url: '/api/Mvc/AddCookies',
+                type: 'POST',
+                //data: formData,
+                async: true,
+                // 下面三个参数要指定，如果不指定，会报一个JQuery的错误
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function (json) {
+                    alert(json);
+                },
+                error: function (msg) {
+                    alert("失败");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

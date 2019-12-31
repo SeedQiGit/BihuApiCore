@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Compile Remove="wwwroot\新文件夹\**" />
+    <Content Remove="wwwroot\新文件夹\**" />
+    <EmbeddedResource Remove="wwwroot\新文件夹\**" />
+    <None Remove="wwwroot\新文件夹\**" />
   </ItemGroup>
 
   <ItemGroup>
