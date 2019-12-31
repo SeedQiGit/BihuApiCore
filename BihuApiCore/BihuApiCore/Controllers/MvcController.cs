@@ -10,8 +10,6 @@ namespace BihuApiCore.Controllers
 {
     public class MvcController:Controller
     {
-
-
         // GET: Home
         public ActionResult Index()
         {

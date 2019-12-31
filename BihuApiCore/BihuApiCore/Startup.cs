@@ -242,6 +242,13 @@ namespace BihuApiCore
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         }
 
+        static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                //这是啥意思  是不是熔断
+                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(60));
+        }
 
 
         /// <summary>
