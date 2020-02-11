@@ -25,9 +25,11 @@ namespace BihuApiCore.Model.Request
             set => _pageSize = value <= 0 ? ConfigurationManager.GetValue<int>("PageSize") : value;
         }
 
+        public long Skip { get => (PageIndex - 1) * PageSize; }
+
         public string LimitSql()
         {
-            string limit = $"LIMIT {(PageIndex - 1) * PageSize},{PageSize}";
+            string limit = $"LIMIT {Skip},{PageSize}";
             return limit;
         }
     }
