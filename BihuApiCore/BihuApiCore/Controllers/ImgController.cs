@@ -31,7 +31,8 @@ namespace BihuApiCore.Controllers
             //二维码尺寸
             qrEncoder.QRCodeScale = 4;
             //二维码版本
-            qrEncoder.QRCodeVersion = 7;
+            //QR图的大小(size)被定义为版本（Version)，版本号从1到40。版本1就是一个21*21的矩阵，每增加一个版本号，矩阵的大小就增 加4个模块(Module)，因此，版本40就是一个177*177的矩阵。（版本越高，意味着存储的内容越多，纠错能力也越强）。
+            qrEncoder.QRCodeVersion = 10;
             //二维码容错程度
             qrEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.M;
             //字体与背景颜色
