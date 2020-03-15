@@ -28,24 +28,6 @@
             异步io控制器
             </summary>
         </member>
-        <member name="M:BihuApiCore.Controllers.AsyncIoController.WeiChatGetQRCodeBase64(System.String)">
-            <summary>
-            传入连接字符串 获取对应的二维码图片Base64
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BihuApiCore.Controllers.AsyncIoController.GetEtOcr(System.String)">
-            <summary>
-            小程序获取行驶本
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:BihuApiCore.Controllers.AsyncIoController.GetRequestPost">
-            <summary>
-            获取post的参数组
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:BihuApiCore.Controllers.AsyncIoController.SyncIoExcel">
             <summary>
             同步方法
@@ -141,6 +123,30 @@
         <member name="M:BihuApiCore.Controllers.HttpController.PressureTest">
             <summary>
             测试Authorize
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ImgController.WeiChatGetQRCodeBase64(System.String)">
+            <summary>
+            传入连接字符串 获取对应的二维码图片Base64
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ImgController.GetEtOcr(System.String)">
+            <summary>
+            小程序获取行驶本
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ImgController.GetRequestPost">
+            <summary>
+            获取post的参数组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ImgController.Base64Photo">
+            <summary>
+            获取行驶本的Base64
             </summary>
             <returns></returns>
         </member>
