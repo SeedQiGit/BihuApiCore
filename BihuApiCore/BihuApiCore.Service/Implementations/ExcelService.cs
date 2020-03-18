@@ -7,6 +7,7 @@ using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -219,7 +220,10 @@ namespace BihuApiCore.Service.Implementations
         /// <summary>
         /// 时间
         /// </summary>
+        [Time]
         [Description("通话时长")]
         public int Second { get; set; }=1000;
     }
+
+ 
 }

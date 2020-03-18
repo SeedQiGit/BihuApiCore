@@ -13,6 +13,11 @@ using NPOI.SS.UserModel;
 
 namespace BihuApiCore.Infrastructure.Extensions
 {
+    [AttributeUsage(AttributeTargets.Property)]  
+    public class TimeAttribute:Attribute  
+    {
+        
+    }  
     public static class ListToExcelExtention
     {
 
@@ -140,7 +145,7 @@ namespace BihuApiCore.Infrastructure.Extensions
                 {
                     HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
                     var property = propertiesUsed[cellIndex];
-                    if (property.Name=="Second")
+                    if (Attribute.IsDefined(property, typeof(TimeAttribute)))
                     {
                         try
                         {
