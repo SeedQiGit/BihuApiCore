@@ -215,5 +215,11 @@ namespace BihuApiCore.Service.Implementations
         /// </summary>
         [Description("姓名")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// 时间
+        /// </summary>
+        [Description("通话时长")]
+        public int Second { get; set; }=1000;
     }
 }

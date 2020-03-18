@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BihuApiCore.Infrastructure.Helper;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -13,6 +15,7 @@ namespace BihuApiCore.Infrastructure.Extensions
 {
     public static class ListToExcelExtention
     {
+
         public static HSSFWorkbook ListWorkbookExchange<T>(List<T> list, string sheetName)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
@@ -135,9 +138,45 @@ namespace BihuApiCore.Infrastructure.Extensions
                 var data = list[i];
                 for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
                 {
-                    var property = propertiesUsed[cellIndex];
                     HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
-                    newCell.SetCellValue(property.GetValue(data).ToString());
+                    var property = propertiesUsed[cellIndex];
+                    if (property.Name=="Second")
+                    {
+                        try
+                        {
+                            TimeSpan ts=new TimeSpan(0, 0, (int)property.GetValue(data));
+                            StringBuilder sb=new StringBuilder();
+                            if ( (int)ts.TotalHours>0)
+                            {
+                                sb.Append( (int)ts.TotalHours +"h");
+                            }
+                            if ( ts.Minutes>0)
+                            {
+                                sb.Append( ts.Minutes +"m");
+                            }
+                            if ( ts.Seconds>0)
+                            {
+                                sb.Append( ts.Seconds +"s");
+                            }
+                            
+                            newCell.SetCellValue(sb.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            ILogger logger = ServiceProviderServiceExtensions.GetRequiredService<ILogger>(
+                                ServiceProviderExtension.ServiceProvider);
+                            logger.LogError($"Second转换失败：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
+                            newCell.SetCellValue(property.GetValue(data).ToString());
+                        }
+                       
+                    }
+                    else
+                    {
+                        newCell.SetCellValue(property.GetValue(data).ToString());
+                    }
+
+                    
+                  
                     newCell.CellStyle = styleCell;
                 }
             }
