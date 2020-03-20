@@ -7,6 +7,7 @@ using System.Text;
 using BihuApiCore.Infrastructure.Helper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NPOI;
 using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -207,6 +208,20 @@ namespace BihuApiCore.Infrastructure.Extensions
 
         #region ListToSheet Xlsx
 
+        public static XSSFWorkbook ListToXlsx<T>(List<T> list, string sheetName)
+        {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+
+            POIXMLProperties props = workbook.GetProperties();
+            props.CoreProperties.Creator = "北京易天正诚信息技术有限公司";
+            props.CoreProperties.Created = DateTime.Now;
+            props.CustomProperties.AddProperty("壁虎科技", "壁虎科技");
+
+            ListToSheetXlsx(workbook, list, sheetName);
+
+            return workbook;
+        }
+
         public static void ListToSheetXlsx<T>(XSSFWorkbook workbook, List<T> list, string sheetName)
         {
             XSSFSheet sheet = (XSSFSheet)workbook.CreateSheet(sheetName);
@@ -294,11 +309,12 @@ namespace BihuApiCore.Infrastructure.Extensions
                     }
 
                     newCell.CellStyle = styleCell;
+                    //统一设置列宽度
+                    sheet.SetColumnWidth(cellIndex,fieldCount);
                 }
             }
 
-            //统一设置列宽度
-            sheet.SetColumnWidth(fieldCount);
+          
         }
 
         #endregion

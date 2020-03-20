@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BihuApiCore.Infrastructure.Extensions;
+using NPOI;
 using NPOI.XSSF.UserModel;
 
 namespace BihuApiCore.Service.Implementations
@@ -35,6 +36,15 @@ namespace BihuApiCore.Service.Implementations
             string fullPath = storePath +"\\"+ fileNam;
 
             XSSFWorkbook workbook = new XSSFWorkbook();
+
+            POIXMLProperties props = workbook.GetProperties();
+            props.CoreProperties.Creator = "北京易天正诚信息技术有限公司";
+            props.CoreProperties.Subject = "壁虎科技";
+            props.CoreProperties.Title = "壁虎科技";
+            props.CoreProperties.Created = DateTime.Now;
+            props.CustomProperties.AddProperty("壁虎科技", "壁虎科技");
+
+
 
             XSSFCellStyle headStyle = (XSSFCellStyle)workbook.CreateCellStyle();
             headStyle.Alignment = HorizontalAlignment.Center;
