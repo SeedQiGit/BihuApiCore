@@ -14,11 +14,55 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BihuApiCore.Infrastructure.Extensions;
+using NPOI.XSSF.UserModel;
 
 namespace BihuApiCore.Service.Implementations
 {
     public class ExcelService:IExcelService
     {
+
+        public async Task<BaseResponse> Xlsx()
+        {
+            List<ExcelTestClass> list=ExcelTestClass.GetList();
+            //BaseDirectory后面有\所以exel前面就不加\了
+            var storePath = AppDomain.CurrentDomain.BaseDirectory + "Excel";
+            if (!Directory.Exists(storePath))
+            {
+                Directory.CreateDirectory(storePath);
+            }
+
+            string fileNam = "导出数据-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx";
+            string fullPath = storePath +"\\"+ fileNam;
+
+            XSSFWorkbook workbook = new XSSFWorkbook();
+
+            XSSFCellStyle headStyle = (XSSFCellStyle)workbook.CreateCellStyle();
+            headStyle.Alignment = HorizontalAlignment.Center;
+            XSSFFont font = (XSSFFont)workbook.CreateFont();
+            font.FontHeightInPoints = 12;
+            font.Boldweight = 700;
+            headStyle.SetFont(font);
+
+            var sheet =workbook.CreateSheet();
+            IRow headerRow = sheet.CreateRow(0);
+           
+            var headCell = headerRow.CreateCell(0);
+            headCell.SetCellValue("111");
+
+
+            FileStream file = new FileStream(fullPath, FileMode.Create);
+            workbook.Write(file);
+            file.Close();
+
+            return BaseResponse.Ok();
+        }
+
+
+
+
+
+
+
         #region 正常写入文件
 
         public async Task<BaseResponse> ListToExcelFile()

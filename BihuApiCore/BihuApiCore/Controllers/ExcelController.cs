@@ -26,6 +26,21 @@ namespace BihuApiCore.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponse), 1)]
+        public async Task<BaseResponse> Xlsx()
+        {						
+            HttpContext.Response.Headers.Add("Site", "Simple-Talk");
+            return await _excelService.Xlsx();
+
+        }
+
+
+
+        /// <summary>
+        /// 列表转换为本地文件，并返回绝对路径
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse), 1)]
         public async Task<BaseResponse> ListToExcelFile()
         {						
             HttpContext.Response.Headers.Add("Site", "Simple-Talk");

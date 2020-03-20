@@ -6,6 +6,7 @@ namespace BihuApiCore.Service.Interfaces
 {
     public interface IExcelService
     {
+        Task<BaseResponse> Xlsx();
         Task<BaseResponse> ListToExcelFile();
         Task<MemoryStream> ListToExcelStream();
         Task<byte[]> ListToExcelByte();
