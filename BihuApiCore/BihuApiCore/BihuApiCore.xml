@@ -87,6 +87,12 @@
         </member>
         <member name="M:BihuApiCore.Controllers.ExcelController.Xlsx">
             <summary>
+            最简单的xlsx导出
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ExcelController.ListToExcelFileXlsx">
+            <summary>
             列表转换为本地文件，并返回绝对路径
             </summary>
             <returns></returns>

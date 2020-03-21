@@ -244,7 +244,7 @@ namespace BihuApiCore.Infrastructure.Extensions
             }
 
             int fieldCount = fieldStringArray.Count;
-            HSSFRow headerRow = (HSSFRow)sheet.CreateRow(0);
+            XSSFRow headerRow = (XSSFRow)sheet.CreateRow(0);
             headerRow.HeightInPoints = 20;
             for (int i = 0; i < fieldCount; i++)
             {
@@ -262,16 +262,16 @@ namespace BihuApiCore.Infrastructure.Extensions
             ICellStyle styleCell = workbook.CreateCellStyle();
             styleCell.Alignment = HorizontalAlignment.Center;//居中 
             styleCell.VerticalAlignment = VerticalAlignment.Center;//垂直居中 
-
+       
             #endregion
 
             for (int i = 0; i < count; i++)
             {
-                HSSFRow dataRow = (HSSFRow)sheet.CreateRow(i + 1);
+                XSSFRow dataRow = (XSSFRow)sheet.CreateRow(i + 1);
                 var data = list[i];
                 for (int cellIndex = 0; cellIndex < fieldCount; cellIndex++)
                 {
-                    HSSFCell newCell = (HSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
+                    XSSFCell newCell = (XSSFCell)dataRow.CreateCell(cellIndex, CellType.String);
                     var property = propertiesUsed[cellIndex];
                     if (Attribute.IsDefined(property, typeof(TimeAttribute)))
                     {
@@ -310,7 +310,7 @@ namespace BihuApiCore.Infrastructure.Extensions
 
                     newCell.CellStyle = styleCell;
                     //统一设置列宽度
-                    sheet.SetColumnWidth(cellIndex,fieldCount);
+                    //sheet.SetColumnWidth(cellIndex,fieldCount);
                 }
             }
 

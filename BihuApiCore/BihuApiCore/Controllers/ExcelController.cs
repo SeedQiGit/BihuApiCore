@@ -21,7 +21,7 @@ namespace BihuApiCore.Controllers
         }
 
         /// <summary>
-        /// 列表转换为本地文件，并返回绝对路径
+        /// 最简单的xlsx导出
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -33,7 +33,19 @@ namespace BihuApiCore.Controllers
 
         }
 
+        
+        /// <summary>
+        /// 列表转换为本地文件，并返回绝对路径
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponse), 1)]
+        public async Task<BaseResponse> ListToExcelFileXlsx()
+        {						
+         
+            return await _excelService.ListToExcelFileXlsx();
 
+        }
 
         /// <summary>
         /// 列表转换为本地文件，并返回绝对路径

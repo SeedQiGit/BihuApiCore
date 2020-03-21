@@ -45,7 +45,6 @@ namespace BihuApiCore.Service.Implementations
             props.CustomProperties.AddProperty("壁虎科技", "壁虎科技");
 
 
-
             XSSFCellStyle headStyle = (XSSFCellStyle)workbook.CreateCellStyle();
             headStyle.Alignment = HorizontalAlignment.Center;
             XSSFFont font = (XSSFFont)workbook.CreateFont();
@@ -64,16 +63,35 @@ namespace BihuApiCore.Service.Implementations
             workbook.Write(file);
             file.Close();
 
-            return BaseResponse.Ok();
+            return BaseResponse.Ok(fullPath);
         }
 
-
-
-
-
-
-
         #region 正常写入文件
+
+        
+        public async Task<BaseResponse> ListToExcelFileXlsx()
+        {
+            List<ExcelTestClass> list=ExcelTestClass.GetList();
+            //BaseDirectory后面有\所以exel前面就不加\了
+            var storePath = AppDomain.CurrentDomain.BaseDirectory + "Excel";
+            if (!Directory.Exists(storePath))
+            {
+                Directory.CreateDirectory(storePath);
+            }
+
+            string fileNam = "导出数据-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx";
+            string fullPath = storePath +"\\"+ fileNam;
+
+            //HSSFWorkbook  hssfworkbook=await GetWorkbook(list,"导出通话记录");
+            XSSFWorkbook  hssfworkbook=ListToExcelExtention.ListToXlsx(list,"导出通话记录");
+            //把这个HSSFWorkbook实例写入文件
+            FileStream file = new FileStream(fullPath, FileMode.Create);
+            hssfworkbook.Write(file);
+            file.Close();
+
+            return BaseResponse.Ok(fullPath);
+        }
+
 
         public async Task<BaseResponse> ListToExcelFile()
         {
@@ -95,7 +113,7 @@ namespace BihuApiCore.Service.Implementations
             hssfworkbook.Write(file);
             file.Close();
 
-            return BaseResponse.Ok();
+            return BaseResponse.Ok(fullPath);
         }
 
         #endregion
@@ -255,7 +273,7 @@ namespace BihuApiCore.Service.Implementations
         {
             return new List<ExcelTestClass>
             {
-                new ExcelTestClass{Id = 1,Name = "xxx"},
+                new ExcelTestClass{Id = 1,Name = "xxXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx"},
                 new ExcelTestClass{Id = 2,Name = "uyy"},
             };
 
