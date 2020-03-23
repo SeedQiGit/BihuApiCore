@@ -122,10 +122,22 @@ namespace BihuApiCore.Repository.Repositories
 
         #region single basic acion
 
+        /// <summary>
+        /// 可以直接这么删除  User user = new User(){Id=6};  _userRepository.Delete(user);
+        /// 也可以查询到数据库里面，再删除
+        /// </summary>
+        /// <param name="entity"></param>
         public void Delete(TEntity entity)
         {
             AttachIfNot(entity);
             Table.Remove(entity);
+        }
+
+
+        public void Delete1(TEntity entity)
+        {
+            var property = Context.Entry(entity);
+            property.State=EntityState.Deleted;
         }
 
         public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
