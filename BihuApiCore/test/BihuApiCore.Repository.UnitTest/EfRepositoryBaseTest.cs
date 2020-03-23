@@ -43,8 +43,10 @@ namespace BihuApiCore.Repository.UnitTest
                 Assert.True(user.UserName==userInDb.UserName);
             }
             Assert.True( _context.Entry(user).State==EntityState.Unchanged);
+
             _repository.Delete(user);
             _repository.SaveChanges();
+
             using (var newContext = new TestContext())
             {
                 var repository = new EfRepositoryBase<User>(newContext);
@@ -52,6 +54,28 @@ namespace BihuApiCore.Repository.UnitTest
                 Assert.True( userInDb==null);
             }
         }
+
+        [Fact]
+        public void Delete()
+        {
+            User user=new User
+            {
+                Id=10
+                //不能用非主键这样删除
+                //UserAccount = "123",
+            };
+
+            _repository.Delete(user);
+            _repository.SaveChanges();
+
+            using (var newContext = new TestContext())
+            {
+                var repository = new EfRepositoryBase<User>(newContext);
+                var userInDb = repository.FirstOrDefault(c=>c.UserAccount=="123");
+                Assert.True( userInDb==null);
+            }
+        }
+
 
         [Fact]
         public void Test_insert_update_attach_success()
