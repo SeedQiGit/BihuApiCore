@@ -7,7 +7,7 @@ using System.Reflection;
 namespace BihuApiCore.Infrastructure.Extensions
 {
 
-    public static class DataTableExtession
+    public static class DataTableExtension
     {
         /// <summary>
         /// 转换DataTable到IList强类型

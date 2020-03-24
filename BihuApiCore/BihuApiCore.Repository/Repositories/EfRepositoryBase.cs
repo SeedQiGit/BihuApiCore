@@ -123,7 +123,7 @@ namespace BihuApiCore.Repository.Repositories
         #region single basic acion
 
         /// <summary>
-        /// 可以直接这么删除  User user = new User(){Id=6};  _userRepository.Delete(user);
+        /// 可以直接这么删除  User user = new User(){Id=6};  _userRepository.Delete(user);await _cronJobRepository.SaveChangesAsync();
         /// 可以用非主键么？不可以。
         /// 也可以查询到数据库里面，再删除
         /// </summary>
