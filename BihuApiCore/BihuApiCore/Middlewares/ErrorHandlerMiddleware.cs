@@ -9,8 +9,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using BihuApiCore.Infrastructure.Helper;
-using Newtonsoft.Json.Linq;
 
 namespace BihuApiCore.Middlewares
 {
