@@ -4,6 +4,7 @@ using BihuApiCore.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Helper.EF;
 
 namespace BihuApiCore.Repository.Repositories
 {

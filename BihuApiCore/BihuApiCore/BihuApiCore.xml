@@ -228,6 +228,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RabbitMqController.QuoteCallBackIntegrationEvent">
+            <summary>
+            Send hello world
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RabbitMqController.Send">
             <summary>
             Send hello world
@@ -290,6 +296,46 @@
         <member name="T:BihuApiCore.Events.EventHandler.NormalEventHandler">
             <summary>
             
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.TaskId">
+            <summary>
+            智能任务Id guid
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.LicenseNo">
+            <summary>
+            车牌号
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.QuoteCompany">
+            <summary>
+            报价保险公司
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.RenewalCarType">
+            <summary>
+            0小车，1大车，默认0
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.QuoteTime">
+            <summary>
+            报价时间
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.Buid">
+            <summary>
+            先定义成string，用于排查不确定的问题
+            </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.SubmitStatus">
+             <summary>
+            -1 正在核保中  0 核保失败  1核保成功  2 未到期未核保 3人工审核中  4 未勾选核保 5 报价失败未核保  6核保功能关闭 
+             </summary>
+        </member>
+        <member name="P:BihuApiCore.Events.Event.CBSQuoteCallBackIntegrationEvent.SubmitResult">
+            <summary>
+            核保结果描述
             </summary>
         </member>
         <member name="T:BihuApiCore.Events.Event.DeadEvent">

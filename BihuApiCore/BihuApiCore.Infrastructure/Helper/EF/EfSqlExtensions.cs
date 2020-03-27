@@ -1,15 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Reflection;
 using System.Threading.Tasks;
 using BihuApiCore.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace BihuApiCore.Infrastructure.Helper
+namespace BihuApiCore.Infrastructure.Helper.EF
 {
     public static class EfSqlExtensions
     {

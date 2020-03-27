@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
+using BihuApiCore.Infrastructure.Helper.EF;
 
 namespace BihuApiCore.Repository.Repositories
 {

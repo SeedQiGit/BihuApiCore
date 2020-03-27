@@ -95,6 +95,32 @@ namespace BihuApiCore.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        public async Task<BaseResponse> QuoteCallBackIntegrationEvent()
+        {
+            using (var connection = _connectionFactory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                string message = @"{'Id': '7a70d2b0-0df8-4d0f-af90-94c18b149688','CreationDate': '2020-03-27T03:24:19.1765869Z','Guid': '5b53a872-56e5-4a32-9f46-f49c70b778bf','Buid': 207364938,'Agent': 102,'ChildAgent': 102,'LicenseNo': '京N772F6','QuoteCompany': 8,'ReQuoteAgent': 0,'ReQuoteName': null,'RenewalCarType': 0,'SubmitStatus': 4,'SubmitResult': '未勾选核保','TaskId': null,'QuoteTime': '2020-03-27T11:24:19.1765869+08:00' }";
+                //Bytes流发送过去,可以使用任意编码模式，对应的解码模式相同即可
+                var body = Encoding.UTF8.GetBytes(message);
+
+                //发送消息  通过hello这个管道    
+                channel.BasicPublish(exchange: "bihutech_event_bus",
+                    routingKey: "CBSQuoteCallBackIntegrationEvent",
+                    basicProperties: null,
+                    body: body);
+                LogHelper.Info($"已发送CBSQuoteCallBackIntegrationEvent:{message}");
+            }
+            return BaseResponse.Ok();
+        }
+
+
+
+        /// <summary>
+        /// Send hello world
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
         public async Task<BaseResponse> Send()
         {
             using (var connection = _connectionFactory.CreateConnection())
@@ -120,5 +146,9 @@ namespace BihuApiCore.Controllers
             }
             return BaseResponse.Ok();
         }
+
+
+
+
     }
 }

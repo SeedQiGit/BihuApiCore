@@ -3,6 +3,7 @@ using BihuApiCore.Infrastructure.Helper;
 using BihuApiCore.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using BihuApiCore.Infrastructure.Helper.EF;
 
 namespace BihuApiCore.Repository.Repositories
 {
