@@ -25,6 +25,16 @@ namespace BihuApiCore.Controllers
             _asyncIoService = asyncIoService;
         }
 
+        /// <summary>
+        /// 同步方法
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> Test( )
+        {
+            return await _asyncIoService.AsyncIoExcel().ConfigureAwait(false);
+        }
+    
         #region Io方法
 
         /// <summary>
