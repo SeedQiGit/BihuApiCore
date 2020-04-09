@@ -39,12 +39,18 @@ namespace BihuApiCore.Controllers
 
         #endregion
 
-        #region 测试
+        #region 测试EF
 
         [HttpGet]
         public async Task<BaseResponse> TestSql()
         {
             return SetStatusCode(await _sqlService.TestSql());
+        }
+
+        [HttpGet]
+        public async Task<BaseResponse> ExecuteSqlCommandAsync()
+        {
+            return SetStatusCode(await _sqlService.ExecuteSqlCommandAsync());
         }
 
         [HttpGet]
