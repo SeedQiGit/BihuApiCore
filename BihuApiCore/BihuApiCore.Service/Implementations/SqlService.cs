@@ -9,6 +9,7 @@ using BihuApiCore.Repository.IRepository;
 using BihuApiCore.Service.Interfaces;
 using System.Threading.Tasks;
 using BihuApiCore.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -49,6 +50,13 @@ namespace BihuApiCore.Service.Implementations
         public async Task<BaseResponse> TestSql()
         {
             return BaseResponse<List<IsVerifyEnum>>.Ok( await _userRepository.TestSql());
+        }
+ 
+        public async Task<BaseResponse> ExecuteSqlCommandAsync()
+        {   
+            var sql = $@" delete from  quote_result where Buid =1  and  Guid!=1 ";
+            await _userRepository.Context.Database.ExecuteSqlCommandAsync(sql);
+            return BaseResponse.Ok();
         }
 
         public async Task<BaseResponse> TestCompareValueAndassign()
