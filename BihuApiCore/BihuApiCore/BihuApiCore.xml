@@ -28,6 +28,12 @@
             异步io控制器
             </summary>
         </member>
+        <member name="M:BihuApiCore.Controllers.AsyncIoController.Test">
+            <summary>
+            同步方法
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.AsyncIoController.SyncIoExcel">
             <summary>
             同步方法
@@ -273,6 +279,12 @@
         <member name="M:BihuApiCore.Controllers.SqlController.DapperBulkInsert">
             <summary>
             批量插入
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.TaskController.Test">
+            <summary>
+            测试get 同步  重试
             </summary>
             <returns></returns>
         </member>
