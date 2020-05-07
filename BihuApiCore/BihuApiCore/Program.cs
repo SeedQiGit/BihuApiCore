@@ -15,19 +15,23 @@ namespace BihuApiCore
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-#if !DEBUG
+//#if !DEBUG
+//                .UseKestrel(opts =>
+//                {
+//                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("Port"));
+//                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("SPort"), lopts =>
+//                    {
+//                        lopts.UseHttps(Path.Combine(Directory.GetCurrentDirectory(), ConfigurationManager.GetValue("File"))  , ConfigurationManager.GetValue("Password"));
+//                    });
+//                })
+//#endif
                 .UseKestrel(opts =>
                 {
-                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("Port"));
-                    opts.Listen(IPAddress.Parse(ConfigurationManager.GetValue("HostIp")), ConfigurationManager.GetValue<int>("SPort"), lopts =>
-                    {
-                        lopts.UseHttps(Path.Combine(Directory.GetCurrentDirectory(), ConfigurationManager.GetValue("File"))  , ConfigurationManager.GetValue("Password"));
-                    });
+                    opts.Limits.MaxConcurrentConnections = 3000;
                 })
-#endif
                 //.UseUrls(ConfigurationManager.GetValue("HostUrl").Split(','))
                 .UseStartup<Startup>()
-              
+
                 ;
     }
 }
