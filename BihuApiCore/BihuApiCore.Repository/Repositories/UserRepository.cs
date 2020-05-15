@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 using BihuApiCore.Infrastructure.Helper.EF;
+using System;
 
 namespace BihuApiCore.Repository.Repositories
 {
@@ -88,16 +89,22 @@ namespace BihuApiCore.Repository.Repositories
 
         #region 测试sql方法
 
-        public async Task<List<IsVerifyEnum>> TestSql()
+        public async Task<object> TestSql()
         {
             #region 查总数
 
-            string sqlcount = @"
-                        SELECT
-	                        IsVerify
-                        FROM  user ";
+            var sql = "SELECT * FROM `company_module_relation` where Updatedtime between ?StratDataTime and ?EndDataTime";
 
-            var count = await Context.SqlQueryAsync<IsVerifyEnum>(sqlcount);
+            var StratDataTime = DateTime.Now.AddYears(-1);
+            var EndDataTime = DateTime.Now.AddYears(1);
+            List<MySqlParameter> parameters = new List<MySqlParameter>() {
+                new MySqlParameter {  MySqlDbType=MySqlDbType.Date,ParameterName= "StratDataTime" ,
+                    Value= StratDataTime},
+                new MySqlParameter {  MySqlDbType=MySqlDbType.Date,ParameterName= "EndDataTime" ,
+                    Value=EndDataTime},
+            };
+
+            var count = await Context.SqlQueryAsync<CompanyModuleRelation>(sql,parameters.ToArray());
 
             #endregion
 

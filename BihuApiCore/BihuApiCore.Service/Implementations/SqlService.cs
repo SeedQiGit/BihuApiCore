@@ -49,7 +49,7 @@ namespace BihuApiCore.Service.Implementations
 
         public async Task<BaseResponse> TestSql()
         {
-            return BaseResponse<List<IsVerifyEnum>>.Ok( await _userRepository.TestSql());
+            return BaseResponse<object>.Ok( await _userRepository.TestSql());
         }
  
         public async Task<BaseResponse> ExecuteSqlCommandAsync()

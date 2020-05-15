@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BihuApiCore.EntityFrameworkCore.Models;
 using Dapper;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace BihuApiCore.Service.Implementations
 {
@@ -22,9 +23,29 @@ namespace BihuApiCore.Service.Implementations
         public async Task<BaseResponse> DapperGetList()
         {
 
-            var list =(await _connection.QueryAsync<Product>("select * from product", new { UserName = "jack" })).ToList();
+            // var list =(await _connection.QueryAsync<Product>("select * from product", new { UserName = "jack" })).ToList();
+            var sql = "SELECT * FROM `company_module_relation` where Updatedtime between ?StratDataTime and ?EndDataTime";
 
-            return BaseResponse<List<Product>>.Ok(list);
+            var StratDataTime = DateTime.Now.AddYears(-1);
+            var EndDataTime = DateTime.Now.AddYears(1);
+            List<MySqlParameter> parameters = new List<MySqlParameter>() {
+                new MySqlParameter {  MySqlDbType=MySqlDbType.Date,ParameterName= "StratDataTime" ,
+                    Value= StratDataTime},
+                new MySqlParameter {  MySqlDbType=MySqlDbType.Date,ParameterName= "EndDataTime" ,
+                    Value=EndDataTime},
+            };
+            var args = new DynamicParameters(new { });
+            parameters.ForEach(p => args.Add(p.ParameterName, p.Value));
+
+            //声明动态参数
+            DynamicParameters Parameters = new DynamicParameters();
+            Parameters.Add("StratDataTime", StratDataTime,DbType.DateTime);
+            Parameters.Add("EndDataTime", EndDataTime,DbType.DateTime);
+
+            var list = (await _connection.QueryAsync<CompanyModuleRelation>(sql, Parameters)).ToList();
+
+
+            return BaseResponse<List<CompanyModuleRelation>>.Ok(list);
         }
 
         public async Task<BaseResponse> DapperBulkInsert()
