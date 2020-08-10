@@ -309,12 +309,45 @@ namespace BihuApiCore.Infrastructure.Extensions
                     }
 
                     newCell.CellStyle = styleCell;
-                    //统一设置列宽度
-                    //sheet.SetColumnWidth(cellIndex,fieldCount);
+                  
                 }
             }
+            //统一设置列宽度
+            sheet.SetColumnWidth(fieldCount);
 
-          
+        }
+
+        /// <summary>
+        /// 统一设置列宽度
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="fieldCount"></param>
+        public static void SetColumnWidth(this XSSFSheet sheet, int fieldCount)
+        {
+            for (int columnNum = 0; columnNum <= fieldCount; columnNum++)
+            {
+                //除以256才是一个字的长度
+                int columnWidth = sheet.GetColumnWidth(columnNum) / 256;//获取当前列宽度  
+                for (int rowNum = 1; rowNum <= sheet.LastRowNum; rowNum++)//在这一列上循环行  
+                {
+                    IRow currentRow = sheet.GetRow(rowNum);
+                    ICell currentCell = currentRow.GetCell(columnNum);
+
+                    int length = currentCell != null ? Encoding.Default.GetBytes(currentCell.ToString()).Count() : 0;//获取当前单元格的内容宽度  
+                    if (columnWidth < length + 1)
+                    {
+                        columnWidth = length + 1;
+                    }//若当前单元格内容宽度大于列宽，则调整列宽为当前单元格宽度，后面的+1是我人为的将宽度增加一个字符  
+                }
+
+                int width = (((columnWidth > 50 ? columnWidth / 4 : columnWidth) + 3) * 256);
+                //The maximum column width for an individual cell is 255 characters
+                if (width > 255 * 256)
+                {
+                    width = 255 * 256;
+                }
+                sheet.SetColumnWidth(columnNum, width);
+            }
         }
 
         #endregion
