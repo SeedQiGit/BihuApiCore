@@ -305,7 +305,15 @@ namespace BihuApiCore.Infrastructure.Extensions
                     }
                     else
                     {
-                        newCell.SetCellValue(property.GetValue(data).ToString());
+                        var propertyValue = property.GetValue(data);
+                        if (propertyValue == null)
+                        {
+                            newCell.SetCellValue("");
+                        }
+                        else
+                        {
+                            newCell.SetCellValue(propertyValue.ToString());
+                        }
                     }
 
                     newCell.CellStyle = styleCell;

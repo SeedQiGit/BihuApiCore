@@ -27,13 +27,13 @@ namespace BihuApiCore.Service.Implementations
             FormRequest request = new FormRequest
             {
                 grant_type = "password",
-                username = "maxiaocui",
-                password = "102",
-                scope = "employee_center",
-                client_id = "wechat",
+                username = "niepan45",
+                password = "91bihu.com",
+                scope = "employee_center car_business smart_car_mgts",
+                client_id = "bot",
                 client_secret = "secret"
             };
-            var response = await _defaultClient.Client.FormDataRequest("http://identity.91bihu.me/connect/token", request);
+            var response = await _defaultClient.Client.FromCodedObjectAsync("http://identity.91bihu.me/connect/token", request);
 
             return BaseResponse.Ok(response);
         }
