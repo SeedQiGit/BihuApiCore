@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,38 +32,28 @@ namespace BihuApiCore.Service.Implementations
             var properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo property in properties)
             {
-                //=property.GetType();
                 var valueSub = property.GetValue(request);
-                var tpSub = valueSub.GetType();
-                if (!ObjectExtession.IsValueType(tpSub) && valueSub != null)
+              
+                if (valueSub != null)
                 {
+                    var tpSub = valueSub.GetType();
                     if (tpSub.IsSubclassOf(typeof(XianZhongBase)))
                     {
+                  
                         var propertiesSub = tpSub.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
 
-                        //_logger.LogInformation(tpSub.Name);
+                        var baoFeiProp = propertiesSub.Where(c => c.Name == "baoFei").FirstOrDefault();
+                        var buJiMianBaoFeiProp = propertiesSub.Where(c => c.Name == "buJiMianBaoFei").FirstOrDefault();
+                        var baoFei =  Convert.ToDouble(baoFeiProp.GetValue(valueSub));
+                        var buJiMianBaoFei = Convert.ToDouble(buJiMianBaoFeiProp.GetValue(valueSub));
+                        total += baoFei;
+                        total += buJiMianBaoFei;
                     }
 
-                }
-                
-
-                //if (row.Table.Columns.Contains(property.Name))
-                //{
-                //    object objValue = row[property.Name];
-
-                //    //忽略空值,忽略只读属性
-                //    if (!ObjectExtession.IsNullOrDbNull(objValue) && property.CanWrite)
-                //    {
-                //        property.SetValue(tReturn, ObjectExtession.DbChangeType(objValue, property.PropertyType));
-                //    }
-                //}
+                }             
             }
 
-
-
-
-
-            return BaseResponse.Ok();
+            return BaseResponse.Ok(total.ToString());
         }
 
 
