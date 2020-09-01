@@ -12,10 +12,13 @@ namespace BihuApiCore.Controllers
     public class RedisController:BaseController
     {
         private readonly IDatabase _database;
-
+        private readonly RedisCacheClient _client;
         public RedisController( RedisCacheClient client )
         {
+            //这种获取每次都要连接一次redis
+            //可以考虑实际使用的时候再GetDatabase
             _database = client.GetDatabase();
+            _client = client;
         }
 
         /// <summary>

@@ -270,6 +270,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.ReflexController.Test">
+            <summary>
+            测试
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BihuApiCore.Controllers.ReflexController.XianZhongF(BihuApiCore.Model.Models.XianZhongF)">
+            <summary>
+            测试
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.SqlController.DapperGetList">
             <summary>
             查询列表
