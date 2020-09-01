@@ -34,6 +34,7 @@ using BihuApiCore.Events.EventHandler;
 using BihuApiCore.Infrastructure.Helper.RabbitMq;
 using MySql.Data.MySqlClient;
 using Polly.Extensions.Http;
+using StackExchange.Redis;
 
 namespace BihuApiCore
 {
@@ -193,7 +194,11 @@ namespace BihuApiCore
             string connectionString = section.GetSection("RedisConnectionString").Value;
             string instanceName = section.GetSection("InstanceName").Value;
             int defaultDb = int.Parse(section.GetSection("Database").Value ?? "0");
+
+            //RedisCacheClient这个组件真的感觉没什么必要。。。。
             services.AddSingleton(new RedisCacheClient(connectionString, instanceName, defaultDb));
+            var redis = ConnectionMultiplexer.Connect(connectionString);
+            services.AddSingleton(redis);
 
             #endregion
 

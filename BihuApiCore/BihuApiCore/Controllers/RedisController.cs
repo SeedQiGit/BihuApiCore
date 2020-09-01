@@ -13,12 +13,18 @@ namespace BihuApiCore.Controllers
     {
         private readonly IDatabase _database;
         private readonly RedisCacheClient _client;
-        public RedisController( RedisCacheClient client )
+        private readonly ConnectionMultiplexer _redis;
+
+        public RedisController( RedisCacheClient client , ConnectionMultiplexer redis)
         {
             //这种获取每次都要连接一次redis
             //可以考虑实际使用的时候再GetDatabase
             _database = client.GetDatabase();
             _client = client;
+
+            //直接ConnectionMultiplexer单例。
+            _redis = redis;
+            _database = _redis.GetDatabase();
         }
 
         /// <summary>
@@ -35,6 +41,23 @@ namespace BihuApiCore.Controllers
             var captchaValue = (await _database.StringGetAsync(key)).ToString();
             return BaseResponse.Ok(captchaValue);
         }
+
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> TestConnectionMultiplexer()
+        {
+            var database = _redis.GetDatabase();
+            string key = "test";
+            string value = DateTime.Now.ToLongTimeString() + Guid.NewGuid().ToString();
+            await database.StringSetAsync(key, value, TimeSpan.FromMinutes(5));
+
+            var captchaValue = (await database.StringGetAsync(key)).ToString();
+            return BaseResponse.Ok(captchaValue);
+        }
+
 
         #region 锁的使用
 

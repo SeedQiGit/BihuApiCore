@@ -12,7 +12,7 @@ namespace BihuApiCore.Infrastructure.Extensions
         private readonly int _defaultDb;
         //为什么不把ConnectionMultiplexer 这个对象直接注册到di容器中呢？
         //多此一举的用这个类，好像只有可以设置_defaultDb这一个优点。
-        //如果还有的话，就是可以用多个_instanceName对应不同的redis。。。哈哈。
+        //如果还有的话，就是可以用多个_instanceName对应不同的redis。。。然而因为单例，这个优点也是不存在的
         private ConcurrentDictionary<string, ConnectionMultiplexer> _connections;
 
         public RedisCacheClient(string connectionString, string instanceName, int defaultDb = 0)

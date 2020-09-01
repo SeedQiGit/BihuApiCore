@@ -252,6 +252,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RedisController.TestConnectionMultiplexer">
+            <summary>
+            测试
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RedisController.RedisDistributedLock">
             <summary>
             使用redis作为并发锁
