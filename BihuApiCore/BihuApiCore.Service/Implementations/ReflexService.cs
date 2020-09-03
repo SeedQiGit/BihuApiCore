@@ -33,10 +33,11 @@ namespace BihuApiCore.Service.Implementations
             foreach (PropertyInfo property in properties)
             {
                 var valueSub = property.GetValue(request);
-              
+                var tpSub = property.PropertyType;
                 if (valueSub != null)
                 {
-                    var tpSub = valueSub.GetType();
+                    //这里 property.PropertyType直接获取类型，而不是根据值获取类型。
+                    //var tpSub = valueSub.GetType();
                     if (tpSub.IsSubclassOf(typeof(XianZhongBase)))
                     {
                   
@@ -50,7 +51,13 @@ namespace BihuApiCore.Service.Implementations
                         total += buJiMianBaoFei;
                     }
 
-                }             
+                }
+                //赋值默认值
+                else if (tpSub.IsSubclassOf(typeof(XianZhongBase)))
+                {
+                    var defaultValue = Activator.CreateInstance(tpSub);
+                    property.SetValue(request, defaultValue);
+                }
             }
 
             return BaseResponse.Ok(total.ToString());
