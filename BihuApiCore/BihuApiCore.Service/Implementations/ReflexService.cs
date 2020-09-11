@@ -64,5 +64,28 @@ namespace BihuApiCore.Service.Implementations
         }
 
 
+        public async Task<BaseResponse> XianZhongG(GXianZhong request)
+        {
+            Type tp = typeof(GXianZhong);
+            //属性列表
+            var properties = tp.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (PropertyInfo property in properties)
+            {
+                var valueSub = property.GetValue(request);
+                var tpSub = property.PropertyType;
+                
+                if (tpSub==typeof(XianZhongUnit) && valueSub == null)
+                {
+                    var defaultValue = Activator.CreateInstance(tpSub);
+                    property.SetValue(request, defaultValue);
+                }
+            }
+
+            return BaseResponse.Ok(JsonConvert.SerializeObject(request));
+        }
+
+
+
     }
 }

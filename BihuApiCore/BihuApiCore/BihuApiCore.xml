@@ -288,6 +288,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.ReflexController.XianZhongG(BihuApiCore.Model.Models.GXianZhong)">
+            <summary>
+            测试
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.SqlController.DapperGetList">
             <summary>
             查询列表

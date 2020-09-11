@@ -39,7 +39,18 @@ namespace BihuApiCore.Controllers
         {
             var res = await _reflexService.XianZhongF(request);
             return res;
-            return BaseResponse.Ok();
+         
+        }
+
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<BaseResponse> XianZhongG([FromBody] GXianZhong request)
+        {
+            var res = await _reflexService.XianZhongG(request);
+            return res;
         }
     }
 }
