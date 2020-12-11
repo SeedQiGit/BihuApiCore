@@ -1,8 +1,10 @@
 ﻿using BihuApiCore.Infrastructure.Extensions;
+using BihuApiCore.Model.Models;
 using BihuApiCore.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -119,6 +121,55 @@ namespace BihuApiCore.Repository.Repositories
         }
 
         #endregion
+
+        #region page
+
+        public PageData<TEntity> FindPage(int pageIndex, int pageSize, Expression<Func<TEntity, bool>> predicate,
+          Expression<Func<TEntity, object>> orderByExpression, bool isDesc)
+        {
+            var query = Context.Set<TEntity>().Where(predicate);
+            if (orderByExpression != null)
+            {
+                if (isDesc)
+                    query = query.OrderByDescending(orderByExpression);
+                else
+                    query = query.OrderBy(orderByExpression);
+            }
+
+            return new PageData<TEntity>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = query.Count(),
+                DataList = query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList()
+            };
+        }
+
+        public async Task<PageData<TEntity>> FindPageAsync(int pageIndex, int pageSize,
+            Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> orderByExpression, bool isDesc)
+        {
+            var query = Context.Set<TEntity>().Where(predicate);
+            if (orderByExpression != null)
+            {
+                if (isDesc)
+                    query = query.OrderByDescending(orderByExpression);
+                else
+                    query = query.OrderBy(orderByExpression);
+            }
+
+            var totalCount = await query.CountAsync();
+            var dataList = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return new PageData<TEntity>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                DataList = dataList
+            };
+        }
+
+        #endregion
+
 
         #region single basic acion
 
@@ -244,7 +295,7 @@ namespace BihuApiCore.Repository.Repositories
             foreach (PropertyInfo pi in eprops)
             {
                 var fieldName = pi.Name;
-                if (fieldName=="CreateTime")
+                if (fieldName == "Createdtime" || fieldName == "CreatedEmp" || fieldName == "UpdatedEmp" || fieldName == "Updatedtime")
                 {
                     continue;
                 }
@@ -264,12 +315,18 @@ namespace BihuApiCore.Repository.Repositories
                 //非值类型，跳过 
                 if (!ObjectExtession.IsValueType(pi.PropertyType)) continue;
 
+                //todo 这里可以自己定义一个Attribute 更专门 需要忽略掉的属性
+                if (Attribute.IsDefined(pi.PropertyType, typeof(DescriptionAttribute)))
+                {
+                    continue;
+                }
+
                 var piValue = pi.GetValue(entity);
 
                 var dpiValue = dpi.GetValue(data);
 
-                
-                if (piValue==null||dpiValue==null)
+
+                if (piValue == null || dpiValue == null)
                 {
                     if (piValue==null&&dpiValue==null)
                     {
