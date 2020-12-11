@@ -41,6 +41,14 @@ namespace BihuApiCore.Controllers
 
         #region 测试EF
 
+
+        [HttpGet]
+        public async Task<BaseResponse> TestCompareValueAndassign()
+        {
+            return SetStatusCode(await _sqlService.TestCompareValueAndassign());
+        }
+
+
         [HttpGet]
         public async Task<BaseResponse> TestSql()
         {
@@ -51,12 +59,6 @@ namespace BihuApiCore.Controllers
         public async Task<BaseResponse> ExecuteSqlCommandAsync()
         {
             return SetStatusCode(await _sqlService.ExecuteSqlCommandAsync());
-        }
-
-        [HttpGet]
-        public async Task<BaseResponse> TestCompareValueAndassign()
-        {
-            return SetStatusCode(await _sqlService.TestCompareValueAndassign());
         }
 
 
