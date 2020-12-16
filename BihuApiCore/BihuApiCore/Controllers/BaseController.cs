@@ -9,7 +9,7 @@ namespace BihuApiCore.Controllers
 //#if !DEBUG
 //      [Authorize]
 //#endif
-    //[Route("api/[controller]")]
+    [Route("api/[controller]")]
     public class BaseController : ControllerBase
     {
         /// <summary>
