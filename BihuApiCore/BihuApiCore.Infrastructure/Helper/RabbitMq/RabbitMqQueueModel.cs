@@ -30,7 +30,22 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// 消息类别
         /// </summary>
         public RabbitMsgKind MessageKind { get; set; } = RabbitMsgKind.Normal;
-        
+
+        /// <summary>
+        /// 是否使用自定义的特性队列名(false时使用根据环境和消息名的拼接名)
+        /// </summary>
+        public bool Customize { get; set; } = false;
+
+        /// <summary>
+        /// Exchange是否持久化
+        /// </summary>
+        public bool ExchangeDurable { get; set; } = false;
+
+        /// <summary>
+        /// Queue是否持久化 程序中通过判断生产环境把这个值改为true
+        /// </summary>
+        public bool QueueDurable { get; set; } = true;
+
         #region 普通消息
 
         /// <summary>

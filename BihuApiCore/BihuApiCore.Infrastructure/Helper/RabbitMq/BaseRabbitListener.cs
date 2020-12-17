@@ -21,7 +21,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         public BaseRabbitListener(RabbitMqClient mqClient)
         {
-            this.MqClient = mqClient;
+            MqClient = mqClient;
             GetMessageKind();
         }
 
@@ -67,28 +67,28 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public virtual Task Handle(T message)
+        public virtual Task Handle(T message, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        ///     注册消费者监听
+        ///  注册消费者监听
         /// </summary>
         /// <param name="cancellationToken"></param>
         protected void Register(CancellationToken cancellationToken)
         {
-            Func<T, Task> handler = Handle;
+            Func<T, CancellationToken, Task> handler = Handle;
             switch (MessageKind)
             {
                 case RabbitMsgKind.Normal:
-                    RabbitModel =MqClient.ReceiveMessage(handler);
+                    RabbitModel = MqClient.ReceiveMessage(handler, cancellationToken);
                     break;
                 case RabbitMsgKind.Delay:
-                    RabbitModel=MqClient.ReceiveMessageDelay(handler);
+                    RabbitModel = MqClient.ReceiveMessageDelay(handler, cancellationToken);
                     break;
                 case RabbitMsgKind.Dead:
-                    RabbitModel=MqClient.ReceiveMessageDead(handler);
+                    RabbitModel = MqClient.ReceiveMessageDead(handler, cancellationToken);
                     break;
             }
         }

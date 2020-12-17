@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -8,26 +9,27 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 
 namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 {
     /// <summary>
-    /// RabbitMQ客户端辅助类
+    /// RabbitMQ客户端辅助类   还可以再精简，参照我在壁虎signal3项目中的改造
     /// </summary>
-    public class RabbitMqClient:IDisposable
+    public class RabbitMqClient : IDisposable
     {
         #region 构造函数及字段
 
-        private readonly  IConnection _conn;
+        private readonly IConnection _conn;
 
         /// <summary>
         ///  Common AMQP model,usually call it channel
         /// </summary>
-        protected  readonly ConcurrentDictionary<string, IModel> ModelDic =new ConcurrentDictionary<string, IModel>();
+        protected readonly ConcurrentDictionary<string, IModel> ModelDicQueue = new ConcurrentDictionary<string, IModel>();
+
+        protected readonly ConcurrentDictionary<string, IModel> ModelDicExchange = new ConcurrentDictionary<string, IModel>();
 
         private readonly ILogger<RabbitMqClient> _logger;
-        private readonly  IHostingEnvironment _env;
+        private readonly IHostingEnvironment _env;
 
         /// <summary>
         /// 构造函数，单例启动
@@ -35,20 +37,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <param name="logger"></param>
         /// <param name="connectionFactory"></param>
         /// <param name="env"></param>
-        public RabbitMqClient(ILogger<RabbitMqClient> logger,ConnectionFactory connectionFactory,IHostingEnvironment env)
+        public RabbitMqClient(ILogger<RabbitMqClient> logger, ConnectionFactory connectionFactory, IHostingEnvironment env)
         {
-            _conn =_conn ?? connectionFactory.CreateConnection();
+            _conn = _conn ?? connectionFactory.CreateConnection();
             _logger = logger;
-            _env=env;
-            //string host = configuration.GetSection("EventBusConnection").Value;
-            //string userName = configuration.GetSection("EventBusUserName").Value;
-            //string pwd = configuration.GetSection("EventBusPassword").Value;
-            //Open(host, userName, pwd);
+            _env = env;
         }
 
         public void Dispose()
         {
-            foreach (var item in ModelDic) item.Value.Dispose();
+            foreach (var item in ModelDicQueue) item.Value.Dispose();
+            foreach (var item in ModelDicExchange) item.Value.Dispose();
             _conn.Dispose();
         }
 
@@ -64,12 +63,20 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         private RabbitMqQueueAttribute GetRabbitMqAttribute<T>()
         {
             var result1 = Attribute.GetCustomAttribute(typeof(T), typeof(RabbitMqQueueAttribute));
-            var result = result1!=null ? result1 as RabbitMqQueueAttribute : new RabbitMqQueueAttribute();
-            string rolekey= typeof(T).Name+$"_{_env.EnvironmentName}_";
+            var result = result1 != null ? result1 as RabbitMqQueueAttribute : new RabbitMqQueueAttribute();
+            if (result.Customize)
+            {
+                //暂时先只定义直接发送模式
+                result.RouteKey = result.RouteKey;
+                result.QueueName = result.QueueName;
+                result.ExchangeName = result.ExchangeName;
+                return result;
+            }
+            string rolekey = typeof(T).Name + $"_{_env.EnvironmentName}_";
             result.RouteKey = rolekey;
             result.DelayRouteKey = rolekey;
             result.DeadRouteKey = rolekey;
-            result.QueueName = string.Concat(result.QueueName,"_", rolekey);
+            result.QueueName = string.Concat(result.QueueName, "_", rolekey);
             result.DelayQueueName = string.Concat(result.DelayQueueName, "_", rolekey);
             result.DeadQueueName = string.Concat(result.DeadQueueName, $"_", rolekey);
 
@@ -77,92 +84,71 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         }
 
         /// <summary>
-        ///  获取或新增Model 也叫channel
+        ///  获取或新增Model 也叫channel   
         /// </summary>
         /// <param name="exchange">交换机名称</param>
-        /// <param name="queue">队列名称</param>
-        /// <param name="routingKey">匹配规则</param>
         /// <param name="exchangeType">交换机类型 direct</param>
         /// <param name="durable">是否持久化</param>
-        /// <param name="autoDelete"></param>
+        /// <param name="autoDelete">当所有绑定队列都不在使用时，是否自动删除交换器 true：删除false：不删除</param>
         /// <param name="exchangeArgs"></param>
-        /// <param name="queueArgs"></param>
         /// <returns></returns>
-        private IModel GetOrAddModel(string exchange, string queue, string routingKey, string exchangeType,
-            bool durable = true,
-            bool autoDelete = false, IDictionary<string, object> exchangeArgs = null,
-            IDictionary<string, object> queueArgs = null)
+        private IModel GetOrAddModelPublish(string exchange, string exchangeType, bool durable = false, bool autoDelete = false, IDictionary<string, object> exchangeArgs = null)
         {
-            return ModelDic.GetOrAdd(queue, key =>
+            exchange = exchange.Trim();
+            return ModelDicExchange.GetOrAdd(exchange, key =>
             {
                 var model = _conn.CreateModel();
-                //声明订阅通道
-                ExchangeDeclare(model, exchange, exchangeType, durable, autoDelete, exchangeArgs);
-               
-                QueueDeclare(model, queue, durable, autoDelete, queueArgs);
-                //绑定队列
-                model.QueueBind(queue, exchange, routingKey);
-                ModelDic[queue] = model;
+                //声明订阅通道  这里不涉及发布，所以不声明了，直接使用壁虎的交换机
+                model.ExchangeDeclare(exchange, exchangeType, durable, autoDelete, exchangeArgs);
+                ModelDicExchange[exchange] = model;
                 return model;
             });
         }
 
-        private void ExchangeDeclare(IModel iModel, string exchange, string type, bool durable = true,
-            bool autoDelete = false, IDictionary<string, object> arguments = null)
+        /// <summary>
+        ///  获取或新增Model 也叫channel   这里发送和接收应该分开。
+        /// </summary>
+        /// <param name="exchange">交换机名称</param>
+        /// <param name="queue">队列名称</param>
+        /// <param name="routingKey">匹配规则</param>
+        /// <param name="durable">是否持久化</param>
+        /// <param name="autoDelete">当所有消费客户端连接断开后，是否自动删除队列 true：删除false：不删除</param>
+        /// <param name="queueArgs"></param>
+        /// <returns></returns>
+        private IModel GetOrAddModelConsumer(string exchange, string queue, string routingKey, bool durable = false, bool autoDelete = false, IDictionary<string, object> queueArgs = null)
         {
-            exchange = string.IsNullOrWhiteSpace(exchange) ? "" : exchange.Trim();
-            iModel.ExchangeDeclare(exchange, type, durable, autoDelete, arguments);
+            queue = queue.Trim();
+            if (_env.IsProduction())
+            {
+                autoDelete = false;
+                durable = true;
+            }
+            return ModelDicQueue.GetOrAdd(queue, key =>
+            {
+                var model = _conn.CreateModel();
+                model.QueueDeclare(queue, durable, false, autoDelete, queueArgs);
+                //绑定队列
+                model.QueueBind(queue, exchange, routingKey);
+                ModelDicQueue[queue] = model;
+                return model;
+            });
         }
-
-        private void QueueDeclare(IModel channel, string queue, bool durable = true, bool autoDelete = false,
-            IDictionary<string, object> arguments = null, bool exclusive = false)
-        {
-            queue = string.IsNullOrWhiteSpace(queue) ? "UndefinedQueueName" : queue.Trim();
-            channel.QueueDeclare(queue, durable, exclusive, autoDelete, arguments);
-        }
-
-        #region 单例创建连接工厂，已经改为di 单例
-
-        //private static readonly object LockObj = new object();
-
-        ///// <summary>
-        ///// 单例创建ConnectionFactory  这里直接用di ConnectionFactory的单例就行
-        ///// </summary>
-        ///// <param name="host"></param>
-        ///// <param name="userName"></param>
-        ///// <param name="pwd"></param>
-        //private void Open(string host, string userName, string pwd)
-        //{
-        //    if (_conn != null) return;
-        //    lock (LockObj)
-        //    {
-        //        if (_conn != null) return;
-        //        // 不过这个写法也留着吧 这都是不同的方法，无关大局
-        //        var factory = new ConnectionFactory
-        //        {
-        //            HostName = host,
-        //            UserName = userName,
-        //            Password = pwd,
-        //            AutomaticRecoveryEnabled = true,
-        //            RequestedHeartbeat = 15
-        //        };
-        //        _conn = _conn ?? factory.CreateConnection();
-        //    }
-        //}
 
         #endregion
 
-        #endregion
+        #region 普通发送消息
 
-        #region 普通收发消息
-
+        /// <summary>
+        /// 使用模型推导queueInfo
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="messageObj"></param>
         public void SendMessage<T>(T messageObj) where T : class
         {
             var queueInfo = GetRabbitMqAttribute<T>();
-            if (queueInfo == null|| queueInfo.MessageKind != RabbitMsgKind.Normal)
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
-            var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
-                queueInfo.ExchangeType, queueInfo.Durable);
+            var channel = GetOrAddModelPublish(queueInfo.ExchangeName, queueInfo.ExchangeType, queueInfo.ExchangeDurable);
             var properties = channel.CreateBasicProperties();
             properties.DeliveryMode = 2;//数据持久化
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
@@ -170,7 +156,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         }
 
         /// <summary>
-        /// 发送消息
+        /// 发送消息  自定义的queueInfo
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="messageObj"></param>
@@ -179,8 +165,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         {
             if (queueInfo == null)
                 throw new ArgumentException("消息上不具有任何特性");
-            var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
-                queueInfo.ExchangeType, queueInfo.Durable);
+            var channel = GetOrAddModelPublish(queueInfo.ExchangeName, queueInfo.ExchangeType, queueInfo.Durable);
             var properties = channel.CreateBasicProperties();
             properties.DeliveryMode = 2;
             channel.ConfirmSelect();
@@ -202,7 +187,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <param name="publishTime">消息推送时间，即服务接收到消息的时间</param>
         public void SendMessageDelay<T>(T messageObj, DateTime publishTime) where T : class
         {
-            long delay = (long) (publishTime - DateTime.Now).TotalSeconds;
+            long delay = (long)(publishTime - DateTime.Now).TotalSeconds;
             SendMessageDelay(messageObj, delay);
         }
 
@@ -223,17 +208,17 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             {
                 {"x-delayed-type", "direct"}
             };
-            var channel = GetOrAddModel(queueInfo.DelayExchangeName, queueInfo.DelayQueueName, queueInfo.DelayRouteKey,
-                queueInfo.DelayExchangeType, queueInfo.Durable, false, args);
-            var properties = channel.CreateBasicProperties();
+            var channelPublish = GetOrAddModelPublish(queueInfo.DelayExchangeName, queueInfo.DelayExchangeType, queueInfo.ExchangeDurable, false, args);
+
+            var properties = channelPublish.CreateBasicProperties();
             properties.Headers = new Dictionary<string, object>
             {
-                {"x-delay", (seconds*1000)}
+                {"x-delay", seconds*1000}
             };
             properties.DeliveryMode = 2;
-      
+
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
-            channel.BasicPublish(queueInfo.DelayExchangeName, queueInfo.DelayRouteKey, properties, body);
+            channelPublish.BasicPublish(queueInfo.DelayExchangeName, queueInfo.DelayRouteKey, properties, body);
         }
 
         #endregion
@@ -248,7 +233,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         /// <param name="publishTime">消息推送时间，即服务接收到消息的时间</param>
         public void SendMessageDead<T>(T messageObj, DateTime publishTime) where T : class
         {
-            long delay = (long) (publishTime - DateTime.Now).TotalMilliseconds;
+            long delay = (long)(publishTime - DateTime.Now).TotalMilliseconds;
             SendMessageDead(messageObj, delay);
         }
 
@@ -261,7 +246,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
         public void SendMessageDead<T>(T messageObj, long milliseconds) where T : class
         {
             var queueInfo = GetRabbitMqAttribute<T>();
-            if (queueInfo == null||queueInfo.MessageKind!=RabbitMsgKind.Dead)
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Dead)
                 throw new ArgumentException("消息上不具有任何特性");
 
             //延迟队列参数，必须
@@ -271,12 +256,14 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
                 {"x-dead-letter-routing-key", queueInfo.DeadRouteKey},
                 {"x-message-ttl", milliseconds}, // 这个时间要一致 //单位毫秒！！
                 {"x-expires", milliseconds+5000},//单位毫秒！！
+                //Auto Expire(x-expires):当队列在指定的时间没有被访问(consume, basicGet, queueDeclare…)就会被删除
             };
- 
+
             //创建一个名叫"wait_dead_queuexxxxxx"的固定等死消息队列
-            string queueName ="wait_dead_queue"+Guid.NewGuid().ToString();
+            string queueName = "wait_dead_queue" + Guid.NewGuid().ToString();
             var model = _conn.CreateModel();
-            model.QueueDeclare(queueName, false,false, true, queueArgs);
+            //这里如果自动删除，可能导致延时消息出现问题  durable为true 那么队列肯定会存活到消息发送，而且我们设置了
+            model.QueueDeclare(queueName, true, false, false, queueArgs);
             var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageObj));
             //发送消息到等死队列
             model.BasicPublish("", queueName, null, body);
@@ -286,70 +273,60 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
 
         #region 消息接收
 
-        public void ReceiveMessage<T>(Func<T, CancellationToken, Task> handler)
-        {
-            var queueInfo = GetRabbitMqAttribute<T>();
-
-            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
-                throw new ArgumentException("消息上不具有任何特性");
-            if (handler == null) throw new NullReferenceException("处理事件为null");
-            var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
-                queueInfo.ExchangeType, queueInfo.Durable);
-            channel.BasicQos(0, 1, false);
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.QueueName, false, consumer);
-            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
-        }
-
-        public IModel ReceiveMessage<T>(Func<T, Task> handler)
+        public IModel ReceiveMessage<T>(Func<T, CancellationToken, Task> handler, CancellationToken cancellationToken)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
             if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Normal)
                 throw new ArgumentException("消息上不具有任何特性");
             if (handler == null) throw new NullReferenceException("处理事件为null");
-            var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
-                queueInfo.ExchangeType, queueInfo.Durable);
-            //同一时间不处理超过一条消息
-            channel.BasicQos(0, 1, false);
+            var channelPublish = GetOrAddModelPublish(queueInfo.ExchangeName, queueInfo.ExchangeType, queueInfo.ExchangeDurable);
+            var channel = GetOrAddModelConsumer(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey, queueInfo.QueueDurable);
+
+            //同一时间不处理超过10条消息  
+            channel.BasicQos(0, 10, false);
             var consumer = new EventingBasicConsumer(channel);
             //autoAck =true 自动应答，一旦我们完成任务，消费者会自动发送应答。通知RabbitMQ消息已被处理，可以从内存删除
             channel.BasicConsume(queueInfo.QueueName, false, consumer);
-            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler, cancellationToken); };
             return channel;
         }
 
-        /// <summary>
-        ///  接收消息
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="queueInfo"></param>
-        /// <param name="handler"></param>
-        public IModel ReceiveMessage<T>(RabbitMqQueueModel queueInfo, Func<T, CancellationToken, Task> handler)
-        {
-            if (queueInfo == null)
-                throw new ArgumentException("消息上不具有任何特性");
-            if (handler == null) throw new NullReferenceException("处理事件为null");
-            var channel = GetOrAddModel(queueInfo.ExchangeName, queueInfo.QueueName, queueInfo.RouteKey,
-                queueInfo.ExchangeType, queueInfo.Durable);
-            channel.BasicQos(0, 1, false);
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.QueueName, false, consumer);
-            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
-            return channel;
-        }
 
         #region 延时消息
+
+        /// <summary>
+        ///  接收延迟消息 通过死信方式
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public IModel ReceiveMessageDead<T>(Func<T, CancellationToken, Task> handler, CancellationToken cancellationToken)
+        {
+            var queueInfo = GetRabbitMqAttribute<T>();
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Dead)
+                throw new ArgumentException("消息上不具有任何特性");
+
+            if (handler == null) throw new NullReferenceException("处理事件为null");
+            var channelPublish = GetOrAddModelPublish(queueInfo.DeadExchangeName, queueInfo.DeadExchangeType, queueInfo.ExchangeDurable);
+            var channel = GetOrAddModelConsumer(queueInfo.DeadExchangeName, queueInfo.DeadQueueName, queueInfo.DeadRouteKey, queueInfo.QueueDurable);
+
+            //同一时间不处理超过20条消息
+            channel.BasicQos(0, 20, false);
+            var consumer = new EventingBasicConsumer(channel);
+            channel.BasicConsume(queueInfo.DeadQueueName, false, consumer);
+            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler, cancellationToken); };
+            return channel;
+        }
 
         /// <summary>
         ///     接收延迟消息，通过 通过插件rabbitmq-delayed-message-exchange实现
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler"></param>
-        public IModel ReceiveMessageDelay<T>(Func<T, Task> handler)
+        public IModel ReceiveMessageDelay<T>(Func<T, CancellationToken, Task> handler, CancellationToken cancellationToken)
         {
             var queueInfo = GetRabbitMqAttribute<T>();
 
-            if (queueInfo == null|| queueInfo.MessageKind!=RabbitMsgKind.Delay)
+            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Delay)
                 throw new ArgumentException("消息上不具有任何特性");
             if (handler == null) throw new NullReferenceException("处理事件为null");
             //延迟队列参数，必须
@@ -358,49 +335,28 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             {
                 {"x-delayed-type", "direct"}
             };
-            var channel = GetOrAddModel(queueInfo.DelayExchangeName, queueInfo.DelayQueueName, queueInfo.DelayRouteKey,
-                queueInfo.DelayExchangeType, queueInfo.Durable, false, args);
+
+            var channelPublish = GetOrAddModelPublish(queueInfo.DelayExchangeName, queueInfo.DelayExchangeType, queueInfo.ExchangeDurable, false, args);
+            var channel = GetOrAddModelConsumer(queueInfo.DelayExchangeName, queueInfo.DelayQueueName, queueInfo.DelayRouteKey, queueInfo.QueueDurable, false);
 
             var consumer = new EventingBasicConsumer(channel);
             channel.BasicConsume(queueInfo.DelayQueueName, false, consumer);
-            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
-            return channel;
-        }
-
-        /// <summary>
-        ///  接收延迟消息 通过死信方式
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="handler"></param>
-        public IModel ReceiveMessageDead<T>(Func<T, Task> handler)
-        {
-            var queueInfo = GetRabbitMqAttribute<T>();
-            if (queueInfo == null || queueInfo.MessageKind != RabbitMsgKind.Dead)
-                throw new ArgumentException("消息上不具有任何特性");
-
-            if (handler == null) throw new NullReferenceException("处理事件为null");
-
-            var channel = GetOrAddModel(queueInfo.DeadExchangeName, queueInfo.DeadQueueName, queueInfo.DeadRouteKey,
-                queueInfo.DeadExchangeType, queueInfo.Durable);
-            //同一时间不处理超过20条消息
-            channel.BasicQos(0, 20, false);
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume(queueInfo.DeadQueueName, false, consumer);
-            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler); };
+            consumer.Received += async (model, ea) => { await _doAsync(channel, ea, handler, cancellationToken); };
             return channel;
         }
 
         #endregion
-        
+
+        #region 消费委托封装
 
         private async Task _doAsync<T>(IModel channel, BasicDeliverEventArgs ea,
-            Func<T, CancellationToken, Task> normalHandler)
+           Func<T, CancellationToken, Task> normalHandler, CancellationToken cancellationToken)
         {
             var body = ea.Body;
             try
             {
-                var msgBody =JsonConvert.DeserializeObject<T>( Encoding.UTF8.GetString(body));
-                await normalHandler(msgBody, default(CancellationToken));
+                var msgBody = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(body));
+                await normalHandler(msgBody, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -413,25 +369,7 @@ namespace BihuApiCore.Infrastructure.Helper.RabbitMq
             }
         }
 
-
-        private async Task _doAsync<T>(IModel channel, BasicDeliverEventArgs ea,
-            Func<T, Task> normalHandler)
-        {
-            try
-            {
-                var msgBody =JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(ea.Body));
-                await normalHandler(msgBody);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"_doAsync处理异常：" + ex.Source + Environment.NewLine + ex.StackTrace + Environment.NewLine + ex.Message + Environment.NewLine + ex.InnerException);
-            }
-            finally
-            {
-                //如果autoAck =true 可以不用再次确认收到
-                channel.BasicAck(ea.DeliveryTag, false);
-            }
-        }
+        #endregion
 
         #endregion
     }
