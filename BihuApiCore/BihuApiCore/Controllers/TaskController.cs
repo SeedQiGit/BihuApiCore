@@ -45,7 +45,8 @@ namespace BihuApiCore.Controllers
 
                 //如果在异步代码中直接赋值i，i都会是5。。。。。哈哈
                 int a = i;
-                //如果直接用worker.Run(); 不会新起现场，而是还是用主线程执行。
+                //如果直接用worker.Run(); 不会新起现场，而是还是用主线程执行。这是因为不await .asycn就没用，跟同步方法一样，所以就同步执行了。
+                //asycn await主要解决的是异步，而不是多线程，所以你还要用Task.Run 来指定对线程执行
                 //Task.Run(async () =>
                 //{
                 //    await worker.Run(a);
