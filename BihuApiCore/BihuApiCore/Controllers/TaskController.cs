@@ -20,6 +20,42 @@ namespace BihuApiCore.Controllers
 
         }
 
+
+        public async Task<BaseResponse> BatchTask()
+        {
+            List<ModulusClass> all = new List<ModulusClass>();
+            //假设有100个任务
+            for (int i = 0; i < 100; i++)
+            {
+                ModulusClass item = new ModulusClass();
+                item.Key = i % 5;
+                item.Value = i;
+                all.Add(item);
+            }
+
+            var workList = all.GroupBy(c => c.Key).Select(g => g.ToList()).ToList();
+
+            List<Task<BaseResponse>> taskList = new List<Task<BaseResponse>>();
+
+            foreach (var item in workList)
+            {
+                var w = Task.Run(async () =>
+                {
+                    //这里实际执行任务，并返回结果
+                    return BaseResponse.Ok();
+                });
+
+                taskList.Add(w);
+            }
+
+
+            await Task.WhenAll(taskList);
+
+            return BaseResponse.Ok();
+        }
+
+
+
         /// <summary>
         /// 测试get 同步  重试
         /// </summary>
