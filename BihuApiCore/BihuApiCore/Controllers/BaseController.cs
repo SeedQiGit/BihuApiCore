@@ -9,7 +9,7 @@ namespace BihuApiCore.Controllers
 //#if !DEBUG
 //      [Authorize]
 //#endif
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")] 这里我用的mvc控制器，所以不要加route
     public class BaseController : ControllerBase
     {
         /// <summary>

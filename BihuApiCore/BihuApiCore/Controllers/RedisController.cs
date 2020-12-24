@@ -2,8 +2,10 @@
 using BihuApiCore.Infrastructure.Extensions.Redis;
 using BihuApiCore.Model.Response;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,8 +16,9 @@ namespace BihuApiCore.Controllers
         private readonly IDatabase _database;
         private readonly RedisCacheClient _client;
         private readonly ConnectionMultiplexer _redis;
+        private readonly ILogger<RedisController> _logger;
 
-        public RedisController( RedisCacheClient client , ConnectionMultiplexer redis)
+        public RedisController( RedisCacheClient client , ConnectionMultiplexer redis, ILogger<RedisController> logger)
         {
             //这种获取每次都要连接一次redis
             //可以考虑实际使用的时候再GetDatabase
@@ -25,6 +28,7 @@ namespace BihuApiCore.Controllers
             //直接ConnectionMultiplexer单例。
             _redis = redis;
             _database = _redis.GetDatabase();
+            _logger = logger;
         }
 
 
@@ -40,7 +44,59 @@ namespace BihuApiCore.Controllers
         public async Task<BaseResponse> CSRedisLock()
         {
             var lockKey = "test";
-            var rlock = RedisHelper.Lock(lockKey, 10);
+
+            List<Task> taskList = new List<Task>();
+
+            var w = Task.Run(async () =>
+            {
+                var rlock = RedisHelper.Lock(lockKey, 10);
+                if (rlock != null)
+                {
+                    _logger.LogInformation("成功获取锁");
+                }
+                else 
+                {
+                    _logger.LogInformation("获取锁失败");
+                }
+                Thread.Sleep(10000);
+                //不释放的情况下，再次请求这个接口，会获取不到锁。具体什么时候自动释放，不确定。应该跟那个看门狗线程或者是c#线程回收有关。但是这种不受控的情况还是避免发生，所以要释放。
+                rlock?.Unlock();
+            });
+
+            taskList.Add(w);
+
+            var a = Task.Run(async () =>
+            {
+                Thread.Sleep(1000);
+                var rlock = RedisHelper.Lock(lockKey, 5);
+                if (rlock != null)
+                {
+                    _logger.LogInformation("获取锁成功1");
+                }
+                else
+                {
+                    _logger.LogInformation("获取锁失败1");
+                }
+                Thread.Sleep(5000);
+                rlock?.Unlock();
+                var rlock2 = RedisHelper.Lock(lockKey, 5);
+                if (rlock2 != null)
+                {
+                    _logger.LogInformation("获取锁成功2");
+                }
+                else
+                {
+                    _logger.LogInformation("获取锁失败2");
+                }
+                rlock2?.Unlock();
+            });
+
+            taskList.Add(a);
+            for (int i = 0; i < 2; i++)
+            {
+                
+            }
+            await Task.WhenAll(taskList);
 
             return BaseResponse.Ok();
         }

@@ -389,9 +389,9 @@ namespace BihuApiCore
         private void ConfigureRabbitMqClient(IServiceCollection services)
         {
             services.AddSingleton<RabbitMqClient>();
-            services.AddHostedService<NormalEventHandler>();
-            services.AddHostedService<DeadEventHandler>();
-            services.AddHostedService<DelayEventHandler>();
+            //services.AddHostedService<NormalEventHandler>();
+            //services.AddHostedService<DeadEventHandler>();
+            //services.AddHostedService<DelayEventHandler>();
         }
 
         #endregion
