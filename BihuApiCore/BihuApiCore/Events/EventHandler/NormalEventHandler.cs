@@ -20,7 +20,7 @@ namespace BihuApiCore.Events.EventHandler
           
         }
 
-        public override async Task Handle(NormalEvent message)
+        public override async Task Handle(NormalEvent message,CancellationToken cancellationToken)
         {
             try
             {

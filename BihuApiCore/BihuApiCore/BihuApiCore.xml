@@ -246,6 +246,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:BihuApiCore.Controllers.RedisController.CSRedisLock">
+            <summary>
+            测试
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:BihuApiCore.Controllers.RedisController.Test">
             <summary>
             测试

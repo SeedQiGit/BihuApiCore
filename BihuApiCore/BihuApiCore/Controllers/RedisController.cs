@@ -27,6 +27,29 @@ namespace BihuApiCore.Controllers
             _database = _redis.GetDatabase();
         }
 
+
+        #region CSRedis
+
+        #region Lock
+
+        /// <summary>
+        /// 测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<BaseResponse> CSRedisLock()
+        {
+            var lockKey = "test";
+            var rlock = RedisHelper.Lock(lockKey, 10);
+
+            return BaseResponse.Ok();
+        }
+
+        #endregion
+
+        #endregion
+
+
         /// <summary>
         /// 测试
         /// </summary>

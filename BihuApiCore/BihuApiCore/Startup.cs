@@ -200,6 +200,10 @@ namespace BihuApiCore
             var redis = ConnectionMultiplexer.Connect(connectionString);
             services.AddSingleton(redis);
 
+            var csredis = new CSRedis.CSRedisClient(Configuration["CSRedis"]);
+            RedisHelper.Initialization(csredis);
+
+
             #endregion
 
             #region 配置rabbitmq
