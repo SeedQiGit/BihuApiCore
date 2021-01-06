@@ -208,7 +208,7 @@ namespace BihuApiCore
 
             #region 配置rabbitmq
 
-            services.AddRabbitmq(Configuration);
+            //services.AddRabbitmq(Configuration);
 
             #endregion
 
@@ -241,7 +241,7 @@ namespace BihuApiCore
 
             #endregion
 
-            ConfigureRabbitMqClient(services);
+            //ConfigureRabbitMqClient(services);
         }
         static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         {
